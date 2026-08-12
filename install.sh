@@ -23,10 +23,20 @@ BIN="camne_${os}_${arch}"
 TMP=$(mktemp -d)
 trap 'rm -rf "$TMP"' EXIT
 
+# Retry wrapper: flaky connections drop mid-transfer, and curl's --retry-all-errors
+# needs 7.71+. fetch <output> <url>
+fetch() {
+	for _try in 1 2 3; do
+		curl -fsSL -o "$1" "$2" && return 0
+		sleep 2
+	done
+	return 1
+}
+
 # The /releases/latest/download alias is flaky on some networks; resolve the
 # tag via the API and use the versioned URL instead.
-TAG=$(curl -fsSL "https://api.github.com/repos/$REPO/releases/latest" |
-	sed -n 's/^[[:space:]]*"tag_name":[[:space:]]*"\([^"]*\)".*/\1/p' | head -1)
+fetch "$TMP/release.json" "https://api.github.com/repos/$REPO/releases/latest" || true
+TAG=$(sed -n 's/^[[:space:]]*"tag_name":[[:space:]]*"\([^"]*\)".*/\1/p' "$TMP/release.json" 2>/dev/null | head -1)
 if [ -z "$TAG" ]; then
 	echo "Tak jumpa release terbaru. Semak internet anda dan cuba lagi." >&2
 	exit 1
@@ -34,7 +44,7 @@ fi
 BASE="https://github.com/$REPO/releases/download/$TAG"
 
 echo "Muat turun camne $TAG ($os/$arch)..."
-if ! curl -fsSL -o "$TMP/$BIN" "$BASE/$BIN" || ! curl -fsSL -o "$TMP/checksums.txt" "$BASE/checksums.txt"; then
+if ! fetch "$TMP/$BIN" "$BASE/$BIN" || ! fetch "$TMP/checksums.txt" "$BASE/checksums.txt"; then
 	echo "Muat turun gagal. Semak internet anda dan cuba lagi." >&2
 	exit 1
 fi
