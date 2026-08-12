@@ -1,15 +1,20 @@
 // camne turns plain Malay into a shell command.
 //
-// Milestone 1 skeleton: a hardcoded keyword table stands in for the model.
-// It only ever prints a command; nothing is executed.
+// The query path: make sure llama-server and the model are provisioned
+// (asking consent before any download), ask the resident model, safety-check
+// the answer, and PRINT it. Nothing is ever executed (constraint 5).
 package main
 
 import (
 	"fmt"
+	"io"
 	"os"
 	"strings"
+	"time"
 
+	"github.com/officialdad/camne/internal/engine"
 	"github.com/officialdad/camne/internal/provision"
+	"github.com/officialdad/camne/internal/safety"
 )
 
 // version is stamped by scripts/build.sh via -ldflags.
@@ -21,22 +26,83 @@ func main() {
 		usage()
 		os.Exit(1)
 	}
-	if args[0] == "--version" || args[0] == "-v" {
+	switch args[0] {
+	case "--version", "-v":
 		fmt.Println("camne " + version)
 		return
-	}
-	if args[0] == "doctor" {
+	case "doctor":
 		doctor()
 		return
+	case "stop":
+		stop()
+		return
 	}
-	q := strings.ToLower(strings.Join(args, " "))
-	cmd, ok := guess(q)
-	if !ok {
-		fmt.Fprintln(os.Stderr, "camne belum faham soalan tu lagi — model penuh datang dalam versi seterusnya.")
-		fmt.Fprintln(os.Stderr, "Cuba contoh: camne nak buat file baru")
+	os.Exit(run(strings.Join(args, " ")))
+}
+
+// run answers one query end to end. Errors from the packages below are
+// already colloquial Malay, so they are printed as-is.
+func run(query string) int {
+	st, err := provision.GetStatus()
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		return 1
+	}
+	if !st.ServerOK || !st.ModelOK {
+		if !ensureProvisioned(st) {
+			return 1
+		}
+	}
+	cli, cold, err := engine.Connect(st.ServerPath, st.ModelPath)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		return 1
+	}
+	if cold {
+		fmt.Fprintln(os.Stderr, "Sekejap ya — model tengah load. Soalan pertama je yang lambat sikit.")
+	}
+	if err := cli.WaitReady(2 * time.Minute); err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		return 1
+	}
+	cmd, err := cli.Complete(query)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		return 1
+	}
+	render(os.Stdout, os.Stderr, cmd, safety.Check(cmd))
+	return 0
+}
+
+// render prints safety warnings to errw and the command itself to out — and
+// that is ALL camne ever does with a command: print it. Danger findings get
+// the BAHAYA banner and must never be auto-run (constraint 5).
+func render(out, errw io.Writer, cmd string, findings []safety.Finding) {
+	for _, f := range findings {
+		if f.Level == safety.LevelDanger {
+			fmt.Fprintf(errw, "  !! BAHAYA  %s\n", f.Reason)
+		}
+	}
+	for _, f := range findings {
+		if f.Level == safety.LevelCaution {
+			fmt.Fprintf(errw, "  !  Awas: %s\n", f.Reason)
+		}
+	}
+	fmt.Fprintln(out, cmd)
+}
+
+// stop shuts the resident llama-server down.
+func stop() {
+	stopped, err := engine.Stop()
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
-	fmt.Println(cmd)
+	if stopped {
+		fmt.Println("Ok, llama-server dah dihentikan.")
+	} else {
+		fmt.Println("Takde llama-server yang tengah jalan pun.")
+	}
 }
 
 // doctor reports what is provisioned and what is missing. Diagnostic only —
@@ -67,8 +133,8 @@ func doctor() {
 		fmt.Println("Semua lengkap — camne sedia untuk digunakan.")
 		return
 	}
-	fmt.Println("Tak perlu buat apa-apa sekarang: bila engine siap (versi seterusnya),")
-	fmt.Println("camne akan tanya kebenaran anda dulu, lepas tu download sendiri apa yang tiada.")
+	fmt.Println("Taip je soalan anda — camne akan tanya kebenaran dulu, lepas tu")
+	fmt.Println("download sendiri apa yang tiada.")
 }
 
 func usage() {
@@ -79,6 +145,7 @@ Contoh:  camne nak buat file baru
          camne cari file dalam folder ni
 
 Lain:    camne doctor   — semak apa yang dah dipasang
+         camne stop     — hentikan model yang duduk dalam memory
 
 camne hanya tunjuk command — ia tak jalankan apa-apa.
 `)
