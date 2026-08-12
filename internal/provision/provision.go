@@ -1,0 +1,132 @@
+// Package provision is the zero-setup subsystem (PROMPT.md §4.3): it knows
+// where camne's cache lives, which pinned llama.cpp build and GGUF model to
+// fetch for this machine, and how to download, verify, and unpack them.
+// Everything is verified against a pinned sha256 BEFORE it is unpacked,
+// renamed, or executed. Nothing in this package executes anything.
+package provision
+
+import (
+	"fmt"
+	"os"
+	"path/filepath"
+	"runtime"
+)
+
+// Pinned llama.cpp release tag. A new upstream build can change behaviour
+// without warning, so camne never tracks "latest".
+const llamaBuild = "b10333"
+
+// The English NL2SH model, used deliberately until the BM bake-off
+// (PROMPT.md §8, milestone 3). Swapping the model means changing these three
+// consts and nothing else.
+const (
+	ModelFile   = "nl2sh-1.5b-Q4_K_M.gguf"
+	ModelURL    = "https://huggingface.co/ThorOdinson246/nl2sh-1.5b-Q4_K_M/resolve/main/" + ModelFile
+	ModelSHA256 = "6f8a17a11129a31074c944f4c2602453fafd9de43bdaeb1630a8f511ec820f71"
+	// ModelSize is the exact GGUF byte size, from the Hugging Face LFS
+	// metadata for the pinned revision.
+	ModelSize int64 = 986048000
+)
+
+// Asset is one llama.cpp release file for a specific platform.
+type Asset struct {
+	Name   string // release asset file name
+	SHA256 string
+	Size   int64
+}
+
+// URL is the direct release-asset download URL for the pinned build.
+func (a Asset) URL() string {
+	return "https://github.com/ggml-org/llama.cpp/releases/download/" + llamaBuild + "/" + a.Name
+}
+
+// llamaAssets maps GOOS/GOARCH to the release asset for the pinned build.
+// Digests and sizes come from the GitHub release API for that tag, hardcoded
+// so provisioning never depends on the rate-limited API at runtime.
+var llamaAssets = map[string]Asset{
+	"linux/amd64":   {"llama-" + llamaBuild + "-bin-ubuntu-x64.tar.gz", "936ce04d98abe2a977e9dd2ff92659bb96947e136acee8f2bc3e21d8eaebbf23", 16507165},
+	"linux/arm64":   {"llama-" + llamaBuild + "-bin-ubuntu-arm64.tar.gz", "95da1a0f7538340f625b0301593ee63c046ec0a155c74f21444ea4d43bca79a1", 13377770},
+	"darwin/amd64":  {"llama-" + llamaBuild + "-bin-macos-x64.tar.gz", "6ffd9e0b9b2e3ab6ccfba332a74b968b0fef891f01bd4747d3d75bc7393877ea", 11290712},
+	"darwin/arm64":  {"llama-" + llamaBuild + "-bin-macos-arm64.tar.gz", "e5d67c5264107e3c14d3bf2aee349365bb2b85ae99bb077a0cb974a1c4c2741a", 11015270},
+	"windows/amd64": {"llama-" + llamaBuild + "-bin-win-cpu-x64.zip", "563ab97cd003cf7cd4843677e6fea2f6162aee0c9580589c8d9e5816923076d5", 18399512},
+	"windows/arm64": {"llama-" + llamaBuild + "-bin-win-cpu-arm64.zip", "6497bfecd5926f48b816a65a8f8e21e613f822850361ab7bdaf33b0489025235", 12237230},
+}
+
+// LlamaAsset picks the llama.cpp release asset for a platform.
+func LlamaAsset(goos, goarch string) (Asset, error) {
+	a, ok := llamaAssets[goos+"/"+goarch]
+	if !ok {
+		return Asset{}, fmt.Errorf("camne belum support %s/%s lagi — buka issue kat GitHub kalau anda perlukan platform ni", goos, goarch)
+	}
+	return a, nil
+}
+
+// Dir is camne's cache root: os.UserCacheDir()/camne. Layout:
+//
+//	bin/llama-<build>/   the unpacked llama.cpp runtime, versioned so an
+//	                     upgrade never overwrites a working install
+//	models/              GGUF files
+func Dir() (string, error) {
+	c, err := os.UserCacheDir()
+	if err != nil {
+		return "", fmt.Errorf("tak jumpa folder cache sistem: %w", err)
+	}
+	return filepath.Join(c, "camne"), nil
+}
+
+func serverBinary() string {
+	if runtime.GOOS == "windows" {
+		return "llama-server.exe"
+	}
+	return "llama-server"
+}
+
+// ServerPath is where the llama-server binary lives once unpacked.
+func ServerPath() (string, error) {
+	d, err := Dir()
+	if err != nil {
+		return "", err
+	}
+	return filepath.Join(d, "bin", "llama-"+llamaBuild, serverBinary()), nil
+}
+
+// ModelPath is where the GGUF lives once downloaded.
+func ModelPath() (string, error) {
+	d, err := Dir()
+	if err != nil {
+		return "", err
+	}
+	return filepath.Join(d, "models", ModelFile), nil
+}
+
+// Status reports what is already provisioned. Used by `camne doctor`.
+type Status struct {
+	CacheDir   string
+	ServerPath string
+	ServerOK   bool
+	ModelPath  string
+	ModelOK    bool
+	LibcNote   string // non-empty when this Linux libc cannot run the prebuilt
+}
+
+// GetStatus inspects the cache. It changes nothing.
+func GetStatus() (Status, error) {
+	var st Status
+	d, err := Dir()
+	if err != nil {
+		return st, err
+	}
+	st.CacheDir = d
+	st.ServerPath, _ = ServerPath()
+	if fi, err := os.Stat(st.ServerPath); err == nil && !fi.IsDir() {
+		st.ServerOK = true
+	}
+	st.ModelPath, _ = ModelPath()
+	// Size check only: the full sha256 was verified before the file got this
+	// name, and hashing ~1 GB on every doctor run would be slower than useful.
+	if fi, err := os.Stat(st.ModelPath); err == nil && fi.Size() == ModelSize {
+		st.ModelOK = true
+	}
+	st.LibcNote = libcNote()
+	return st, nil
+}
