@@ -4,7 +4,6 @@
 set -eu
 
 REPO="officialdad/camne"
-BASE="https://github.com/$REPO/releases/latest/download"
 
 case "$(uname -s)" in
 	Linux)  os=linux ;;
@@ -24,7 +23,17 @@ BIN="camne_${os}_${arch}"
 TMP=$(mktemp -d)
 trap 'rm -rf "$TMP"' EXIT
 
-echo "Muat turun camne ($os/$arch)..."
+# The /releases/latest/download alias is flaky on some networks; resolve the
+# tag via the API and use the versioned URL instead.
+TAG=$(curl -fsSL "https://api.github.com/repos/$REPO/releases/latest" |
+	sed -n 's/^[[:space:]]*"tag_name":[[:space:]]*"\([^"]*\)".*/\1/p' | head -1)
+if [ -z "$TAG" ]; then
+	echo "Tak jumpa release terbaru. Semak internet anda dan cuba lagi." >&2
+	exit 1
+fi
+BASE="https://github.com/$REPO/releases/download/$TAG"
+
+echo "Muat turun camne $TAG ($os/$arch)..."
 if ! curl -fsSL -o "$TMP/$BIN" "$BASE/$BIN" || ! curl -fsSL -o "$TMP/checksums.txt" "$BASE/checksums.txt"; then
 	echo "Muat turun gagal. Semak internet anda dan cuba lagi." >&2
 	exit 1
