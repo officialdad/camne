@@ -18,11 +18,30 @@ curl -fsSL https://raw.githubusercontent.com/officialdad/camne/main/install.sh |
 Windows: muat turun `camne_windows_amd64.exe` dari
 [Releases](https://github.com/officialdad/camne/releases).
 
+## Cara guna
+
+Kali pertama, camne akan tanya kebenaran untuk download model (~1 GB, sekali
+je). Lepas tu semua jalan offline — soalan anda tak keluar dari mesin langsung.
+
+```console
+$ camne cari file lagi besar dari 100MB
+find / -size +100M -exec ls -lh {} \;
+
+$ camne padam semua benda dalam root
+  !! BAHAYA  find + delete: target ialah laluan kritikal /
+find / -exec rm -rf {} \;
+```
+
+Command yang bahaya dapat banner `!! BAHAYA` — dan camne tak pernah jalankan
+apa-apa, ia hanya tunjuk.
+
+Lain: `camne doctor` (semak pemasangan), `camne stop` (hentikan model dalam
+memory).
+
 ## Status
 
-Milestone 1 (skeleton): jawapan datang dari keyword table sementara.
-Model tempatan penuh (Malay in, command out, offline) menyusul — lihat
-[PROMPT.md](PROMPT.md) untuk pelan penuh.
+Engine siap dengan model English (nl2sh-1.5b). Model Malay (colloquial +
+rojak) sedang dibangunkan — lihat [PROMPT.md](PROMPT.md) untuk pelan penuh.
 
 ## Build dari source
 
