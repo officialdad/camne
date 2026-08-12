@@ -1,0 +1,124 @@
+# CLAUDE.md
+
+`camne` — plain Malay in, shell command out, fully local, zero setup.
+
+**Read [`PROMPT.md`](PROMPT.md) before doing anything non-trivial.** It holds
+the constraints, the architecture rationale, the benchmark protocol, and the
+references. This file is only the working rules.
+
+## The six constraints
+
+Violating any of these means the change is wrong, not the constraint.
+
+1. Colloquial Malay input works (`camne nak buat file baru`), rojak works, English still works.
+2. Zero setup — no `pipx`, no Ollama, no separate `llama-server` install, no compiler on the user's machine.
+3. Runs on 4 cores / 8 GB / no GPU. Warm answer < 1.5 s, cold start < 5 s, RSS < 2.5 GB.
+4. Nothing typed at the prompt leaves the machine. No telemetry.
+5. Nothing executes without explicit consent. `BAHAYA` never auto-runs.
+6. Linux, macOS, Windows × amd64, arm64.
+
+## Stack
+
+Go, `CGO_ENABLED=0`, **standard library only**.
+
+```bash
+go build ./...
+go test ./...
+CGO_ENABLED=0 GOOS=linux   GOARCH=amd64 go build -o dist/camne       ./cmd/camne
+CGO_ENABLED=0 GOOS=darwin  GOARCH=arm64 go build -o dist/camne       ./cmd/camne
+CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build -o dist/camne.exe   ./cmd/camne
+```
+
+Adding a module requires a written justification in the PR. `cgo` is banned —
+it destroys cross-compilation, which is the main reason Go was chosen.
+
+## How to work here
+
+Take the simplest thing that satisfies the constraints:
+
+1. Does this need to exist? Speculative need → skip it, say so in one line.
+2. Already in this repo? Reuse it. Look before writing.
+3. Standard library does it? Use it.
+4. One line? One line.
+5. Only then: the minimum code that works.
+
+No interface with one implementation. No factory for one product. No config
+knob for a value that never changes. Shortest working diff wins — but only
+after you have read the code the change touches and traced the real flow.
+The smallest change in the wrong place is a second bug.
+
+Bug reports name symptoms. Grep every caller before editing; one guard in the
+shared function beats a guard in each caller and leaves no sibling broken.
+
+Deliberate shortcuts with a known ceiling get a `// ponytail:` comment naming
+the ceiling and the upgrade path.
+
+Never simplify away: input validation at trust boundaries, download
+verification, the safety checker, error handling that loses user data.
+
+## Non-trivial logic leaves one runnable check
+
+A branch, a loop, a parser, anything in the safety or download path gets the
+smallest test that fails if the logic breaks. Plain `go test`, table-driven, no
+frameworks. Trivial one-liners need no test.
+
+## Safety code — read first, write second
+
+Before touching `internal/safety`, read the module docstring of
+[`whatisit_pkg/whatisit/safety.py`](https://github.com/ThorOdinson246/whatisit-nl2sh/blob/master/whatisit_pkg/whatisit/safety.py).
+It records an adversarial audit that found the obvious regex version was
+evadable and noisy at once. Do not re-derive those bugs.
+
+Rules that came out of it:
+
+- Strip terminal control bytes. Model output is untrusted and reaches a terminal.
+- Tokenize; never regex a raw command string. `rm -rf '/'` == `rm -rf /`.
+- Normalize long options to short before matching.
+- A target must **be** a critical path, never merely **contain** one.
+  `/home` is critical. `/home/ariff/project/build` is not.
+- `$VAR` and command substitution are dangerous by default.
+
+It is a seatbelt, not a sandbox. The real protection is that the default path
+never executes. Keep it that way.
+
+Port `tests/test_safety.py` before the implementation — those tests are the audit.
+
+## Model work — measure or it did not happen
+
+No model change merges without numbers. Not examples, numbers.
+
+- Accuracy: [InterCode-ALFA](https://github.com/westenfelder/InterCode-ALFA),
+  **unmodified scorer**, 300 tasks, colloquial-BM prompts plus the English
+  control set.
+- Fixed and always stated: temperature 0, `max_tokens=64`, threshold 0.75.
+- Significance: paired exact McNemar vs the untuned base, with 95% CI. Report
+  when 300 tasks cannot resolve a difference — that is a result too.
+- Performance on the target box: tok/s, warm latency, cold start, RSS, disk
+  size, install wall time. Sweep threads 2/4/6/8.
+- Include the untuned base as a row. A tune that does not beat its own base is
+  not a result.
+- Seed 42, one variable changed per run.
+
+## Dataset work
+
+- Commands are **never** translated. Byte-identical to source. This is what
+  keeps the scorer usable.
+- Four registers per pair: formal BM, colloquial, rojak, English.
+- Technical nouns stay English — *file*, *folder*, *delete*, *download*,
+  *server*. A translation API will "correct" these and poison the set. Stoplist
+  them back.
+- Hand-read 200 rows before training on 125k. Reads like a government circular
+  → the pipeline is broken.
+
+## User-facing text
+
+Malay, colloquial, aimed at someone who has never used a terminal. Error
+messages say what to do next. No Go stack traces reaching the user.
+
+Technical terms stay English inside Malay sentences — that is how people
+actually speak.
+
+## Commits
+
+Conventional commits, written normally (not in the terse style used in chat):
+`feat:`, `fix:`, `docs:`, `test:`, `chore:`. Subject in English, imperative.
