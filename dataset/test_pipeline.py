@@ -28,7 +28,9 @@ assert clean("padam baldi S3 di pelabuhan 8080", "formal") == \
     "padam bucket S3 di port 8080"
 assert clean("panjang paketi dalam bait", "formal") == "panjang packet dalam byte"
 # ...but valid BM containing an ID word as substring stays intact
-assert clean("menghapuskan password", "formal") == "menghapuskan password"
+# "hapus" inside "menghapuskan" has no word boundary, so the ID rule stays put;
+# only the imperative flip touches it
+assert clean("menghapuskan password", "formal") == "hapuskan password"
 assert clean("saja sudah", "colloquial") == "saja sudah"
 
 # --- opener stripping (binary name carries the question word) ---------------
@@ -48,6 +50,52 @@ assert clean("camne nak tengok free space?", "colloquial") == "nak tengok free s
 assert clean("nak tengok file terbuka tu camne?", "colloquial") == "nak tengok file terbuka tu"
 # "macam" alone (comparison, not opener) untouched
 assert clean("buat file baru macam contoh ni", "colloquial") == "buat file baru macam contoh ni"
+# interrogative scaffold with a pronoun in it
+assert clean("Bagaimana saya boleh memadam file ini?", "formal") == "Padam file ini"
+# polite scaffold wrapped around the interrogative
+assert clean("Sila nyatakan bagaimana untuk menyimpan hasil.", "formal") == \
+    "Simpan hasil."
+# "sila" without an interrogative behind it is a normal request, left alone
+assert clean("Sila nyatakan nombor port.", "formal") == "Sila nyatakan nombor port."
+
+# --- formal is imperative even with no opener to strip ---------------------
+assert clean("Menulis output ke file log", "formal") == "Tulis output ke file log"
+# a lowercase stoplist replacement must not decapitalise the row
+assert clean("Memperbarui definisi virus", "formal") == "Update definisi virus"
+# unmapped meN- verb still survives (ceiling of the curated map)
+assert clean("Mengarkibkan folder ini", "formal") == "Mengarkibkan folder ini"
+
+# --- affixed Indonesian forms the bare-stem rules missed --------------------
+assert clean("Mengunduh dan menghapus berkas lama", "formal") == \
+    "Download dan membuang file lama"
+assert clean("Memuat turun laporan ini", "formal") == "Download laporan ini"
+assert clean("cari regex je dalam folder-folder tu", "colloquial") == \
+    "cari regex je dalam folder tu"
+# technical nouns the translator "corrected" into textbook BM
+assert clean("Senaraikan pengguna dalam repositori", "formal") == \
+    "Senaraikan user dalam repo"
+
+# --- lah/la/ah never belong on a question -----------------------------------
+assert clean("nak check disk space lah", "rojak") == "nak check disk space"
+assert clean("run the tests lah using this config", "rojak") == "run the tests using this config"
+assert clean("zip PNG ni, save kat path tu lah?", "colloquial") == "zip PNG ni, save kat path tu?"
+assert clean("check domain info la", "rojak") == "check domain info"
+assert clean("nak document this example ah", "rojak") == "nak document this example"
+# a word merely ending in the particle is not the particle
+assert clean("check kalau ada yang salah", "rojak") == "check kalau ada yang salah"
+assert clean("nak tengok apa yang telah berubah", "colloquial") == "nak tengok apa yang telah berubah"
+# neither is the flag in `ls -la` / `ls -lah`
+assert clean("nak run ls -lah kat sini lah", "rojak") == "nak run ls -lah kat sini"
+assert clean("nak run ls -la la", "rojak") == "nak run ls -la"
+# the comma that carried the particle goes with it
+assert clean("set watak ASCII output boleh tak, lah?", "colloquial") == \
+    "set watak ASCII output boleh tak?"
+
+# --- profanity filler --------------------------------------------------------
+assert clean("nak tengok lock semua, sial", "rojak") == "nak tengok lock semua"
+assert clean("set alias fuck jadi thefuck", "colloquial",
+             cmd="eval $(thefuck --alias fuck)") == "set alias fuck jadi thefuck"
+assert clean("apa shit ni, list file je", "rojak") == "apa ni, list file je"
 
 # --- tldr -------------------------------------------------------------------
 from tldr import parse_page
