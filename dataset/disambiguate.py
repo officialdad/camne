@@ -4,12 +4,9 @@ that map to many different commands. Stdlib only.
 
   python3 disambiguate.py out/pool.jsonl out/pool.train.jsonl
 
-Two defects this fixes, both from tldr's page structure:
+The defect this fixes comes from tldr's page structure:
 
-1. Junk targets. Pages for interactive TUIs list keybindings, not commands:
-   "Scroll down" -> `<Spacebar>`. Not shell, never useful, dropped.
-
-2. Generic descriptions. Every tldr page has "Display help", so one prompt
+   Generic descriptions. Every tldr page has "Display help", so one prompt
    maps to ~880 different commands. Training on that teaches the model to
    guess a random tool name for a common phrase — and "display help" is the
    single most frequent prompt in the pool, so the damage is concentrated
@@ -21,6 +18,12 @@ Two defects this fixes, both from tldr's page structure:
    — adding the tool there would teach the model to expect a name real
    queries do not carry.
 
+Keystroke answers (`<Ctrl x>` to leave nano, `<ESC>:q!<Enter>` to leave vim)
+are kept deliberately. "How do I quit vim" is the most-asked beginner
+terminal question there is, and beginners are who this tool is for. They
+collide across tools ("Scroll down" in every TUI page), which the
+disambiguation below already resolves by naming the tool.
+
 Whole pairs are dropped or rewritten, never single registers, so all four
 stay in sync. Commands are never modified; verify.py still passes after.
 """
@@ -28,9 +31,6 @@ import collections
 import json
 import re
 import sys
-
-# `<Spacebar>`, `q`, `:wq`, `Ctrl + C` — tldr keybinding rows, not commands.
-JUNK = re.compile(r"^\s*(<[^>]+>|[A-Za-z]|:\w+|Ctrl\s*\+.*|Alt\s*\+.*)\s*$")
 
 # Prefixes that are not the tool being described.
 SKIP = {"sudo", "env", "time", "nohup", "doas", "command", "exec"}
@@ -61,10 +61,6 @@ def main():
     by_id = collections.defaultdict(list)
     for r in rows:
         by_id[r["id"]].append(r)
-
-    dropped_junk = [i for i, rs in by_id.items() if JUNK.match(rs[0]["cmd"])]
-    for i in dropped_junk:
-        del by_id[i]
 
     # Group pairs by their English (source) description: same description,
     # different commands means the prompt cannot identify its answer.
@@ -107,7 +103,6 @@ def main():
         for r in out:
             f.write(json.dumps(r, ensure_ascii=False) + "\n")
 
-    print(f"dropped {len(dropped_junk)} junk pairs (keybindings, not commands)")
     print(f"named the tool in {disambiguated} ambiguous pairs")
     print(f"dropped {dropped_dup} same-prompt-same-tool duplicate pairs")
     print(f"{len(out)} rows ({len(by_id)} pairs) -> {dst}")

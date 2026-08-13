@@ -98,13 +98,11 @@ assert clean("set alias fuck jadi thefuck", "colloquial",
 assert clean("apa shit ni, list file je", "rojak") == "apa ni, list file je"
 
 # --- disambiguation ----------------------------------------------------------
-from disambiguate import tool_of, JUNK
+from disambiguate import tool_of
 
 assert tool_of("sudo systemctl restart nginx") == "systemctl"
 assert tool_of("./goldeneye.py --help") == "goldeneye.py"
 assert tool_of("FOO=1 docker ps") == "docker"
-assert JUNK.match("<Spacebar>") and JUNK.match("q") and JUNK.match(":wq")
-assert not JUNK.match("ls -la") and not JUNK.match("docker ps")
 
 # --- tldr -------------------------------------------------------------------
 from tldr import parse_page
