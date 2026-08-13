@@ -16,7 +16,19 @@ const (
 	cPath   = "\x1b[35m"   // magenta
 	cString = "\x1b[33m"   // yellow
 	cOp     = "\x1b[1m"    // bold, no hue
+
+	cDanger  = "\x1b[1;31m" // bold red, the BAHAYA block
+	cCaution = "\x1b[33m"   // yellow, the Awas lines
 )
+
+// paint wraps s in code when on. Callers ask enabled() once per stream and pass
+// the answer down, so one warning block cannot end up half coloured.
+func paint(on bool, code, s string) string {
+	if !on {
+		return s
+	}
+	return code + s + reset
+}
 
 // enabled reports whether w is a terminal we may write escape sequences to.
 // `camne ... | sh` and `$(camne ...)` are the normal way to use this tool, so
