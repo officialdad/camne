@@ -118,6 +118,11 @@ messages say what to do next. No Go stack traces reaching the user.
 Technical terms stay English inside Malay sentences — that is how people
 actually speak.
 
+This covers what the program prints, and only that. Repo docs — README,
+CONTRIBUTING, release notes, commits, issues, PRs — are English, because their
+audience is contributors, not the person at the prompt. Malay quoted inside
+them (real CLI output, the demo queries) stays verbatim.
+
 ## Commits
 
 Conventional commits, written normally (not in the terse style used in chat):
