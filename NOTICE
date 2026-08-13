@@ -1,0 +1,29 @@
+Copyright 2026 camne contributors
+
+Licensed under the Apache License, Version 2.0. You may obtain a copy of
+the License at http://www.apache.org/licenses/LICENSE-2.0
+
+---
+
+Training data sources, by share of the NL->command pair pool:
+
+  58.2%  NL2SH-ALFA training split   MIT
+         https://huggingface.co/datasets/westenfelder/NL2SH-ALFA
+  41.8%  tldr-pages                  CC-BY-4.0
+         https://github.com/tldr-pages/tldr
+
+Attribution, required by CC-BY-4.0: this work includes content from
+tldr-pages (https://github.com/tldr-pages/tldr) under CC-BY-4.0
+(https://creativecommons.org/licenses/by/4.0/). Page content is CC-BY-4.0;
+only that repository's scripts/ directory is MIT.
+
+The natural-language side of every pair was machine-translated into Bahasa
+Melayu (formal, colloquial, and rojak registers) with
+Gemma-SEA-LION-v3-9B-IT (https://huggingface.co/aisingapore/Gemma-SEA-LION-v3-9B-IT-GGUF),
+run locally. Commands are byte-identical to their sources and were never
+translated. SEA-LION inherits the Gemma Terms of Use; those terms govern the
+translation model, not the translated text.
+
+The safety checker design and the training recipe follow
+ThorOdinson246/whatisit-nl2sh (Apache-2.0),
+https://github.com/ThorOdinson246/whatisit-nl2sh.

@@ -162,6 +162,13 @@ type completionReq struct {
 	Grammar     string   `json:"grammar"`
 	Stop        []string `json:"stop"`
 	CachePrompt bool     `json:"cache_prompt"`
+	// Greedy decoding on nl2sh-1.5b degenerates without a small repetition
+	// penalty — whatisit documented flag spam ("zip -r -9 -q -n -j -0 ..."),
+	// and we reproduced `: > file.txt` instead of `touch file.txt` on
+	// colloquial BM input. 1.08/64 matches whatisit's measured settings;
+	// dropping them during the Go port was a regression.
+	RepeatPenalty float64 `json:"repeat_penalty"`
+	RepeatLastN   int     `json:"repeat_last_n"`
 }
 
 // chatML wraps the question in the ChatML template the nl2sh-1.5b model (a
@@ -181,8 +188,10 @@ func (c *Client) Complete(query string) (string, error) {
 		NPredict:    64,
 		Temperature: 0,
 		Grammar:     grammar,
-		Stop:        []string{"\n"},
-		CachePrompt: true,
+		Stop:          []string{"\n"},
+		CachePrompt:   true,
+		RepeatPenalty: 1.08,
+		RepeatLastN:   64,
 	})
 	if err != nil {
 		return "", fmt.Errorf("soalan tu tak boleh diproses: %w", err)

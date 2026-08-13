@@ -1,0 +1,10 @@
+[project]
+name = "camne-training"
+version = "0.1.0"
+description = "LoRA bake-off runs for camne (milestone 6). Python lives here, not in the Go tree."
+requires-python = ">=3.11,<3.13"
+dependencies = [
+    "unsloth",
+    "datasets",
+    "icalfa",
+]

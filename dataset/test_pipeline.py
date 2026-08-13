@@ -31,6 +31,28 @@ assert clean("panjang paketi dalam bait", "formal") == "panjang packet dalam byt
 assert clean("menghapuskan password", "formal") == "menghapuskan password"
 assert clean("saja sudah", "colloquial") == "saja sudah"
 
+# --- tldr -------------------------------------------------------------------
+from tldr import parse_page
+
+PAGE = """# touch
+
+> Create files and set access/modification times.
+
+- Create specific files:
+
+`touch {{path/to/file1}} {{path/to/file2}}`
+
+- Set the times on a file to a specific date and time:
+
+`touch -t {{YYYYMMDDHHMM.SS}} {{path/to/file}}`
+"""
+got = parse_page(PAGE, "touch")
+assert got[0] == ("Create specific files", "touch path/to/file1 path/to/file2"), got[0]
+assert len(got) == 2 and "{{" not in got[1][1]
+# description kept verbatim, no tool-name leak
+got = parse_page("- Start the daemon:\n\n`redis-server`\n", "redis-server")
+assert got == [("Start the daemon", "redis-server")], got
+
 # --- verify -----------------------------------------------------------------
 def rows_file(rows):
     f = tempfile.NamedTemporaryFile("w", suffix=".jsonl", delete=False, encoding="utf-8")
