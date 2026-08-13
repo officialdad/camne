@@ -1,0 +1,71 @@
+#!/usr/bin/env python3
+"""Smallest checks that fail if the pipeline logic breaks. Stdlib only.
+
+  python3 test_pipeline.py
+"""
+import json
+import os
+import tempfile
+
+from stoplist import clean
+from verify import check
+
+# --- stoplist ---------------------------------------------------------------
+assert clean("camne nak padam fail ni", "colloquial") == "camne nak padam file ni"
+assert clean("sila muat turun fail itu dari pelayan", "formal") == \
+    "sila download file itu dari server"
+# longest-first: "muat turun" must not decay via a shorter rule
+assert "download" in clean("muat turun", "rojak")
+# word boundary: "failed" (inside rojak English) must not become "fileed"
+assert clean("job tu failed ke", "rojak") == "job tu failed ke"
+# english register untouched even if it contains a BM-looking word
+assert clean("delete the fail log", "english") == "delete the fail log"
+# Indonesian -> BM/English
+assert clean("gimana bisa hapus berkas ini", "colloquial") == \
+    "macam mana boleh buang file ini"
+# translated technical nouns forced back to English
+assert clean("padam baldi S3 di pelabuhan 8080", "formal") == \
+    "padam bucket S3 di port 8080"
+assert clean("panjang paketi dalam bait", "formal") == "panjang packet dalam byte"
+# ...but valid BM containing an ID word as substring stays intact
+assert clean("menghapuskan password", "formal") == "menghapuskan password"
+assert clean("saja sudah", "colloquial") == "saja sudah"
+
+# --- verify -----------------------------------------------------------------
+def rows_file(rows):
+    f = tempfile.NamedTemporaryFile("w", suffix=".jsonl", delete=False, encoding="utf-8")
+    for r in rows:
+        f.write(json.dumps(r) + "\n")
+    f.close()
+    return f.name
+
+src = {"t:0": "rm -rf ./build"}
+good = [{"id": "t:0", "register": reg, "nl": "x", "cmd": "rm -rf ./build"}
+        for reg in ("formal", "colloquial", "rojak", "english")]
+
+p = rows_file(good)
+assert check(src, p) == [], check(src, p)
+os.unlink(p)
+
+drifted = [dict(r) for r in good]
+drifted[1]["cmd"] = "rm -rf /build"  # one byte off
+p = rows_file(drifted)
+assert any("drifted" in e for e in check(src, p))
+os.unlink(p)
+
+missing = good[:2]  # formal+colloquial only
+p = rows_file(missing)
+assert any("missing registers" in e for e in check(src, p))
+os.unlink(p)
+
+eval_only = [{"id": "t:0", "register": "colloquial", "nl": "x", "cmd": "rm -rf ./build"}]
+p = rows_file(eval_only)
+assert check(src, p) == []  # colloquial-only file is a valid eval set
+os.unlink(p)
+
+dup = good + [good[0]]
+p = rows_file(dup)
+assert any("duplicate" in e for e in check(src, p))
+os.unlink(p)
+
+print("ok: all pipeline checks pass")
