@@ -36,7 +36,7 @@ BASES = {
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--base", choices=BASES, required=True)
-    ap.add_argument("--data", default="../dataset/out/rows.clean.jsonl")
+    ap.add_argument("--data", default="../dataset/out/pool.train.jsonl")
     ap.add_argument("--out", default=None)
     ap.add_argument("--micro-batch", type=int, default=16,
                     help="drop this and raise --grad-accum if OOM; keep the product 32")

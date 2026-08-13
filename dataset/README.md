@@ -12,6 +12,10 @@ fetch.py      # source pools → raw/           (NL2SH-ALFA public; whatisit poo
 registers.py  # raw CSV → out/rows.jsonl      (drives a local LLM endpoint, resumable)
 stoplist.py   # out/rows.jsonl → out/rows.clean.jsonl  (force technical nouns back to English, marker stats)
 verify.py     # asserts every command byte-identical to source; nonzero exit on drift
+
+# after both pools are cleaned and concatenated into out/pool.jsonl:
+disambiguate.py  # out/pool.jsonl → out/pool.train.jsonl  (drop keybinding junk,
+                 # name the tool in prompts that map to many commands)
 ```
 
 Eval set (300 InterCode-ALFA prompts, colloquial only):

@@ -24,17 +24,18 @@ from concurrent.futures import ThreadPoolExecutor
 REGISTERS = ("formal", "colloquial", "rojak")
 
 PROMPT = """Translate this English request into MALAYSIAN Bahasa Melayu, in 3 registers. Rules:
-- Malaysian BM, NEVER Indonesian. Write Bagaimanakah/memulakan/menyahaktifkan/kod/antara muka — never bagaimana cara/memulai/menonaktifkan/kode/antarmuka/bisa/terhubung.
-- Technical nouns STAY ENGLISH: file, folder, directory, delete, download, upload, install, compress, extract, server, list, copy, move, rename, search, permission, process, disk, memory, network, password, user, log, backup, script, command, terminal, port, link, zip, update, restart, bucket, byte, packet, flag, database, output, match, interface, code. Malaysians do not translate these — "S3 bucket" is never "baldi", "port" is never "pelabuhan".
-- The meaning must match exactly. Do not add or drop details. Never let a filler word change meaning: "name and PID" is "nama dan PID", never "nama je PID" ("je" means "only").
+- Malaysian BM, NEVER Indonesian. Write Bagaimanakah/memulakan/menyahaktifkan/kod/antara muka — never bagaimana cara/memulai/menonaktifkan/kode/antarmuka/bisa/terhubung. Also never: mengunduh/mengunggah/memperbarui/mengurutkan/menampilkan/memindai/mengkompilasi/mengonversi/menginstal/keluaran/masukan/perangkat/peranti/jaringan/tautan/penyimpanan/pengaturan/pratinjau/ekstensi/kolom/wadah/kontainer/tumpukan/otentikasi/nih/tuh/trus.
+- Technical nouns STAY ENGLISH: file, folder, directory, delete, download, upload, install, compress, extract, server, list, copy, move, rename, search, permission, process, disk, memory, network, password, user, log, backup, script, command, terminal, port, link, zip, update, restart, bucket, byte, packet, flag, database, output, input, match, interface, code, shell, host, path, repo, branch, string, pattern, error, image, extension, column, container, device, storage. Malaysians do not translate these — "S3 bucket" is never "baldi", "port" is never "pelabuhan", "user" is never "pengguna", "shell" is never "cangkang".
+- The meaning must match exactly. Do not add or drop details. Every number, flag and path in the English must appear unchanged in all three registers ("3 days" stays 3, "-t 1" stays -t 1). Never let a filler word change meaning: "name and PID" is "nama dan PID", never "nama je PID" ("je" means "only").
 - Colloquial markers are optional flavour — use them only where a Malaysian naturally would, not in every sentence.
+- Translate the request as a request. Never explain what the command does ("Command ini akan..."), never comment on the translation, never emit anything but the JSON object.
 - Output ONLY a JSON object: {"formal": "...", "colloquial": "...", "rojak": "..."}
 
 Registers:
-- The user already typed the tool name (`camne`, which means "how do I"), so NO register opens with a "how do I" phrase: never "Bagaimanakah cara untuk", never "camne"/"cmne"/"macam mana"/"mcm mana". Start straight at the request, every register.
-- formal: proper written Bahasa Melayu, imperative request: "Paparkan ruang kosong pada semua sistem file.", "Cari file melebihi 100MB dalam folder ini."
-- colloquial: how a Malaysian actually types, short and casual: "nak tengok...", "tolong delete...", "cari file...". Vary among: nak, tolong, tlg, boleh tak, tengok, buang. Use kat/ni/tu/je/dah where natural.
-- rojak: heavy Malay/English code-switching, keeps whole English phrases ("nak check disk space kat sini"). "lah" is occasional flavour, not a suffix for every sentence.
+- The user already typed the tool name (`camne`, which means "how do I"), so NO register opens with a "how do I" phrase: never "Bagaimanakah cara untuk", never "Sila nyatakan bagaimana", never "camne"/"cmne"/"macam mana"/"mcm mana" anywhere in the sentence. Start straight at the request, every register.
+- formal: proper written Bahasa Melayu, imperative request: "Paparkan ruang kosong pada semua sistem file.", "Cari file melebihi 100MB dalam folder ini." Start with the bare imperative verb, never a meN- form — "Tulis output...", never "Menulis output..."; "Baca file...", never "Membaca file...".
+- colloquial: how a Malaysian actually types, short and casual: "nak tengok...", "tolong delete...", "cari file...". Vary among: nak, tolong, tlg, boleh tak, tengok, buang — do not open every row the same way, and match the verb to the request ("find" is "cari", not "tengok"). Use kat/ni/tu/je/dah where natural.
+- rojak: heavy Malay/English code-switching, keeps whole English phrases ("nak check disk space kat sini"). Vary the opener the same way. NEVER write "lah", "la" or "ah": the user is asking a question (the tool name `camne` is the question word), and Malaysians do not put those particles on a question.
 
 Request: {nl}"""
 
