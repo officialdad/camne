@@ -13,7 +13,6 @@ from collections import Counter
 # ponytail: flat word-boundary replace on the NL column only; no morphology.
 STOPLIST = [
     # Indonesian leaking out of the (ID-heavy) translator model -> BM/English
-    ("bagaimana cara", "Bagaimanakah cara"),
     ("terhubung", "bersambung"),
     ("komitmen", "commit"),
     ("pangkalan data", "database"),
@@ -79,13 +78,68 @@ MARKERS = ["camne", "macam mana", "mcm mana", "cmne", "nak", "kat", "ni",
            "tu", "je", "dah", "boleh tak", "tolong", "tlg", "tunjuk",
            "buat", "letak", "buang"]
 
+# The binary name IS the question word: `camne <words>` means the model only
+# ever sees <words>, so no register keeps a "how do I" opener (owner decision,
+# 2026-08-13). Formal drops the interrogative scaffold and flips the leading
+# meN- verb to its imperative; colloquial/rojak drop camne/macam-mana forms.
+_FORMAL_OPENER = re.compile(
+    r"^(bagaimana(kah)?|apakah)\s+((cara|kaedah|langkah)\s+)?(untuk\s+)?", re.IGNORECASE)
+_CHAT_OPENER = re.compile(r"^(camne|cmne|macam\s*mana|mcm\s*mana|cammana)[\s,]+", re.IGNORECASE)
+_CHAT_TRAILER = re.compile(r"[\s,]+(camne|cmne|macam\s*mana|mcm\s*mana|cammana)\s*[?!.]*$", re.IGNORECASE)
+
+# leading formal verb -> imperative. Curated from the corpus (top forms cover
+# >90% of formal rows); unmapped meN- words stay as-is — safe, just stilted.
+# ponytail: a lexicon-free meN- peeler is ambiguous (mengira->kira but
+# mengambil->ambil); curate instead, extend when coverage stats say so.
+VERB_MAP = {
+    "mencari": "cari", "memaparkan": "paparkan", "mencetak": "cetak",
+    "menjalankan": "jalankan", "memulakan": "mulakan",
+    "menyenaraikan": "senaraikan", "membuat": "buat",
+    "mendapatkan": "dapatkan", "menghasilkan": "hasilkan",
+    "menetapkan": "tetapkan", "memilih": "pilih",
+    "menghapuskan": "hapuskan", "membuka": "buka", "melihat": "lihat",
+    "menggunakan": "gunakan", "menyalin": "salin", "mengubah": "ubah",
+    "memasang": "pasang", "menukar": "tukar", "menggantikan": "gantikan",
+    "mengekstrak": "ekstrak", "menghantar": "hantar",
+    "mengaktifkan": "aktifkan", "menambahkan": "tambahkan",
+    "memeriksa": "periksa", "melaksanakan": "laksanakan",
+    "mengambil": "ambil", "menunjukkan": "tunjukkan",
+    "memadamkan": "padamkan", "memadam": "padam", "menyemak": "semak",
+    "menghentikan": "hentikan", "mengeluarkan": "keluarkan",
+    "menyimpan": "simpan", "menutup": "tutup", "mengira": "kira",
+    "menambah": "tambah", "membuang": "buang", "memuatkan": "muatkan",
+    "menyahaktifkan": "nyahaktifkan", "mengemaskini": "kemas kini",
+    "memaparkan semula": "paparkan semula", "menyaring": "saring",
+    "menapis": "tapis", "mengedit": "edit", "menguji": "uji",
+    "mengesahkan": "sahkan", "mengalihkan": "alihkan",
+    "memindahkan": "pindahkan", "menyambung": "sambung",
+}
+
+
+def _deopener(nl, register):
+    if register == "formal":
+        stripped = _FORMAL_OPENER.sub("", nl).strip()
+        if stripped and stripped != nl:
+            words = stripped.split()
+            head = words[0].lower()
+            if head in VERB_MAP:
+                words[0] = VERB_MAP[head]
+            nl = " ".join(words)
+            nl = nl[0].upper() + nl[1:]
+            nl = nl.rstrip("?").rstrip()
+        return nl
+    # colloquial / rojak
+    nl = _CHAT_OPENER.sub("", nl).strip()
+    nl = _CHAT_TRAILER.sub("", nl).strip()
+    return nl
+
 
 def clean(nl, register):
     if register == "english":
         return nl
     for pat, en in _SUBS:
         nl = pat.sub(en, nl)
-    return nl
+    return _deopener(nl, register)
 
 
 def main():
