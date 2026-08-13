@@ -78,6 +78,9 @@ func run(query string) int {
 // render prints safety warnings to errw and the command itself to out — and
 // that is ALL camne ever does with a command: print it. Danger findings get
 // the BAHAYA banner and must never be auto-run (constraint 5).
+//
+// The command is syntax-highlighted only when out is a terminal, so
+// `camne ... | sh` still receives the exact bytes it did before.
 func render(out, errw io.Writer, cmd string, findings []safety.Finding) {
 	for _, f := range findings {
 		if f.Level == safety.LevelDanger {
@@ -88,6 +91,9 @@ func render(out, errw io.Writer, cmd string, findings []safety.Finding) {
 		if f.Level == safety.LevelCaution {
 			fmt.Fprintf(errw, "  !  Awas: %s\n", f.Reason)
 		}
+	}
+	if enabled(out) {
+		cmd = highlight(cmd)
 	}
 	fmt.Fprintln(out, cmd)
 }
