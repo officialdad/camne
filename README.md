@@ -9,16 +9,26 @@
 [![Go](https://img.shields.io/github/go-mod/go-version/officialdad/camne)](go.mod)
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue)](LICENSE)
 
-Ask in Malay, get a shell command. Fully local, zero setup.
+> **Status: work in progress.** The engine works today, but it runs an English
+> model (nl2sh-1.5b). The Malay model is still training, so colloquial and
+> rojak questions will not answer well yet.
 
-![camne demo: a colloquial Malay question, the syntax-highlighted command it prints, a red BAHAYA line, and `camne doctor` on a fresh machine](demo/demo.gif)
+*camne* is how people say *macam mana* / *bagaimana*: "how".
+
+Ask a terminal question in Malay, get the command back. Everything runs on your
+machine and there is nothing to set up.
+
+![camne demo: a colloquial Malay question, the syntax-highlighted command it prints, a red BAHAYA line, the same query piped into `cat` to show plain output, and `camne doctor` on a fresh machine](demo/demo.gif)
 
 ```console
 $ camne nak buat file baru
 touch file.txt
 ```
 
-camne only prints the command. It never runs anything.
+It is not only for "do this task for me". Questions about the CLI itself count
+too: which flag does what, which tool to reach for, how a shell shortcut works.
+The answer comes back as one command line, and camne only prints it. Nothing
+runs.
 
 ## Install
 
@@ -36,13 +46,9 @@ Windows: download `camne_windows_amd64.exe` (or `camne_windows_arm64.exe`) from
 ## Usage
 
 On first run camne downloads llama-server and the model (about 1 GB, once),
-printing the size before it starts and the progress while it runs. Once
-everything is in place it all runs offline, so your questions never leave the
-machine. To see what is missing without downloading anything, run
-`camne doctor`.
-
-The interface is Malay, because that is the point. Colloquial and rojak both
-work, and English still works too.
+printing the size before it starts and the progress while it runs. After that
+it works offline, so your questions never leave the machine. To see what is
+missing without downloading anything, run `camne doctor`.
 
 ```console
 $ camne cari file lagi besar dari 100MB
@@ -54,21 +60,18 @@ find /etc -type f -exec rm {} \;
 ```
 
 Dangerous commands get a red `!! BAHAYA` line; anything merely worth a second
-look gets a yellow `!  Awas` line. camne never executes anything regardless, it
-only prints.
+look gets a yellow `!  Awas` line. camne prints either way and executes
+neither.
 
-The command itself is syntax-highlighted, and the warnings are coloured, only
-when the stream is a terminal. Pipe it — `camne ... | sh`, `$(camne ...)` — and
-you get exactly the plain bytes you always did. `NO_COLOR` or `TERM=dumb` turns
-colour off everywhere.
+The command is syntax-highlighted and the warnings are coloured only when the
+output is a terminal. Pipe it anywhere (`camne ... | sh`, `$(camne ...)`) and
+you get plain bytes. That is the third scene in the demo above: the same query
+sent through `cat` comes back with no colour, which is what any program reading
+camne's output would see. `NO_COLOR` or `TERM=dumb` turns colour off
+everywhere.
 
-Also: `camne doctor` (check the install), `camne stop` (shut down the model
-held in memory).
-
-## Status
-
-The engine works with an English model (nl2sh-1.5b). The Malay model
-(colloquial + rojak) is still in progress.
+Two other commands: `camne doctor` checks the install, `camne stop` shuts down
+the model held in memory.
 
 ## Build from source
 
