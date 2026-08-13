@@ -1,0 +1,27 @@
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+
+      # scripts/build.sh already cross-compiles all six targets into dist/,
+      # stamps the version, and writes dist/checksums.txt. Do not duplicate it.
+      - run: scripts/build.sh "$GITHUB_REF_NAME"
+
+      # Asset names must stay exactly as build.sh emits them — install.sh
+      # downloads camne_${os}_${arch} and greps checksums.txt for " $BIN$".
+      - run: gh release create "$GITHUB_REF_NAME" --generate-notes dist/camne_* dist/checksums.txt
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
