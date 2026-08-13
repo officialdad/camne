@@ -25,6 +25,25 @@ jobs:
           unformatted=$(gofmt -l .)
           [ -z "$unformatted" ] || { echo "$unformatted"; exit 1; }
 
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      # `go vet` (in the test job) + staticcheck is the whole lint stack.
+      # No .golangci.yml: it bundles ~50 linters whose defaults are not this
+      # repo's bar — CLAUDE.md is — and it is one more thing to pin and silence.
+      # Pinned, never @latest, so a new staticcheck release cannot redden an
+      # unrelated PR. `go run <pkg>@<version>` builds in a temp module, so
+      # staticcheck never lands in go.mod/go.sum.
+      # ST1005 stays ON: the Malay error strings are already lowercase and
+      # unpunctuated, so it fires on nothing. If it ever fights a user-facing
+      # Malay string, add `-ST1005` to a staticcheck.conf — do not reword the
+      # Malay to satisfy a linter.
+      - run: go run honnef.co/go/tools/cmd/staticcheck@2025.1.1 ./...
+
   cross-compile:
     runs-on: ubuntu-latest
     steps:
