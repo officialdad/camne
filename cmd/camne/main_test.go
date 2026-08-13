@@ -40,27 +40,3 @@ func TestRender(t *testing.T) {
 		})
 	}
 }
-
-func TestAskConsent(t *testing.T) {
-	tests := []struct {
-		in   string
-		want bool
-	}{
-		{"y\n", true},
-		{"Y\n", true},
-		{"ya\n", true},
-		{"yes\n", true},
-		{"  ok  \n", true},
-		{"\n", false},  // empty line: default is no
-		{"", false},    // closed stdin: no
-		{"t\n", false}, // tidak
-		{"tak\n", false},
-		{"n\n", false},
-		{"yolo\n", false},
-	}
-	for _, tt := range tests {
-		if got := askConsent(strings.NewReader(tt.in)); got != tt.want {
-			t.Errorf("askConsent(%q) = %v, want %v", tt.in, got, tt.want)
-		}
-	}
-}

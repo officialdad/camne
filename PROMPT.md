@@ -50,7 +50,7 @@ the decision is wrong, not the constraint.
 2. **Zero-setup.** First run downloads what it needs and starts working. No
    `setup` subcommand the user must know to run, no separate `llama-server`
    install, no Ollama, no Python, no `pipx`, no compiler. One binary, one
-   download prompt, done.
+   download, done — no question to answer first.
 3. **Runs on a small machine.** 4 CPU cores, 8 GB RAM, no GPU, spinning-rust or
    slow SSD. A student laptop. Not a workstation.
 4. **Fully local after install.** Nothing typed at the prompt leaves the
@@ -132,8 +132,10 @@ llama.cpp does the inference. We do not bind to it, we talk to it.
 
 This is the feature. Treat it as a first-class subsystem, not a script.
 
-On first run, with **one** confirmation prompt that states total download size
-in MB:
+On first run, **announced, not asked** — camne states the total download size
+in MB before it starts and ticks the MB as they land, but it does not stop for
+a yes. Nothing works without these files, so a prompt would only offer a choice
+between camne working and camne doing nothing:
 
 1. Detect `runtime.GOOS`/`GOARCH`, and on Linux detect glibc version — builds
    from llama.cpp releases require glibc ≥ 2.34 and simply will not start on

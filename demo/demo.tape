@@ -2,8 +2,10 @@
 #
 # Needs: vhs, ttyd, ffmpeg, Go. The tape builds camne from source itself.
 # Scenes 1 and 2 use the model already in ~/.cache/camne (check with
-# `camne doctor`). Scene 3 shows the first-run screen against an empty cache
-# and ANSWERS NO — so this tape never downloads anything.
+# `camne doctor`). Scene 3 runs `camne doctor` against an empty cache: it
+# reports what is missing and touches nothing, so this tape never downloads
+# anything. Do NOT put a bare query here — since the consent prompt was
+# dropped, a query on an empty cache downloads ~1 GB.
 #
 # The typed queries stay in Malay: that is the product, not a translation gap.
 
@@ -36,17 +38,13 @@ Sleep 500ms
 Enter
 Sleep 4s
 
-# 3. First run on a new machine: camne asks permission before downloading.
+# 3. A fresh machine: `camne doctor` shows what camne will fetch on first run.
 Hide
 Type `export XDG_CACHE_HOME=$(mktemp -d) && clear`
 Enter
 Sleep 2s
 Show
-Type "camne macam mana nak zip folder ni"
+Type "camne doctor"
 Sleep 500ms
 Enter
-Sleep 3s
-Type "t"
-Sleep 800ms
-Enter
-Sleep 3s
+Sleep 4s
