@@ -11,7 +11,7 @@ $ camne cari file lagi besar dari 100MB kat folder ni
 find . -size +100M -exec ls -lh {} \;
 
 $ camne nak padam semua benda dalam root
-  !! BAHAYA  padam paksa rekursif pada laluan kritikal
+!! BAHAYA
 rm -rf /
 ```
 

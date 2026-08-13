@@ -255,12 +255,12 @@
 {"id": "nl2sh_test:256", "register": "colloquial", "nl": "tolong extract semua .gz kat /workspace la", "cmd": "find /workspace -name '*.gz' -print0 | xargs -0 gunzip"}
 {"id": "nl2sh_test:254", "register": "colloquial", "nl": "nak tengok permission, user, group, full path semua file kat /workspace", "cmd": "tree /workspace -p -u -g -f"}
 {"id": "nl2sh_test:255", "register": "colloquial", "nl": "cari 'hello' semua file kat /workspace, tunjukkan baris yang match dgn nama file", "cmd": "find /workspace -type f -print0  | xargs -0 grep -iH \"hello\""}
-{"id": "nl2sh_test:259", "register": "colloquial", "nl": "nak tengok build number kernel je, tu #104 macam mana?", "cmd": "uname -v | grep -o '#[0-9]\\+'"}
+{"id": "nl2sh_test:259", "register": "colloquial", "nl": "nak tengok build number kernel je, tu #104", "cmd": "uname -v | grep -o '#[0-9]\\+'"}
 {"id": "nl2sh_test:257", "register": "colloquial", "nl": "tlg extract '/workspace/archive.tar.gz' kat '/backup' la", "cmd": "gzip -dc /workspace/archive.tar.gz | tar -xf - -C /backup"}
 {"id": "nl2sh_test:261", "register": "colloquial", "nl": "nak tengok info file grep ni", "cmd": "ls -ald `which grep`"}
 {"id": "nl2sh_test:260", "register": "colloquial", "nl": "nak tengok reverse lookup 127.0.0.1", "cmd": "dig -x 127.0.0.1"}
 {"id": "nl2sh_test:258", "register": "colloquial", "nl": "nak buat link simbolik '/workspace/test' ke '/workspace/dir1/terminate.txt' lah", "cmd": "ln /workspace/dir1/terminate.txt /workspace/test"}
-{"id": "nl2sh_test:262", "register": "colloquial", "nl": "nak ambik nama host je kat 'http://www.google.com' macam mana?", "cmd": "echo \"http://www.google.com\" | cut -d'/' -f3"}
+{"id": "nl2sh_test:262", "register": "colloquial", "nl": "nak ambik nama host je kat 'http://www.google.com'", "cmd": "echo \"http://www.google.com\" | cut -d'/' -f3"}
 {"id": "nl2sh_test:264", "register": "colloquial", "nl": "nak tengok semua process tree ngan argumen command line dia", "cmd": "pstree -a"}
 {"id": "nl2sh_test:263", "register": "colloquial", "nl": "nak tengok semua env vars dgn escape semicolon pakai backslash", "cmd": "env | sed 's/;/\\\\;/g'"}
 {"id": "nl2sh_test:267", "register": "colloquial", "nl": "nak tengok semua readline binding-nya", "cmd": "bind -P"}

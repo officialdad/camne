@@ -31,9 +31,10 @@ PROMPT = """Translate this English request into MALAYSIAN Bahasa Melayu, in 3 re
 - Output ONLY a JSON object: {"formal": "...", "colloquial": "...", "rojak": "..."}
 
 Registers:
-- formal: proper written Bahasa Melayu, full sentence ("Bagaimanakah cara untuk...").
-- colloquial: how a Malaysian actually types after a CLI tool name, short and casual. The user already typed the tool name, so NEVER open with "camne", "cmne" or another "how do I" filler — start straight at the request: "nak tengok...", "tolong delete...", "cari file...". Vary among: nak, tolong, tlg, boleh tak, tengok, buang; an occasional "macam mana nak" is fine. Use kat/ni/tu/je/dah where natural.
-- rojak: heavy Malay/English code-switching, keeps whole English phrases ("nak check disk space kat sini"). Same rule: no "how do I" opener, start at the request. "lah" is occasional flavour, not a suffix for every sentence.
+- The user already typed the tool name (`camne`, which means "how do I"), so NO register opens with a "how do I" phrase: never "Bagaimanakah cara untuk", never "camne"/"cmne"/"macam mana"/"mcm mana". Start straight at the request, every register.
+- formal: proper written Bahasa Melayu, imperative request: "Paparkan ruang kosong pada semua sistem file.", "Cari file melebihi 100MB dalam folder ini."
+- colloquial: how a Malaysian actually types, short and casual: "nak tengok...", "tolong delete...", "cari file...". Vary among: nak, tolong, tlg, boleh tak, tengok, buang. Use kat/ni/tu/je/dah where natural.
+- rojak: heavy Malay/English code-switching, keeps whole English phrases ("nak check disk space kat sini"). "lah" is occasional flavour, not a suffix for every sentence.
 
 Request: {nl}"""
 
