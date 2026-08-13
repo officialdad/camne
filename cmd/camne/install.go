@@ -1,9 +1,7 @@
 package main
 
 import (
-	"bufio"
 	"fmt"
-	"io"
 	"os"
 	"path"
 	"path/filepath"
@@ -14,9 +12,10 @@ import (
 	"github.com/officialdad/camne/internal/provision"
 )
 
-// ensureProvisioned downloads whatever Status says is missing, after exactly
-// ONE consent prompt stating the total size in MB. Anything but an explicit
-// yes downloads nothing (constraint: no surprise network use, ever).
+// ensureProvisioned downloads whatever Status says is missing. Announced, not
+// asked: the size breakdown below and the MB ticker during the fetch mean no
+// surprise network use, but nothing is gated — without these two files camne
+// cannot answer a single question, so there is no second choice to offer.
 func ensureProvisioned(st provision.Status) bool {
 	asset, err := provision.LlamaAsset(runtime.GOOS, runtime.GOARCH)
 	if err != nil {
@@ -30,7 +29,7 @@ func ensureProvisioned(st provision.Status) bool {
 	if !st.ModelOK {
 		total += provision.ModelSize
 	}
-	fmt.Fprintf(os.Stderr, "camne perlu download %d MB dulu (sekali je — lepas ni semua jalan offline):\n", total/1_000_000)
+	fmt.Fprintf(os.Stderr, "camne tengah setup sendiri — download %d MB (sekali je, lepas ni semua jalan offline):\n", total/1_000_000)
 	if !st.ServerOK {
 		fmt.Fprintf(os.Stderr, "  llama-server  %d MB\n", asset.Size/1_000_000)
 	}
@@ -39,11 +38,6 @@ func ensureProvisioned(st provision.Status) bool {
 	}
 	if st.LibcNote != "" {
 		fmt.Fprintln(os.Stderr, "Perhatian: "+st.LibcNote)
-	}
-	fmt.Fprint(os.Stderr, "Nak teruskan? [y/T] ")
-	if !askConsent(os.Stdin) {
-		fmt.Fprintln(os.Stderr, "Okey, takde apa yang di-download. Bila dah sedia, taip je soalan tadi semula.")
-		return false
 	}
 	if !st.ServerOK {
 		if err := installServer(asset, st.ServerPath); err != nil {
@@ -62,19 +56,6 @@ func ensureProvisioned(st provision.Status) bool {
 	}
 	fmt.Fprintln(os.Stderr, "Siap — semua dah lengkap.")
 	return true
-}
-
-// askConsent reads one line; anything but an explicit yes is a no.
-func askConsent(r io.Reader) bool {
-	sc := bufio.NewScanner(r)
-	if !sc.Scan() {
-		return false
-	}
-	switch strings.ToLower(strings.TrimSpace(sc.Text())) {
-	case "y", "ya", "yes", "ok", "okey":
-		return true
-	}
-	return false
 }
 
 // installServer downloads the pinned llama.cpp release archive (verified

@@ -1,8 +1,9 @@
 // camne turns plain Malay into a shell command.
 //
 // The query path: make sure llama-server and the model are provisioned
-// (asking consent before any download), ask the resident model, safety-check
-// the answer, and PRINT it. Nothing is ever executed (constraint 5).
+// (downloading them on first run, size announced up front), ask the resident
+// model, safety-check the answer, and PRINT it. Nothing is ever executed
+// (constraint 5).
 package main
 
 import (
@@ -133,8 +134,8 @@ func doctor() {
 		fmt.Println("Semua lengkap — camne sedia untuk digunakan.")
 		return
 	}
-	fmt.Println("Taip je soalan anda — camne akan tanya kebenaran dulu, lepas tu")
-	fmt.Println("download sendiri apa yang tiada.")
+	fmt.Println("Taip je soalan anda — camne download sendiri apa yang tiada dulu,")
+	fmt.Println("lepas tu terus jawab.")
 }
 
 func usage() {

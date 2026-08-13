@@ -7,7 +7,7 @@
 
 Ask in Malay, get a shell command. Fully local, zero setup.
 
-![camne demo: a colloquial Malay question, the command it prints, a BAHAYA warning, and the first-run download consent screen](demo/demo.gif)
+![camne demo: a colloquial Malay question, the command it prints, a BAHAYA warning, and `camne doctor` on a fresh machine](demo/demo.gif)
 
 ```console
 $ camne nak buat file baru
@@ -31,10 +31,11 @@ Windows: download `camne_windows_amd64.exe` (or `camne_windows_arm64.exe`) from
 
 ## Usage
 
-On first run camne asks permission to download llama-server and the model
-(about 1 GB, once). Answer anything but `y` and nothing is downloaded. Once
+On first run camne downloads llama-server and the model (about 1 GB, once),
+printing the size before it starts and the progress while it runs. Once
 everything is in place it all runs offline — your questions never leave the
-machine.
+machine. To see what is missing without downloading anything, run
+`camne doctor`.
 
 The interface is Malay, because that is the point. Colloquial and rojak both
 work, and English still works too.
