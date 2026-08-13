@@ -12,7 +12,6 @@ import (
 	"os"
 	"strings"
 	"time"
-	"unicode/utf8"
 
 	"github.com/officialdad/camne/internal/engine"
 	"github.com/officialdad/camne/internal/provision"
@@ -76,101 +75,25 @@ func run(query string) int {
 	return 0
 }
 
-// render prints safety warnings to errw and the command itself to out — and
-// that is ALL camne ever does with a command: print it. Danger findings get
-// the BAHAYA block and must never be auto-run (constraint 5).
+// render prints one safety word to errw and the command itself to out — and
+// that is ALL camne ever does with a command: print it. A BAHAYA command must
+// never be auto-run (constraint 5).
 //
 // Each stream is asked about colour on its own: stdout is usually piped into a
 // shell while stderr is still the terminal the user is reading. The command is
 // highlighted only when out is a terminal, so `camne ... | sh` still receives
 // exactly the bytes it did before.
 func render(out, errw io.Writer, cmd string, findings []safety.Finding) {
-	var dangers, cautions []safety.Finding
-	for _, f := range findings {
-		switch f.Level {
-		case safety.LevelDanger:
-			dangers = append(dangers, f)
-		case safety.LevelCaution:
-			cautions = append(cautions, f)
-		}
-	}
-	warn := enabled(errw)
-	if len(dangers) > 0 {
-		head := "BAHAYA"
-		if len(dangers) > 1 {
-			head = fmt.Sprintf("BAHAYA (%d perkara)", len(dangers))
-		}
-		fmt.Fprintln(errw, paint(warn, cDanger, rule(head)))
-		for _, f := range dangers {
-			for _, line := range wrap(f.Reason + " — " + advice(f.Reason)) {
-				fmt.Fprintln(errw, paint(warn, cDanger, line))
-			}
-		}
-		for _, line := range wrap("camne cuma tunjuk command ni je — ia tak jalankan apa-apa, dan tak akan.") {
-			fmt.Fprintln(errw, line)
-		}
-		fmt.Fprintln(errw, paint(warn, cDanger, rule("")))
-	}
-	for _, f := range cautions {
-		fmt.Fprintln(errw, paint(warn, cCaution, "  !  Awas: "+f.Reason))
+	switch safety.Worst(findings) {
+	case safety.LevelDanger:
+		fmt.Fprintln(errw, paint(enabled(errw), cDanger, "!! BAHAYA"))
+	case safety.LevelCaution:
+		fmt.Fprintln(errw, paint(enabled(errw), cCaution, "!  Awas"))
 	}
 	if enabled(out) {
 		cmd = highlight(cmd)
 	}
 	fmt.Fprintln(out, cmd)
-}
-
-// rule draws an edge of the danger block: `!! BAHAYA !!!!...` on top, a plain
-// run of `!` underneath. ASCII, because the box-drawing characters garble on an
-// old Windows console and this is the one message that must always be readable.
-func rule(label string) string {
-	if label == "" {
-		return strings.Repeat("!", ruleWidth)
-	}
-	s := "!! " + label + " "
-	return s + strings.Repeat("!", max(0, ruleWidth-len(s)))
-}
-
-const ruleWidth = 60
-
-// wrap breaks one line of the danger block at word boundaries so it stays
-// inside the rule instead of spilling ragged past it on an 80-column terminal,
-// and indents every line to the block's three spaces. Counted in runes, not
-// bytes, because the em dash in these strings is three bytes wide and one
-// column. A word longer than the width is left over-long rather than cut in
-// half — a truncated path is worse than an untidy block.
-func wrap(s string) []string {
-	const indent = "   "
-	var lines []string
-	line := indent
-	for _, word := range strings.Fields(s) {
-		switch {
-		case line == indent:
-			line += word
-		case utf8.RuneCountInString(line+" "+word) <= ruleWidth:
-			line += " " + word
-		default:
-			lines = append(lines, line)
-			line = indent + word
-		}
-	}
-	return append(lines, line)
-}
-
-// advice turns a diagnosis into an instruction, because an error message has to
-// say what to do next. It reads the Reason wording rather than the detection
-// logic, which it must not touch; an unmatched reason falls through to the
-// generic line, so a new rule in internal/safety degrades quietly.
-func advice(reason string) string {
-	switch {
-	case strings.Contains(reason, "kritikal") || strings.Contains(reason, "home directory"):
-		return "tukar target ke folder yang kau betul-betul nak"
-	case strings.Contains(reason, "internet") || strings.Contains(reason, "remote"):
-		return "download dulu, baca sendiri, baru jalankan"
-	case strings.Contains(reason, "placeholder"):
-		return "ganti placeholder tu dengan nama betul dulu"
-	}
-	return "jangan jalankan sampai kau faham betul apa command ni buat"
 }
 
 // stop shuts the resident llama-server down.

@@ -36,7 +36,7 @@ Sleep 500ms
 Enter
 Sleep 3s
 
-# 2. A dangerous command gets the red BAHAYA block. camne still runs nothing.
+# 2. A dangerous command gets the red BAHAYA line. camne still runs nothing.
 Type "camne nak delete semua file dalam /etc"
 Sleep 500ms
 Enter

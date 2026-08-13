@@ -11,7 +11,7 @@
 
 Ask in Malay, get a shell command. Fully local, zero setup.
 
-![camne demo: a colloquial Malay question, the syntax-highlighted command it prints, a red BAHAYA block, and `camne doctor` on a fresh machine](demo/demo.gif)
+![camne demo: a colloquial Malay question, the syntax-highlighted command it prints, a red BAHAYA line, and `camne doctor` on a fresh machine](demo/demo.gif)
 
 ```console
 $ camne nak buat file baru
@@ -49,18 +49,13 @@ $ camne cari file lagi besar dari 100MB
 find / -size +100M -type f -exec ls -lh {} \; | sort -n -k5
 
 $ camne nak delete semua file dalam /etc
-!! BAHAYA !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-   find + delete: target ialah laluan kritikal /etc — tukar
-   target ke folder yang kau betul-betul nak
-   camne cuma tunjuk command ni je — ia tak jalankan
-   apa-apa, dan tak akan.
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!! BAHAYA
 find /etc -type f -exec rm {} \;
 ```
 
-Dangerous commands get a red `!! BAHAYA` block that says what to do about
-them; anything merely worth a second look gets a yellow `!  Awas:` line. camne
-never executes anything regardless, it only prints.
+Dangerous commands get a red `!! BAHAYA` line; anything merely worth a second
+look gets a yellow `!  Awas` line. camne never executes anything regardless, it
+only prints.
 
 The command itself is syntax-highlighted, and the warnings are coloured, only
 when the stream is a terminal. Pipe it — `camne ... | sh`, `$(camne ...)` — and
