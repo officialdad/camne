@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="camne-hero-640x640.png" alt="camne logo" width="160">
+</p>
+
 # camne
 
 [![CI](https://github.com/officialdad/camne/actions/workflows/ci.yml/badge.svg)](https://github.com/officialdad/camne/actions/workflows/ci.yml)
@@ -23,7 +27,7 @@ curl -fsSL https://raw.githubusercontent.com/officialdad/camne/main/install.sh |
 ```
 
 The installer puts the binary in `/usr/local/bin` if that directory is
-writable, otherwise `~/.local/bin` — and tells you if that directory is not on
+writable, otherwise `~/.local/bin`. It tells you when that directory is not on
 your `PATH` yet.
 
 Windows: download `camne_windows_amd64.exe` (or `camne_windows_arm64.exe`) from
@@ -33,7 +37,7 @@ Windows: download `camne_windows_amd64.exe` (or `camne_windows_arm64.exe`) from
 
 On first run camne downloads llama-server and the model (about 1 GB, once),
 printing the size before it starts and the progress while it runs. Once
-everything is in place it all runs offline — your questions never leave the
+everything is in place it all runs offline, so your questions never leave the
 machine. To see what is missing without downloading anything, run
 `camne doctor`.
 
@@ -69,8 +73,8 @@ held in memory).
 ## Status
 
 The engine works with an English model (nl2sh-1.5b). The Malay model
-(colloquial + rojak) is still in progress — see [PROMPT.md](PROMPT.md) for the
-full plan.
+(colloquial + rojak) is still in progress. [PROMPT.md](PROMPT.md) has the full
+plan.
 
 ## Build from source
 
@@ -81,7 +85,7 @@ vhs demo/demo.tape          # re-record demo.gif
 ```
 
 Contributing: [CONTRIBUTING.md](CONTRIBUTING.md). The repo ships a checked-in
-`.claude/` config — see [`.claude/README.md`](.claude/README.md).
+`.claude/` config, described in [`.claude/README.md`](.claude/README.md).
 
 ## License
 
