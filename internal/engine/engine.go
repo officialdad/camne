@@ -184,10 +184,10 @@ func chatML(query string) string {
 // every benchmark states (PROMPT.md §7.1), so the tool must match them.
 func (c *Client) Complete(query string) (string, error) {
 	body, err := json.Marshal(completionReq{
-		Prompt:      chatML(query),
-		NPredict:    64,
-		Temperature: 0,
-		Grammar:     grammar,
+		Prompt:        chatML(query),
+		NPredict:      64,
+		Temperature:   0,
+		Grammar:       grammar,
 		Stop:          []string{"\n"},
 		CachePrompt:   true,
 		RepeatPenalty: 1.08,
