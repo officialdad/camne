@@ -1,4 +1,4 @@
-// Package engine drives a resident llama-server (PROMPT.md §4.2). The first
+// Package engine drives a resident llama-server. The first
 // query starts the server detached and leaves it resident, so later queries
 // skip the ~1 GB model load; `camne stop` shuts it down. Transport is a UNIX
 // domain socket in a 0700 run directory on linux/darwin (llama-server binds a
@@ -34,7 +34,7 @@ const systemPrompt = "You are a shell command generator. Output exactly one line
 
 // grammar constrains generation to one non-empty line of printable ASCII —
 // no newlines, no markdown fences, no "Sure, here's the command:" framing to
-// strip afterwards (PROMPT.md §4.2).
+// strip afterwards.
 const grammar = "root ::= [ -~]+"
 
 // idleSleep: after 30 min idle llama-server unloads the model from RAM; the
@@ -181,7 +181,7 @@ func chatML(query string) string {
 
 // Complete asks the model for one command. Decoding is fixed — temperature 0,
 // 64 tokens max, grammar-constrained to a single line — the same settings
-// every benchmark states (PROMPT.md §7.1), so the tool must match them.
+// every benchmark states, so the tool must match them.
 func (c *Client) Complete(query string) (string, error) {
 	body, err := json.Marshal(completionReq{
 		Prompt:        chatML(query),

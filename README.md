@@ -68,8 +68,7 @@ held in memory).
 ## Status
 
 The engine works with an English model (nl2sh-1.5b). The Malay model
-(colloquial + rojak) is still in progress. [PROMPT.md](PROMPT.md) has the full
-plan.
+(colloquial + rojak) is still in progress.
 
 ## Build from source
 

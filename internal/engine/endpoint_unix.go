@@ -13,7 +13,7 @@ import (
 
 // The socket lives in the 0700 run dir, so filesystem permissions gate access
 // — unlike a loopback port, which every UID on a shared box can reach, and
-// which another process could squat between restarts (PROMPT.md §4.2).
+// which another process could squat between restarts.
 // llama-server binds a UNIX socket when --host ends in ".sock", verified in
 // common/arg.cpp at the pinned b10333 tag.
 

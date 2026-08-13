@@ -12,7 +12,7 @@ import (
 	"syscall"
 )
 
-// Windows difference, documented (PROMPT.md §4.2): llama-server's ".sock"
+// Windows difference: llama-server's ".sock"
 // binding is a POSIX path convention, so camne falls back to a loopback TCP
 // port here. Two consequences vs the unix-socket transport: loopback is
 // reachable by every local user, and the port is picked by binding :0 then

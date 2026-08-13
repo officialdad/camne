@@ -2,10 +2,6 @@
 
 `camne` — plain Malay in, shell command out, fully local, zero setup.
 
-**Read [`PROMPT.md`](PROMPT.md) before doing anything non-trivial.** It holds
-the constraints, the architecture rationale, the benchmark protocol, and the
-references. This file is only the working rules.
-
 ## The six constraints
 
 Violating any of these means the change is wrong, not the constraint.

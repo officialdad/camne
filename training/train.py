@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""LoRA tune per PROMPT.md §5.2, adapted for the RTX 3090 per issue #2.
+"""LoRA tune, adapted for the RTX 3090 per issue #2.
 
 One arm per invocation, one variable at a time, seed 42:
 

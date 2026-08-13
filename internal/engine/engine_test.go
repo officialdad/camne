@@ -68,7 +68,7 @@ func TestComplete(t *testing.T) {
 		t.Errorf("cmd = %q, want trimmed command", cmd)
 	}
 
-	// The fixed decoding contract (PROMPT.md §7.1): temp 0, 64 tokens, grammar.
+	// The fixed decoding contract: temp 0, 64 tokens, grammar.
 	if got.Temperature != 0 {
 		t.Errorf("temperature = %v, want 0", got.Temperature)
 	}

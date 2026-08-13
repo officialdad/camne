@@ -1,4 +1,4 @@
-// Package provision is the zero-setup subsystem (PROMPT.md §4.3): it knows
+// Package provision is the zero-setup subsystem: it knows
 // where camne's cache lives, which pinned llama.cpp build and GGUF model to
 // fetch for this machine, and how to download, verify, and unpack them.
 // Everything is verified against a pinned sha256 BEFORE it is unpacked,
@@ -17,7 +17,7 @@ import (
 const llamaBuild = "b10333"
 
 // The English NL2SH model, used deliberately until the BM bake-off
-// (PROMPT.md §8, milestone 3). Swapping the model means changing these three
+// (milestone 3). Swapping the model means changing these three
 // consts and nothing else.
 const (
 	ModelFile   = "nl2sh-1.5b-Q4_K_M.gguf"

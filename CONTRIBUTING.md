@@ -1,7 +1,7 @@
 # Contributing to camne
 
-Read [`CLAUDE.md`](CLAUDE.md) for the working rules and [`PROMPT.md`](PROMPT.md)
-for the constraints and architecture rationale. This file is just the commands.
+Read [`CLAUDE.md`](CLAUDE.md) for the working rules and the constraints. This
+file is just the commands.
 
 ## Build, test, lint
 

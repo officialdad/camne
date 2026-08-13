@@ -3,7 +3,7 @@
 
   uv run eval_score.py --answers out/answers_bm.jsonl
 
-Protocol (PROMPT.md §7.1): eval_mode=embed, threshold 0.75 — needs Ollama
+Protocol: eval_mode=embed, threshold 0.75 — needs Ollama
 with mxbai-embed-large pulled. Docker required. Per-task results land next
 to the input as <answers>.scored.jsonl so a crashed run can be diffed.
 """

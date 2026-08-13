@@ -1,6 +1,6 @@
 ---
 name: Milestone
-about: Track a PROMPT.md milestone with enough context to resume on any machine
+about: Track a milestone with enough context to resume on any machine
 title: "milestone N: <name>"
 labels: milestone
 ---
@@ -17,8 +17,7 @@ under five minutes without asking anything.
 
 ## Spec
 
-<!-- Link the PROMPT.md section(s) that define this milestone. The issue
-     summarizes; PROMPT.md decides. -->
+<!-- What defines this milestone: the behaviour it must have when it closes. -->
 
 ## State when this issue was written
 
