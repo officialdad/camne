@@ -1,27 +1,62 @@
 name: Release
 
+# A v* tag builds all six binaries and publishes them as a GitHub Release.
+# Heavy lifting lives in scripts/build.sh so this workflow stays a thin
+# orchestrator — the same script is what CI cross-compiles with, so the
+# release path cannot rot unnoticed.
 on:
   push:
     tags: ["v*"]
 
+# Never cancel a release mid-publish. Assets are uploaded one at a time, and a
+# half-published release is worse than a late one.
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
 permissions:
-  contents: write
+  contents: write # create the release + upload the six binaries
 
 jobs:
   release:
+    name: Six binaries + publish release
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-go@v5
         with:
           go-version-file: go.mod
 
+      # Fail before building rather than after publishing a release named
+      # after a typo. build.sh stamps this string into `camne --version`.
+      - name: Check the tag is vMAJOR.MINOR.PATCH
+        run: |
+          case "$GITHUB_REF_NAME" in
+            v[0-9]*.[0-9]*.[0-9]*) ;;
+            *) echo "::error::tag '$GITHUB_REF_NAME' is not a vMAJOR.MINOR.PATCH release tag"; exit 1 ;;
+          esac
+
       # scripts/build.sh already cross-compiles all six targets into dist/,
       # stamps the version, and writes dist/checksums.txt. Do not duplicate it.
-      - run: scripts/build.sh "$GITHUB_REF_NAME"
+      - name: Build six binaries + checksums
+        run: scripts/build.sh "$GITHUB_REF_NAME"
 
+      # --generate-notes builds "What's Changed" from the PRs merged since the
+      # previous tag (grouped by .github/release.yml). --notes is PREPENDED
+      # above it as a fixed header carrying what a changelog cannot know:
+      # how to install, how to verify, and what happens on first run.
+      #
       # Asset names must stay exactly as build.sh emits them — install.sh
       # downloads camne_${os}_${arch} and greps checksums.txt for " $BIN$".
-      - run: gh release create "$GITHUB_REF_NAME" --generate-notes dist/camne_* dist/checksums.txt
+      - name: Create GitHub release + upload binaries
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          HEADER=$'Six static binaries — Linux, macOS and Windows on both amd64 and arm64. No runtime, no dependencies, nothing to install alongside them.\n\n**Linux / macOS:** `curl -fsSL https://raw.githubusercontent.com/officialdad/camne/main/install.sh | sh`\n**Windows:** download `camne_windows_amd64.exe` (or `camne_windows_arm64.exe`) below.\n\nEvery asset\'s SHA-256 is in `checksums.txt`. `install.sh` verifies it before installing and refuses on a mismatch.\n\nOn first run camne asks permission to download llama-server and the model (~1 GB, once). Answer anything but `y` and nothing is downloaded. Everything runs offline after that — nothing you type ever leaves the machine.\n\ncamne only prints commands, it never runs them, and dangerous ones are flagged with a BAHAYA warning first.'
+          gh release create "$GITHUB_REF_NAME" \
+            --title "camne ${GITHUB_REF_NAME#v}" \
+            --verify-tag \
+            --generate-notes \
+            --notes "$HEADER" \
+            dist/camne_* dist/checksums.txt
