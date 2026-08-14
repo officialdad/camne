@@ -9,9 +9,10 @@
 [![Go](https://img.shields.io/github/go-mod/go-version/officialdad/camne)](go.mod)
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue)](LICENSE)
 
-> **Status: work in progress.** The engine works today, but it runs an English
-> model (nl2sh-1.5b). The Malay model is still training, so colloquial and
-> rojak questions will not answer well yet.
+> **Status: the Malay model has landed.** camne now runs
+> [camne-1.5b](https://huggingface.co/opariffazman/camne-1.5b-Q4_K_M), tuned on
+> 307k four-register rows. Malay and rojak questions answer well; English is
+> roughly level with the model it replaces. Numbers in [RESULTS.md](RESULTS.md).
 
 *camne* is how people say *macam mana* / *bagaimana*: "how".
 
@@ -79,6 +80,24 @@ release exists and offers to install it — nothing is downloaded or replaced
 until you answer the prompt. The check sends nothing but that question, never
 runs before the answer, and is skipped entirely when camne's output is piped
 somewhere.
+
+## The model
+
+[InterCode-ALFA](https://github.com/westenfelder/InterCode-ALFA), unmodified
+scorer, 300 tasks per register. Rojak — Malay grammar around English technical
+nouns — is what people actually type, so it is the column that matters.
+
+| model | BM | rojak | EN | size | tok/s @4t | RSS |
+|---|---|---|---|---|---|---|
+| nl2sh-1.5b (the English model camne used to ship) | 0.297 | 0.430 | **0.593** | 986 MB | 40 | 1.6 GB |
+| **camne-1.5b** | **0.417** | **0.490** | 0.533 | 986 MB | 40 | 1.6 GB |
+
+Malay +0.120 (p=0.0002) and rojak +0.060 (p=0.044) against the model it
+replaces. English is −0.060 at p=0.050, which 300 tasks cannot resolve — so
+the honest claim is "cannot distinguish", not "as good as". Speed and memory
+are unchanged: same base, same quantisation, same file size.
+
+Full method, the runs that failed, and why, in [RESULTS.md](RESULTS.md).
 
 ## Build from source
 
