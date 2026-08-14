@@ -47,9 +47,14 @@ func enabled(w io.Writer) bool {
 		return false
 	}
 	f, ok := w.(*os.File)
-	if !ok {
-		return false
-	}
+	return ok && isTTY(f)
+}
+
+// isTTY reports whether f is a character device, which is the portable
+// stand-in for "a person is on the other end of this". Colour asks it, and so
+// does the update prompt — one check, so the two can never disagree about
+// whether camne is being piped somewhere.
+func isTTY(f *os.File) bool {
 	fi, err := f.Stat()
 	return err == nil && fi.Mode()&os.ModeCharDevice != 0
 }
