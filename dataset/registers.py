@@ -72,7 +72,9 @@ def main():
     ap.add_argument("--workers", type=int, default=8)
     ap.add_argument("--temperature", type=float, default=0.7)
     ap.add_argument("--limit", type=int, default=0, help="translate only the first N rows (smoke test)")
-    ap.add_argument("--eval", action="store_true", help="emit colloquial register only (eval-set mode)")
+    ap.add_argument("--eval", action="store_true", help="emit one register only (eval-set mode)")
+    ap.add_argument("--register", default="colloquial", choices=REGISTERS,
+                    help="which register --eval emits")
     args = ap.parse_args()
 
     tag = os.path.splitext(os.path.basename(args.src))[0]
@@ -94,7 +96,7 @@ def main():
     out_f = open(args.out, "a", encoding="utf-8")
     rej_f = open(args.out + ".rejects", "a", encoding="utf-8")
     lock = threading.Lock()
-    wanted = ("colloquial",) if args.eval else REGISTERS
+    wanted = (args.register,) if args.eval else REGISTERS
     n_done = n_fail = 0
 
     def work(item):

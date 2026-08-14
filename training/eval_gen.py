@@ -31,7 +31,8 @@ def load_prompts(which):
                   newline="", encoding="utf-8") as f:
             return [(i, r["nl"]) for i, r in enumerate(csv.DictReader(f))]
     rows = {}
-    with open(os.path.join(HERE, "../dataset/eval_bm_300.jsonl"), encoding="utf-8") as f:
+    name = "eval_rojak_300.jsonl" if which == "rojak" else "eval_bm_300.jsonl"
+    with open(os.path.join(HERE, "../dataset", name), encoding="utf-8") as f:
         for line in f:
             r = json.loads(line)
             rows[int(r["id"].split(":")[1])] = r["nl"]
@@ -40,7 +41,7 @@ def load_prompts(which):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--prompts", choices=("bm", "en"), required=True)
+    ap.add_argument("--prompts", choices=("bm", "en", "rojak"), required=True)
     ap.add_argument("--out", required=True)
     ap.add_argument("--endpoint", default="http://127.0.0.1:18092/completion")
     args = ap.parse_args()
