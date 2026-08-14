@@ -30,12 +30,12 @@ func tcpClient(port string) *Client {
 func newEndpoint(rd string) (*Client, []string, error) {
 	l, err := net.Listen("tcp", "127.0.0.1:0")
 	if err != nil {
-		return nil, nil, errors.New("tak boleh buka port tempatan untuk llama-server — cuba lagi")
+		return nil, nil, errors.New("could not open a local port for llama-server — try again in a moment")
 	}
 	port := strconv.Itoa(l.Addr().(*net.TCPAddr).Port)
 	l.Close()
 	if err := os.WriteFile(portPath(rd), []byte(port), 0o600); err != nil {
-		return nil, nil, fmt.Errorf("tak boleh simpan fail port: %w", err)
+		return nil, nil, fmt.Errorf("could not save the port file camne uses to find llama-server again — check you have free space in your home folder, then try again: %w", err)
 	}
 	return tcpClient(port), []string{"--host", "127.0.0.1", "--port", port}, nil
 }

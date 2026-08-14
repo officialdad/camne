@@ -56,7 +56,7 @@ var llamaAssets = map[string]Asset{
 func LlamaAsset(goos, goarch string) (Asset, error) {
 	a, ok := llamaAssets[goos+"/"+goarch]
 	if !ok {
-		return Asset{}, fmt.Errorf("camne belum support %s/%s lagi — buka issue kat GitHub kalau anda perlukan platform ni", goos, goarch)
+		return Asset{}, fmt.Errorf("camne does not support %s/%s yet — open an issue at https://github.com/officialdad/camne/issues if you need this platform", goos, goarch)
 	}
 	return a, nil
 }
@@ -69,7 +69,7 @@ func LlamaAsset(goos, goarch string) (Asset, error) {
 func Dir() (string, error) {
 	c, err := os.UserCacheDir()
 	if err != nil {
-		return "", fmt.Errorf("tak jumpa folder cache sistem: %w", err)
+		return "", fmt.Errorf("could not find your system's cache folder, so camne has nowhere to keep its files — check that HOME is set, then try again: %w", err)
 	}
 	return filepath.Join(c, "camne"), nil
 }
