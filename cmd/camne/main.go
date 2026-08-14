@@ -27,18 +27,27 @@ func main() {
 		usage()
 		os.Exit(1)
 	}
+	code := 0
 	switch args[0] {
 	case "--version", "-v":
 		fmt.Println("camne " + version)
-		return
 	case "doctor":
 		doctor()
-		return
 	case "stop":
 		stop()
-		return
+	case "update":
+		os.Exit(update()) // asked for explicitly: no offer, no throttle
+	default:
+		code = run(strings.Join(args, " "))
 	}
-	os.Exit(run(strings.Join(args, " ")))
+	// Only now, with the answer already printed, does camne look at the
+	// network for a newer release (constraint 3) — and only if that answer
+	// worked. Someone whose command just failed is owed the error, not an
+	// offer to install a different version of the thing that failed.
+	if code == 0 {
+		offerUpdate()
+	}
+	os.Exit(code)
 }
 
 // run answers one query end to end. Errors from the packages below are
@@ -151,6 +160,7 @@ Contoh:  camne nak buat file baru
 
 Lain:    camne doctor   — semak apa yang dah dipasang
          camne stop     — hentikan model yang duduk dalam memory
+         camne update   — check for a newer camne and install it
 
 camne hanya tunjuk command — ia tak jalankan apa-apa.
 `)

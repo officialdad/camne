@@ -70,8 +70,14 @@ sent through `cat` comes back with no colour, which is what any program reading
 camne's output would see. `NO_COLOR` or `TERM=dumb` turns colour off
 everywhere.
 
-Two other commands: `camne doctor` checks the install, `camne stop` shuts down
-the model held in memory.
+Three other commands: `camne doctor` checks the install, `camne stop` shuts down
+the model held in memory, and `camne update` installs the newest release.
+
+Once a day, after it has printed an answer, camne asks GitHub whether a newer
+release exists and offers to install it — nothing is downloaded or replaced
+until you answer the prompt. The check sends nothing but that question, never
+runs before the answer, and is skipped entirely when camne's output is piped
+somewhere.
 
 ## Build from source
 
