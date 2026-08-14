@@ -29,7 +29,7 @@ func ensureProvisioned(st provision.Status) bool {
 	if !st.ModelOK {
 		total += provision.ModelSize
 	}
-	fmt.Fprintf(os.Stderr, "camne tengah setup sendiri — download %d MB (sekali je, lepas ni semua jalan offline):\n", total/1_000_000)
+	fmt.Fprintf(os.Stderr, "camne is setting itself up — downloading %d MB (once only; after this it all works offline):\n", total/1_000_000)
 	if !st.ServerOK {
 		fmt.Fprintf(os.Stderr, "  llama-server  %d MB\n", asset.Size/1_000_000)
 	}
@@ -37,7 +37,7 @@ func ensureProvisioned(st provision.Status) bool {
 		fmt.Fprintf(os.Stderr, "  model         %d MB\n", provision.ModelSize/1_000_000)
 	}
 	if st.LibcNote != "" {
-		fmt.Fprintln(os.Stderr, "Perhatian: "+st.LibcNote)
+		fmt.Fprintln(os.Stderr, "Heads up: "+st.LibcNote)
 	}
 	if !st.ServerOK {
 		if err := installServer(asset, st.ServerPath); err != nil {
@@ -46,7 +46,7 @@ func ensureProvisioned(st provision.Status) bool {
 		}
 	}
 	if !st.ModelOK {
-		fmt.Fprintln(os.Stderr, "Download model...")
+		fmt.Fprintln(os.Stderr, "Downloading the model...")
 		if err := withProgress(st.ModelPath+".part", provision.ModelSize, func() error {
 			return provision.Download(provision.ModelURL, st.ModelPath, provision.ModelSHA256)
 		}); err != nil {
@@ -54,7 +54,7 @@ func ensureProvisioned(st provision.Status) bool {
 			return false
 		}
 	}
-	fmt.Fprintln(os.Stderr, "Siap — semua dah lengkap.")
+	fmt.Fprintln(os.Stderr, "Done — everything is ready.")
 	return true
 }
 
@@ -67,7 +67,7 @@ func installServer(asset provision.Asset, serverPath string) error {
 		return err
 	}
 	archive := filepath.Join(cacheDir, "downloads", asset.Name)
-	fmt.Fprintln(os.Stderr, "Download llama-server...")
+	fmt.Fprintln(os.Stderr, "Downloading llama-server...")
 	if err := withProgress(archive+".part", asset.Size, func() error {
 		return provision.Download(asset.URL(), archive, asset.SHA256)
 	}); err != nil {
@@ -96,7 +96,7 @@ func installServer(asset provision.Asset, serverPath string) error {
 	os.Remove(archive)
 	// The layout assumption above is upstream's packaging, not ours: verify.
 	if _, err := os.Stat(serverPath); err != nil {
-		return fmt.Errorf("unpack siap tapi llama-server tak jumpa kat tempat sepatutnya — padam folder %s lepas tu cuba lagi", filepath.Dir(serverPath))
+		return fmt.Errorf("unpacking finished but llama-server is not where it should be — delete the folder %s, then run camne again", filepath.Dir(serverPath))
 	}
 	return nil
 }

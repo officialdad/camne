@@ -10,7 +10,7 @@ Violating any of these means the change is wrong, not the constraint.
 2. Zero setup — no `pipx`, no Ollama, no separate `llama-server` install, no compiler on the user's machine.
 3. Runs on 4 cores / 8 GB / no GPU. Warm answer < 1.5 s, cold start < 5 s, RSS < 2.5 GB.
 4. Nothing typed at the prompt leaves the machine. No telemetry.
-5. Nothing executes without explicit consent. `BAHAYA` never auto-runs.
+5. Nothing executes without explicit consent. camne prints the command and stops there; a command the safety checker flags is still only printed.
 6. Linux, macOS, Windows × amd64, arm64.
 
 ## Stack
@@ -108,16 +108,17 @@ No model change merges without numbers. Not examples, numbers.
 
 ## User-facing text
 
-Malay, colloquial, aimed at someone who has never used a terminal. Error
-messages say what to do next. No Go stack traces reaching the user.
+English, plain, aimed at someone who has never used a terminal. Error messages
+say what to do next. No Go stack traces reaching the user.
 
-Technical terms stay English inside Malay sentences — that is how people
-actually speak.
+Output is English; input is not. Colloquial Malay in, rojak in, English in —
+`camne nak buat file baru` still works, camne just answers in English
+(issue #25). Do not "fix" a printed string back to Malay.
 
 This covers what the program prints, and only that. Repo docs — README,
-CONTRIBUTING, release notes, commits, issues, PRs — are English, because their
-audience is contributors, not the person at the prompt. Malay quoted inside
-them (real CLI output, the demo queries) stays verbatim.
+CONTRIBUTING, release notes, commits, issues, PRs — are English too, because
+their audience is contributors, not the person at the prompt. Malay quoted
+inside them (the demo queries, real CLI input) stays verbatim.
 
 ## Commits
 

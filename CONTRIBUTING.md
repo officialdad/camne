@@ -33,7 +33,7 @@ A change that violates one of these is wrong; the constraint is not.
 2. Zero setup — no `pipx`, no Ollama, no separate `llama-server` install, no compiler on the user's machine.
 3. Runs on 4 cores / 8 GB / no GPU. Warm answer < 1.5 s, cold start < 5 s, RSS < 2.5 GB.
 4. Nothing typed at the prompt leaves the machine. No telemetry.
-5. Nothing executes without explicit consent. `BAHAYA` never auto-runs.
+5. Nothing executes without explicit consent. camne prints the command and stops there; a command the safety checker flags is still only printed.
 6. Linux, macOS, Windows × amd64, arm64.
 
 ## Before you open a PR
@@ -43,9 +43,10 @@ A change that violates one of these is wrong; the constraint is not.
 - Touching `internal/safety`? Read the audit notes in `CLAUDE.md` first. Those
   tests *are* the audit — do not weaken them.
 - Model or dataset change? Numbers, not examples. See `CLAUDE.md`.
-- User-facing text is colloquial Malay with technical terms left in English
-  (*file*, *folder*, *server*). Error messages say what to do next. A linter
-  does not get to reword them.
+- User-facing text is plain English, aimed at someone who has never used a
+  terminal. Error messages say what to do next. A linter does not get to
+  reword them. Input stays multilingual: colloquial Malay, rojak and English
+  all have to keep working.
 
 ## Commits
 

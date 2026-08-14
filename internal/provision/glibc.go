@@ -16,8 +16,8 @@ const glibcMinMajor, glibcMinMinor = 2, 34
 // get a diagnosis, not a fix. Upgrade path: pin a static/compat llama.cpp
 // build (as whatisit's fetch.py does) and select it here.
 
-// libcNote returns a colloquial-Malay note when this machine's libc cannot
-// run the prebuilt llama.cpp, or "" when it can (or this is not Linux).
+// libcNote returns a plain-English note when this machine's libc cannot run
+// the prebuilt llama.cpp, or "" when it can (or this is not Linux).
 func libcNote() string {
 	if runtime.GOOS != "linux" {
 		return ""
@@ -26,19 +26,19 @@ func libcNote() string {
 	if err != nil && len(out) == 0 {
 		// No ldd at all — usually musl or a container image stripped bare.
 		if m, _ := filepath.Glob("/lib/ld-musl-*"); len(m) > 0 {
-			return "sistem ni guna musl (macam Alpine) — llama-server prebuilt tak akan jalan kat sini"
+			return "this system uses musl (Alpine and friends), so the ready-made llama-server will not run here — camne needs a system built on glibc 2.34 or newer, such as Ubuntu or Debian"
 		}
-		return "tak dapat kesan versi glibc — kalau llama-server tak jalan nanti, ini mungkin sebabnya"
+		return "could not work out this system's glibc version — if llama-server fails to start later, this is probably why"
 	}
 	musl, major, minor, ok := parseLddVersion(string(out))
 	switch {
 	case musl:
-		return "sistem ni guna musl (macam Alpine) — llama-server prebuilt tak akan jalan kat sini"
+		return "this system uses musl (Alpine and friends), so the ready-made llama-server will not run here — camne needs a system built on glibc 2.34 or newer, such as Ubuntu or Debian"
 	case !ok:
-		return "tak dapat kesan versi glibc — kalau llama-server tak jalan nanti, ini mungkin sebabnya"
+		return "could not work out this system's glibc version — if llama-server fails to start later, this is probably why"
 	case major < glibcMinMajor || (major == glibcMinMajor && minor < glibcMinMinor):
 		return "glibc " + strconv.Itoa(major) + "." + strconv.Itoa(minor) +
-			" terlalu lama (perlu 2.34 ke atas) — llama-server prebuilt tak akan jalan kat sini"
+			" is too old, so the ready-made llama-server will not run here — camne needs glibc 2.34 or newer, which comes with a newer version of your system"
 	}
 	return ""
 }

@@ -57,7 +57,7 @@ func runDir() (string, error) {
 	}
 	rd := filepath.Join(d, "run")
 	if err := os.MkdirAll(rd, 0o700); err != nil {
-		return "", fmt.Errorf("tak boleh buat folder run camne: %w", err)
+		return "", fmt.Errorf("could not create camne's working folder — check you have free space in your home folder, then try again: %w", err)
 	}
 	if runtime.GOOS != "windows" {
 		// MkdirAll leaves a pre-existing dir's mode alone: enforce it anyway,
@@ -117,7 +117,7 @@ func Connect(serverPath, modelPath string) (c *Client, cold bool, err error) {
 	}
 	cmd.SysProcAttr = detachAttr()
 	if err := cmd.Start(); err != nil {
-		return nil, false, fmt.Errorf("tak boleh start llama-server — jalankan `camne doctor` untuk semak: %w", err)
+		return nil, false, fmt.Errorf("could not start llama-server — run `camne doctor` to see what is missing: %w", err)
 	}
 	os.WriteFile(pidPath(rd), []byte(strconv.Itoa(cmd.Process.Pid)), 0o600)
 	cmd.Process.Release()
@@ -149,7 +149,7 @@ func (c *Client) WaitReady(timeout time.Duration) error {
 			return nil
 		}
 		if time.Now().After(deadline) {
-			return errors.New("model masih tak sedia — cuba `camne stop`, lepas tu tanya semula. Kalau masih gagal, `camne doctor` boleh tolong semak")
+			return errors.New("the model is still not ready — run `camne stop`, then ask again. If it keeps happening, `camne doctor` will show what is missing")
 		}
 		time.Sleep(300 * time.Millisecond)
 	}
@@ -194,33 +194,33 @@ func (c *Client) Complete(query string) (string, error) {
 		RepeatLastN:   64,
 	})
 	if err != nil {
-		return "", fmt.Errorf("soalan tu tak boleh diproses: %w", err)
+		return "", fmt.Errorf("your question could not be prepared for the model — try rewording it, then ask again: %w", err)
 	}
 	// Generous cap: a server that idled to sleep reloads the model first.
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Minute)
 	defer cancel()
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, c.base+"/completion", bytes.NewReader(body))
 	if err != nil {
-		return "", errors.New("tak dapat hubungi model — cuba `camne stop`, lepas tu tanya semula")
+		return "", errors.New("could not reach the model — run `camne stop`, then ask again")
 	}
 	req.Header.Set("Content-Type", "application/json")
 	resp, err := c.hc.Do(req)
 	if err != nil {
-		return "", errors.New("tak dapat hubungi model — cuba `camne stop`, lepas tu tanya semula")
+		return "", errors.New("could not reach the model — run `camne stop`, then ask again")
 	}
 	defer resp.Body.Close()
 	if resp.StatusCode != http.StatusOK {
-		return "", fmt.Errorf("model bagi ralat (HTTP %d) — cuba `camne stop`, lepas tu tanya semula", resp.StatusCode)
+		return "", fmt.Errorf("the model gave an error (HTTP %d) — run `camne stop`, then ask again", resp.StatusCode)
 	}
 	var out struct {
 		Content string `json:"content"`
 	}
 	if err := json.NewDecoder(resp.Body).Decode(&out); err != nil {
-		return "", errors.New("jawapan model tak boleh dibaca — cuba tanya semula")
+		return "", errors.New("the model's answer could not be read — please ask again")
 	}
 	cmd := strings.TrimSpace(printable(out.Content))
 	if cmd == "" {
-		return "", errors.New("model tak bagi jawapan kali ni — cuba ubah ayat soalan tu sikit")
+		return "", errors.New("the model had no answer this time — try saying it a different way and ask again")
 	}
 	return cmd, nil
 }

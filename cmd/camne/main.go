@@ -51,7 +51,7 @@ func main() {
 }
 
 // run answers one query end to end. Errors from the packages below are
-// already colloquial Malay, so they are printed as-is.
+// already written for the person at the prompt, so they are printed as-is.
 func run(query string) int {
 	st, err := provision.GetStatus()
 	if err != nil {
@@ -69,7 +69,7 @@ func run(query string) int {
 		return 1
 	}
 	if cold {
-		fmt.Fprintln(os.Stderr, "Sekejap ya — model tengah load. Soalan pertama je yang lambat sikit.")
+		fmt.Fprintln(os.Stderr, "One moment — the model is loading. Only the first question is this slow.")
 	}
 	if err := cli.WaitReady(2 * time.Minute); err != nil {
 		fmt.Fprintln(os.Stderr, err)
@@ -121,9 +121,9 @@ func stop() {
 		os.Exit(1)
 	}
 	if stopped {
-		fmt.Println("Ok, llama-server dah dihentikan.")
+		fmt.Println("Ok, llama-server has been shut down.")
 	} else {
-		fmt.Println("Takde llama-server yang tengah jalan pun.")
+		fmt.Println("There was no llama-server running.")
 	}
 }
 
@@ -132,44 +132,44 @@ func stop() {
 func doctor() {
 	st, err := provision.GetStatus()
 	if err != nil {
-		fmt.Fprintln(os.Stderr, err) // provision errors are already in Malay
+		fmt.Fprintln(os.Stderr, err) // provision errors are already written for the user
 		os.Exit(1)
 	}
 	mark := func(ok bool) string {
 		if ok {
-			return "[ada]   "
+			return "[found]   "
 		}
-		return "[tiada] "
+		return "[missing] "
 	}
-	fmt.Println("camne doctor — semak apa yang camne perlukan")
+	fmt.Println("camne doctor — what camne needs, and what it already has")
 	fmt.Println()
 	fmt.Println(mark(st.ServerOK) + "llama-server : " + st.ServerPath)
-	fmt.Printf("%smodel        : %s (lebih kurang %d MB)\n",
+	fmt.Printf("%smodel        : %s (about %d MB)\n",
 		mark(st.ModelOK), st.ModelPath, provision.ModelSize/1_000_000)
 	if st.LibcNote != "" {
 		fmt.Println()
-		fmt.Println("Perhatian: " + st.LibcNote)
+		fmt.Println("Heads up: " + st.LibcNote)
 	}
 	fmt.Println()
 	if st.ServerOK && st.ModelOK {
-		fmt.Println("Semua lengkap — camne sedia untuk digunakan.")
+		fmt.Println("All set — camne is ready to use.")
 		return
 	}
-	fmt.Println("Taip je soalan anda — camne download sendiri apa yang tiada dulu,")
-	fmt.Println("lepas tu terus jawab.")
+	fmt.Println("Just type your question — camne downloads whatever is missing")
+	fmt.Println("first, then answers.")
 }
 
 func usage() {
-	fmt.Fprint(os.Stderr, `camne — tanya dalam BM, dapat shell command.
+	fmt.Fprint(os.Stderr, `camne — ask in plain Malay or English, get a shell command.
 
-Guna:    camne <soalan anda>
-Contoh:  camne nak buat file baru
-         camne cari file dalam folder ni
+Use:      camne <your question>
+Examples: camne nak buat file baru
+          camne how do I find a file in this folder
 
-Lain:    camne doctor   — semak apa yang dah dipasang
-         camne stop     — hentikan model yang duduk dalam memory
-         camne update   — check for a newer camne and install it
+Also:     camne doctor   — check what is already installed
+          camne stop     — shut down the model sitting in memory
+          camne update   — check for a newer camne and install it
 
-camne hanya tunjuk command — ia tak jalankan apa-apa.
+camne only shows you the command — it never runs anything.
 `)
 }

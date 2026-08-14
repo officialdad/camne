@@ -22,7 +22,7 @@ import (
 func ExtractZip(archive, destDir string, keep func(name string) bool) error {
 	r, err := zip.OpenReader(archive)
 	if err != nil {
-		return fmt.Errorf("arkib rosak, tak boleh dibuka — padam dan download semula: %w", err)
+		return fmt.Errorf("the downloaded file is damaged and will not open — run camne again to download a fresh copy: %w", err)
 	}
 	defer r.Close()
 	for _, f := range r.File {
@@ -35,7 +35,7 @@ func ExtractZip(archive, destDir string, keep func(name string) bool) error {
 		}
 		rc, err := f.Open()
 		if err != nil {
-			return fmt.Errorf("arkib rosak — padam dan download semula: %w", err)
+			return fmt.Errorf("the downloaded file is damaged — run camne again to download a fresh copy: %w", err)
 		}
 		err = writeFile(dst, rc, f.Mode())
 		rc.Close()
@@ -52,12 +52,12 @@ func ExtractZip(archive, destDir string, keep func(name string) bool) error {
 func ExtractTarGz(archive, destDir string, keep func(name string) bool) error {
 	f, err := os.Open(archive)
 	if err != nil {
-		return fmt.Errorf("arkib rosak, tak boleh dibuka — padam dan download semula: %w", err)
+		return fmt.Errorf("the downloaded file is damaged and will not open — run camne again to download a fresh copy: %w", err)
 	}
 	defer f.Close()
 	gz, err := gzip.NewReader(f)
 	if err != nil {
-		return fmt.Errorf("arkib rosak, tak boleh dibuka — padam dan download semula: %w", err)
+		return fmt.Errorf("the downloaded file is damaged and will not open — run camne again to download a fresh copy: %w", err)
 	}
 	defer gz.Close()
 	tr := tar.NewReader(gz)
@@ -67,7 +67,7 @@ func ExtractTarGz(archive, destDir string, keep func(name string) bool) error {
 			return nil
 		}
 		if err != nil {
-			return fmt.Errorf("arkib rosak — padam dan download semula: %w", err)
+			return fmt.Errorf("the downloaded file is damaged — run camne again to download a fresh copy: %w", err)
 		}
 		if !keep(hdr.Name) {
 			continue
@@ -96,11 +96,11 @@ func ExtractTarGz(archive, destDir string, keep func(name string) bool) error {
 				return err
 			}
 			if err := os.MkdirAll(filepath.Dir(dst), 0o755); err != nil {
-				return fmt.Errorf("tak boleh unpack: %w", err)
+				return fmt.Errorf("could not unpack the download — check you have free space on your disk, then try again: %w", err)
 			}
 			os.Remove(dst) // re-extraction over an old link
 			if err := os.Symlink(hdr.Linkname, dst); err != nil {
-				return fmt.Errorf("tak boleh unpack: %w", err)
+				return fmt.Errorf("could not unpack the download — check you have free space on your disk, then try again: %w", err)
 			}
 		}
 		// Directories are created as needed by writeFile; other types
@@ -114,26 +114,26 @@ func ExtractTarGz(archive, destDir string, keep func(name string) bool) error {
 func safeJoin(destDir, name string) (string, error) {
 	local := filepath.FromSlash(name)
 	if strings.Contains(name, `\`) || !filepath.IsLocal(local) {
-		return "", fmt.Errorf("arkib mengandungi nama fail bahaya (%q) — padam dan download semula", name)
+		return "", fmt.Errorf("the downloaded file contains an unsafe file name (%q), so nothing was unpacked — run camne again to download a fresh copy", name)
 	}
 	return filepath.Join(destDir, local), nil
 }
 
 func writeFile(dst string, src io.Reader, mode os.FileMode) error {
 	if err := os.MkdirAll(filepath.Dir(dst), 0o755); err != nil {
-		return fmt.Errorf("tak boleh unpack: %w", err)
+		return fmt.Errorf("could not unpack the download — check you have free space on your disk, then try again: %w", err)
 	}
 	f, err := os.OpenFile(dst, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, mode)
 	if err != nil {
-		return fmt.Errorf("tak boleh unpack: %w", err)
+		return fmt.Errorf("could not unpack the download — check you have free space on your disk, then try again: %w", err)
 	}
 	_, copyErr := io.Copy(f, src)
 	closeErr := f.Close()
 	if copyErr != nil {
-		return fmt.Errorf("tak boleh unpack: %w", copyErr)
+		return fmt.Errorf("could not unpack the download — check you have free space on your disk, then try again: %w", copyErr)
 	}
 	if closeErr != nil {
-		return fmt.Errorf("tak boleh unpack: %w", closeErr)
+		return fmt.Errorf("could not unpack the download — check you have free space on your disk, then try again: %w", closeErr)
 	}
 	return nil
 }
