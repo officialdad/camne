@@ -14,7 +14,7 @@ cd "$(dirname "$0")"
 export PATH="$HOME/.local/bin:$PATH"
 
 echo "== convert to f16 GGUF"
-PYTHONPATH="$(dirname "$CONVERT")/gguf-py" \
+PYTHONPATH="$(dirname "$CONVERT")/gguf-py:$(dirname "$CONVERT")" \
   uv run python "$CONVERT" "$MERGED" --outfile "out/$NAME-f16.gguf" --outtype f16
 
 echo "== quantize Q4_K_M"
