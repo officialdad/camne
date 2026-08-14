@@ -33,3 +33,5 @@ dist/
 .env
 # Per-developer Claude Code overrides; .claude/settings.json IS committed
 .claude/settings.local.json
+# Agent worktrees created by Claude Code; each is a checkout, never content
+.claude/worktrees/

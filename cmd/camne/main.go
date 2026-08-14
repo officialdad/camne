@@ -41,8 +41,12 @@ func main() {
 		code = run(strings.Join(args, " "))
 	}
 	// Only now, with the answer already printed, does camne look at the
-	// network for a newer release (constraint 3).
-	offerUpdate()
+	// network for a newer release (constraint 3) — and only if that answer
+	// worked. Someone whose command just failed is owed the error, not an
+	// offer to install a different version of the thing that failed.
+	if code == 0 {
+		offerUpdate()
+	}
 	os.Exit(code)
 }
 
