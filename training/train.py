@@ -41,6 +41,9 @@ def main():
     ap.add_argument("--micro-batch", type=int, default=16,
                     help="drop this and raise --grad-accum if OOM; keep the product 32")
     ap.add_argument("--grad-accum", type=int, default=2)
+    ap.add_argument("--epochs", type=float, default=2,
+                    help="four registers per command means 1 epoch is already "
+                         "4 exposures; 2 overfits on a narrow pool")
     args = ap.parse_args()
     out = args.out or f"out/{args.base}-lora"
 
@@ -71,7 +74,7 @@ def main():
             output_dir=out,
             per_device_train_batch_size=args.micro_batch,
             gradient_accumulation_steps=args.grad_accum,
-            num_train_epochs=2,
+            num_train_epochs=args.epochs,
             learning_rate=2e-4,
             lr_scheduler_type="cosine",
             warmup_ratio=0.03,
