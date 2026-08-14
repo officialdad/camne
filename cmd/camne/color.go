@@ -6,9 +6,18 @@ import (
 	"strings"
 )
 
-// One fixed scheme, no themes and no 256-colour palette. These are the
+// One fixed scheme, no themes and no 256-colour palette. Hues come from the
 // non-bright SGR codes, the ones a terminal theme is obliged to keep legible
 // against its own background, so the same escapes read on light and dark.
+//
+// cWarn breaks that on purpose. The warning block has to be visibly camne
+// speaking rather than more of the command printed under it, so it takes bright
+// magenta — Ansible's warning colour, and the one thing here allowed to shout.
+//
+// It shares a hue with cPath, and that is fine: weight separates them, and they
+// never appear on the same line or even the same stream. Paths keep plain
+// magenta rather than moving. Underline would swallow the underscores in a
+// filename, and blue is the one colour a dark theme renders near-invisible.
 const (
 	reset   = "\x1b[0m"
 	cBinary = "\x1b[1;32m" // bold green
@@ -17,8 +26,7 @@ const (
 	cString = "\x1b[33m"   // yellow
 	cOp     = "\x1b[1m"    // bold, no hue
 
-	cDanger  = "\x1b[1;31m" // bold red, the BAHAYA block
-	cCaution = "\x1b[33m"   // yellow, the Awas lines
+	cWarn = "\x1b[1;35m" // bright magenta, the camne warning block
 )
 
 // paint wraps s in code when on. Callers ask enabled() once per stream and pass

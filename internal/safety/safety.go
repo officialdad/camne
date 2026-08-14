@@ -53,11 +53,11 @@ const (
 	LevelSafe Level = iota
 	// LevelCaution warns the user but the command may still be run.
 	LevelCaution
-	// LevelDanger must never be auto-run; the caller shows the !! BAHAYA banner.
+	// LevelDanger must never be auto-run; the caller warns and prints anyway.
 	LevelDanger
 )
 
-// Finding is one flagged reason. Reason is colloquial Malay for the user.
+// Finding is one flagged reason. Reason is the user-facing line camne prints.
 type Finding struct {
 	Level  Level
 	Reason string
@@ -281,10 +281,11 @@ func normPath(tok string) string {
 }
 
 const (
-	reasonTildeEscape = "'~' jadi home directory dan '..' terlepas ke parent yang tak diketahui"
-	reasonHome        = "padam home directory kau"
-	// The marker "variable tak di-expand" is checked by the chmod branch.
-	reasonUnexpanded = "target ada variable tak di-expand atau substitution -- kalau kosong ni kena /"
+	reasonTildeEscape = "'~' is your home directory and '..' escapes to an unknown parent"
+	reasonHome        = "your whole home directory"
+	// reasonUnexpanded itself is compared by the chmod branch below.
+	reasonUnexpanded = "target holds an unexpanded variable or substitution -- " +
+		"if it is empty, this hits /"
 )
 
 var unresolvedRe = regexp.MustCompile(`\$\{?\w+|\$\(|` + "`")
@@ -305,7 +306,7 @@ func isCritical(tok string) (bool, string) {
 		if rest == "root" || strings.HasPrefix(rest, "root/") {
 			norm := normPath("/root" + rest[len("root"):])
 			if criticalTargets[norm] || criticalFiles[norm] {
-				return true, fmt.Sprintf("target ialah laluan kritikal %s", norm)
+				return true, fmt.Sprintf("target is the critical path %s", norm)
 			}
 		}
 	}
@@ -318,13 +319,13 @@ func isCritical(tok string) (bool, string) {
 	}
 	norm := normPath(tok)
 	if criticalTargets[norm] {
-		return true, fmt.Sprintf("target ialah laluan kritikal %s", norm)
+		return true, fmt.Sprintf("target is the critical path %s", norm)
 	}
 	if criticalFiles[norm] {
-		return true, fmt.Sprintf("target ialah fail sistem kritikal %s", norm)
+		return true, fmt.Sprintf("target is the critical system file %s", norm)
 	}
 	if wholeHomeRe.MatchString(norm) {
-		return true, fmt.Sprintf("target ialah seluruh home directory user (%s)", norm)
+		return true, fmt.Sprintf("target is a whole user home directory (%s)", norm)
 	}
 	if strings.ContainsAny(tok, "*?[") {
 		parent := ""
@@ -340,7 +341,7 @@ func isCritical(tok string) (bool, string) {
 			if shown == "" {
 				shown = "/"
 			}
-			return true, fmt.Sprintf("glob merentas laluan kritikal %s", shown)
+			return true, fmt.Sprintf("glob across the critical path %s", shown)
 		}
 	}
 	return false, ""
@@ -397,126 +398,128 @@ func mk(pat, reason string) rule { return rule{regexp.MustCompile(pat), reason} 
 // Patterns checked against the WHOLE command (they need to see `|` or `;`).
 var wholeDanger = []rule{
 	mk(`\b(curl|wget)\b[^|;]*\|\s*(sudo\s+)?(ba|z|k|fi|da)?sh\b`,
-		"salurkan content dari internet terus masuk shell"),
+		"internet content piped straight into a shell"),
 	mk(`\w{0,16}\(\s{0,4}\)\s{0,4}\{[^}]{0,64}\|[^}]{0,64}&\s{0,4}\}\s{0,4};`,
 		"fork bomb"),
-	mk(`\bmkfs(\.\w+)?\b`, "format filesystem"),
-	mk(`\bdd\b[^|;]*\bof=/dev/(sd|nvme|hd|vd|mmcblk)`, "tulis raw terus ke block device"),
-	mk(`>\s*/dev/(sd|nvme|hd|vd|mmcblk)`, "redirect atas block device"),
-	mk(`\b(wipefs|blkdiscard|sgdisk)\b[^|;]*/dev/(sd|nvme|hd|vd|mmcblk)`, "wipe block device"),
+	mk(`\bmkfs(\.\w+)?\b`, "formats a filesystem"),
+	mk(`\bdd\b[^|;]*\bof=/dev/(sd|nvme|hd|vd|mmcblk)`, "raw write straight to a block device"),
+	mk(`>\s*/dev/(sd|nvme|hd|vd|mmcblk)`, "redirect onto a block device"),
+	mk(`\b(wipefs|blkdiscard|sgdisk)\b[^|;]*/dev/(sd|nvme|hd|vd|mmcblk)`, "wipes a block device"),
 	mk(`\bcryptsetup\b[^|;]*\b(luksFormat|luksErase|erase)\b[^|;]*/dev/(sd|nvme|hd|vd|mmcblk)`,
-		"format semula / erase block device"),
+		"reformats or erases a block device"),
 	mk(`\bparted\b[^|;]*/dev/(sd|nvme|hd|vd|mmcblk)[^|;]*\b(rm|mklabel)\b`,
-		"ubah partition table block device"),
-	mk(`\b(shutdown|reboot|halt|poweroff|init\s+0|init\s+6)\b`, "matikan mesin"),
-	mk(`\bgit\s+reset\s+--hard\b`, "git reset --hard buang kerja belum commit"),
-	mk(`\b(history\s+-c|shred\s+.*\.bash_history)\b`, "padam history shell"),
-	mk(`\bchmod\b[^|;]*\s0{3,4}\s+/\s*$`, "chmod 000 / buat sistem tak boleh guna"),
-	mk(`\btruncate\s+-s\s*0\s+/etc/(passwd|shadow|fstab|sudoers)\b`, "musnah fail sistem penting"),
-	mk(`>\|?\s*/etc/(passwd|shadow|fstab|sudoers)\b`, "musnah fail sistem penting"),
+		"rewrites a block device partition table"),
+	mk(`\b(shutdown|reboot|halt|poweroff|init\s+0|init\s+6)\b`, "shuts the machine down"),
+	mk(`\bgit\s+reset\s+--hard\b`, "git reset --hard throws away uncommitted work"),
+	mk(`\b(history\s+-c|shred\s+.*\.bash_history)\b`, "erases the shell history"),
+	mk(`\bchmod\b[^|;]*\s0{3,4}\s+/\s*$`, "chmod 000 / leaves the system unusable"),
+	mk(`\btruncate\s+-s\s*0\s+/etc/(passwd|shadow|fstab|sudoers)\b`,
+		"destroys a critical system file"),
+	mk(`>\|?\s*/etc/(passwd|shadow|fstab|sudoers)\b`, "destroys a critical system file"),
 	mk(`\bln\b[^|;]*-\w*f\w*[^|;]*/etc/(passwd|shadow|fstab|sudoers)\b`,
-		"tindih fail sistem penting dengan symlink"),
-	mk(`\binstall\b[^|;]*/etc/(passwd|shadow|fstab|sudoers)\b`, "install(1) potong/ganti fail destinasi"),
+		"overwrites a critical system file with a symlink"),
+	mk(`\binstall\b[^|;]*/etc/(passwd|shadow|fstab|sudoers)\b`,
+		"install(1) truncates or replaces the destination file"),
 	mk(`\bfind\b[^|]*(?:^|\s)(/|/etc|/usr|/var|/home|/boot|/bin|/sbin|/lib\w*|/root)(?:\s|$)`+
 		`[^|]*\|\s*xargs\b[^|]*\b(rm|shred|unlink|srm|rmdir)\b`,
-		"cari atas laluan kritikal lepas tu salurkan ke delete"),
-	mk(`--no-preserve-root`, "override guard root rm secara eksplisit"),
-	mk(`\bcrontab\b(?:\s+-\w+)*\s+-\w*r`, "crontab -r padam seluruh crontab tanpa tanya"),
+		"search over a critical path piped into delete"),
+	mk(`--no-preserve-root`, "explicitly overrides rm's root guard"),
+	mk(`\bcrontab\b(?:\s+-\w+)*\s+-\w*r`, "crontab -r deletes the entire crontab without asking"),
 	mk(`\b(?:userdel|deluser)\b[^|;]*\s--?(?:r\b|remove-home|remove-all-files)`,
-		"padam akaun user sekali dengan home dan fail dia"),
+		"deletes a user account together with its home directory and files"),
 	mk(`\biptables\b[^|;]*\s-[FX]\b|\bnft\s+flush\s+ruleset\b`,
-		"flush firewall rules -- boleh kunci kau keluar dari mesin remote"),
+		"flushes the firewall rules -- can lock you out of a remote machine"),
 	mk(`\bchmod\b[^|;]*\s(?:0?[0-7][4-7][0-7]|0?[0-7][0-7][4-7]|[ugoa]*\+r)\s`+
 		`[^|;]*(?:id_rsa|id_dsa|id_ecdsa|id_ed25519|private[_-]?key|\.pem)\b`,
-		"buat private key boleh dibaca orang lain -- expose, ssh pun akan reject"),
+		"makes a private key readable by others -- exposed, and ssh will refuse it"),
 	mk(`\b(?:apt|apt-get|aptitude|dpkg|yum|dnf|rpm)\b[^|;]*`+
 		`\b(?:remove|purge|erase|autoremove)\b[^|;]*`+
 		`(?:^|[^\w-])(?:dpkg|apt|apt-get|coreutils|bash|libc6|glibc|systemd|`+
 		`util-linux|sudo|linux-image)(?:[^\w-]|$)`,
-		"buang package penting -- sistem tak boleh pulih sendiri"),
+		"removes an essential package -- the system cannot repair itself"),
 	mk(`\bgit\s+reflog\s+expire\b[^|;]*--expire(?:=|\s+)(?:now|all)`+
 		`|\bgit\s+gc\b[^|;]*--prune(?:=|\s+)now`,
-		"expire reflog -- buang recovery terakhir git"),
+		"expires the reflog -- git's last route back"),
 
 	// credential exfiltration -- a secret AND an outbound sink.
 	mk(`(?:`+secretFile+`)[^;&]{0,240}(?:`+netSink+`)`+
 		`|(?:`+netSink+`)[^;&]{0,240}(?:`+secretFile+`)`+
 		`|`+copyOut,
-		"hantar private key atau credential keluar dari mesin ni"),
+		"sends a private key or credential off this machine"),
 
 	// reverse shells and callbacks.
 	mk(`\b(?:ba|z|k|da|a)?sh\b[^|;]{0,80}/dev/(?:tcp|udp)/`+
 		`|/dev/(?:tcp|udp)/[^\s;]{0,80}0>&1`+
 		`|>&\s{0,4}/dev/(?:tcp|udp)/`,
-		"reverse shell: sambung stdin/stdout shell ke socket remote"),
+		"reverse shell: a shell's stdin/stdout wired to a remote socket"),
 	mk(`\b(?:nc|ncat|netcat|nc\.traditional)\b[^|;]{0,160}`+
 		`(?:\s-\w{0,3}[ec]\s|--exec\b|--sh-exec\b|--lua-exec\b)`,
-		"netcat -e/--exec bagi shell ke sesiapa yang connect"),
+		"netcat -e/--exec: a shell for whoever connects"),
 	mk(`\bmkfifo\b[^\n]{0,200}\|[^\n]{0,200}\b(?:nc|ncat|netcat)\b`+
 		`|\b(?:nc|ncat|netcat)\b[^\n]{0,200}\|[^\n]{0,200}\bmkfifo\b`,
-		"reverse shell guna named pipe (mkfifo + netcat)"),
+		"reverse shell over a named pipe (mkfifo + netcat)"),
 	mk(`\bsocat\b[^;]{0,200}\b(?:EXEC|SYSTEM):`,
-		"socat EXEC:/SYSTEM: jalankan program untuk peer remote -- bind/reverse shell"),
+		"socat EXEC:/SYSTEM: runs a program for the remote peer -- a bind or reverse shell"),
 	mk(`\b(?:python\d?(?:\.\d+)?|perl|ruby|php|node)\b[^\n]{0,400}\bsocket\b`+
 		`[^\n]{0,400}(?:pty\.spawn|dup2|/bin/(?:ba|z|k|da)?sh|\bexec\s*\()`,
-		"scripted reverse shell: buka socket dan sambung shell padanya"),
+		"scripted reverse shell: opens a socket and attaches a shell to it"),
 
 	// privilege escalation.
 	mk(`\bchmod\b[^|;]{0,120}\s(?:0?[467][0-7]{3}|[ugoa]*u\+s|\+s(?:\s|$))`,
-		"set bit setuid -- file jalan sebagai owner (root) untuk semua user"),
+		"sets the setuid bit -- the file runs as its owner (root) for every user"),
 	mk(`\b(?:usermod|gpasswd|adduser|useradd)\b[^|;&]{0,120}`+
 		`(?:^|[^\w-])(?:sudo|wheel|admin|root)(?:[^\w-]|$)`,
-		"bagi keahlian group setara root"),
-	mk(`NOPASSWD`, "bagi sudo tanpa password"),
-	mk(`>\|?>?\s{0,4}/etc/sudoers\.d/|\btee\b[^|;]{0,120}/etc/sudoers`, "pasang rule sudo baru"),
+		"grants root-equivalent group membership"),
+	mk(`NOPASSWD`, "grants sudo without a password"),
+	mk(`>\|?>?\s{0,4}/etc/sudoers\.d/|\btee\b[^|;]{0,120}/etc/sudoers`, "installs a new sudo rule"),
 	mk(`\bsudo\b[^|;&]{0,200}\b(?:find|tar|zip|awk|gawk|mawk|perl|python\d?|ruby`+
 		`|node|lua|vim|vi|view|nano|ed|less|more|man|ftp|nmap|git|env|nice`+
 		`|tcpdump|rsync|xargs)\b[^|;&]{0,200}`+
 		`(?:/bin/(?:ba|z|k|da)?sh|\bsystem\s*\(|\bos\.system|pty\.spawn`+
 		`|\bexec\s*\(|:!|!\s{0,2}/bin/|--interactive|checkpoint-action=exec)`,
-		"living off the land: sudo jalankan tool yang lepas tu buka root shell"),
+		"living off the land: sudo runs a tool that then opens a root shell"),
 
 	// persistence.
 	mk(`(?:^|[^>])>\|?\s{0,4}\S{0,64}`+shellRC+`(?:$|[^\w.])`,
-		"tindih fail startup shell, buang semua yang dah ada dalam tu"),
+		"overwrites a shell startup file, dropping everything already in it"),
 
 	// history and log tampering.
 	mk(`(?:^|[^>])>\|?\s{0,4}\S{0,64}\.(?:bash|zsh|sh)_history`+
 		`|\b(?:rm|shred|truncate)\b[^|;]{0,120}\.(?:bash|zsh|sh)_history`+
 		`|\bunset\s+HISTFILE(?:$|[^\w])|\bHISTFILE=(?:/dev/null|\s|$)`+
 		`|\bset\s\+o\s+history\b|\bexport\s+HISTSIZE=0\b`,
-		"padam atau matikan history shell -- sorok apa yang dijalankan"),
+		"erases or disables the shell history -- hides what was run"),
 	mk(`(?:^|[^>])>\|?\s{0,4}/var/log/\S+`+
 		`|\btruncate\b[^|;]{0,80}-s\s{0,2}0\s+/var/log/`+
 		`|\bjournalctl\b[^|;]{0,80}--vacuum-(?:time|size|files)`,
-		"kosongkan log sistem di tempat"),
+		"empties the system logs in place"),
 
 	// firewall / MAC controls.
 	mk(`\bufw\b[^|;&]{0,60}\b(?:disable|reset)\b|\bsetenforce\s+0\b`+
 		`|\bsystemctl\b[^|;&]{0,60}\b(?:stop|disable|mask)\b[^|;&]{0,60}`+
 		`\b(?:firewalld|ufw|iptables|nftables|apparmor)\b`+
 		`|\biptables\b[^|;&]{0,80}-P\s+(?:INPUT|FORWARD)\s+DROP\b`,
-		"matikan firewall host atau mandatory access control dia"),
+		"turns off the host firewall or its mandatory access control"),
 
 	// storage teardown addressed by NAME.
 	mk(`\b(?:lvremove|vgremove|pvremove)\b|\bzpool\s+destroy\b|\bzfs\s+destroy\b`+
 		`|\bmdadm\b[^|;]{0,80}--zero-superblock\b`+
 		`|\bhdparm\b[^|;]{0,80}--security-erase`,
-		"musnah logical volume, pool atau array"),
+		"destroys a logical volume, pool or array"),
 	mk(`\bumount\b[^|;]{0,40}(?:-\w{0,3}a\s|-\w{0,3}a$|(?:^|\s)/(?:\s|$))`,
-		"unmount root filesystem (atau semua sekali)"),
+		"unmounts the root filesystem (or every mount at once)"),
 
 	// remote code execution beyond curl|sh.
 	mk(`\b(?:curl|wget)\b[^|;]{0,200}\|\s{0,4}(?:sudo\s+)?`+
 		`(?:python\d?(?:\.\d+)?|perl|ruby|node|php)\b`,
-		"salurkan content internet terus ke interpreter"),
+		"internet content piped straight into an interpreter"),
 	mk(`(?:\b(?:ba|z|k|da)?sh\b|\bsource\b|(?:^|[^\w.])\.\s)[^|;]{0,40}`+
 		`<\(\s{0,4}(?:curl|wget)\b`+
 		`|\beval\b[^|;]{0,60}["']?\$\(\s{0,4}(?:curl|wget)\b`,
-		"jalankan content remote guna process substitution -- sama macam curl | sh"),
+		"runs remote content through process substitution -- the same as curl | sh"),
 	mk(`\bbase64\b[^|;]{0,60}(?:-d|--decode)[^|;]{0,60}`+
 		`\|\s{0,4}(?:sudo\s+)?(?:ba|z|k|da)?sh\b`,
-		"decode dan jalankan content yang disorok"),
+		"decodes and runs hidden content"),
 }
 
 // git clean needs two flag clusters (f-or-x AND d-or-x); handled apart because
@@ -531,36 +534,36 @@ var akTeeAppend = regexp.MustCompile(`\btee\s+-\w*a`)
 
 var wholeCaution = []rule{
 	mk(`\brsync\b[^|;]*--delete\b`,
-		"rsync --delete buang fail di destinasi yang tiada di source"),
+		"rsync --delete removes files at the destination that the source does not have"),
 	mk(`\b(awk|cut|sed)\b[^|]*\|\s*xargs\b[^|]*\b(kill|docker\s+rm|rm)\b`,
-		"bunuh/buang guna field yang di-parse dari teks -- pastikan column tu betul-betul ID"),
+		"kills or removes by a field parsed out of text -- check that column really is the ID"),
 	mk(`\b(?:fuser|pkill|killall|kill)\b(?:\s+-{1,2}\w+)*\s+-?\d+\s*(?:$|[|;&])`,
-		"bunuh process ikut nombor port atau pid literal -- confirm betul ke tak"),
-	mk(`\b(curl|wget)\b[^|;]*\b(https?://|[a-z0-9-]+\.[a-z]{2,})`, "hubungi network"),
+		"kills a process by a literal pid or port number -- confirm it is the right one"),
+	mk(`\b(curl|wget)\b[^|;]*\b(https?://|[a-z0-9-]+\.[a-z]{2,})`, "contacts the network"),
 	mk(`\bdocker\s+system\s+prune\b[^|;]*-a|\bdocker\s+system\s+prune\s+-a`,
-		"buang semua docker image tak guna, bukan dangling je"),
-	mk(`\bsudo\b`, "perlu sudo"),
+		"removes every unused docker image, not just the dangling ones"),
+	mk(`\bsudo\b`, "runs as root"),
 	mk(`\bsetfacl\b[^|;]*-\w*R\w*[^|;]*(?:^|\s)`+
 		`(/|/etc|/usr|/var|/home|/boot|/bin|/sbin|/root)(?:\s|$)`,
-		"tulis semula ACL secara rekursif atas laluan kritikal"),
+		"rewrites ACLs recursively over a critical path"),
 
 	// semantic classes, at CAUTION.
 	mk(`\b(?:cat|less|more|head|tail|strings|xxd|od|base64)\b`+
 		`[^|;]{0,200}(?:`+secretFile+`)`,
-		"papar private key atau fail credential ke terminal"),
-	mk(`/dev/(?:tcp|udp)/`, "buka raw network socket melalui /dev/tcp bash"),
+		"prints a private key or credential file to the terminal"),
+	mk(`/dev/(?:tcp|udp)/`, "opens a raw network socket through bash's /dev/tcp"),
 	mk(`\|\s{0,4}(?:sudo\s+)?crontab\s+-\s{0,4}(?:$|[|;&])`,
-		"`crontab -` ganti SELURUH crontab dengan apa yang dibaca"),
+		"`crontab -` replaces the ENTIRE crontab with whatever it reads"),
 	mk(`>>\s{0,4}\S{0,64}`+shellRC+`(?:$|[^\w.])`+
 		`|\btee\b[^|;]{0,120}`+shellRC+`(?:$|[^\w.])`+
 		`|(?:>\|?>?|\btee\b[^|;]{0,120})\s{0,4}`+
 		`/etc/(?:cron\.[a-z]{1,8}/|crontab|rc\.local|systemd/system/|init\.d/)`,
-		"pasang code yang jalan sendiri setiap kali login atau boot"),
+		"installs code that runs itself at every login or boot"),
 	mk(`\bchmod\b[^|;]{0,120}\s(?:[0-7]?[0-7]{2}[2367](?:\s|$)|[ugoa]*o\+w)`,
-		"buat file boleh ditulis oleh semua user dalam mesin"),
-	mk(`\bchmod\b[^|;]{0,120}\s(?:0?2[0-7]{3}(?:\s|$)|[ugoa]*g\+s)`, "set bit setgid"),
+		"makes a file writable by every user on the machine"),
+	mk(`\bchmod\b[^|;]{0,120}\s(?:0?2[0-7]{3}(?:\s|$)|[ugoa]*g\+s)`, "sets the setgid bit"),
 	mk(`\bmount\b[^|;]{0,80}\bremount\b[^|;]{0,40}(?:^|\s)/(?:\s|$)`,
-		"remount root filesystem -- service yang tengah jalan mungkin mula gagal"),
+		"remounts the root filesystem -- running services may start failing"),
 }
 
 // ping without a -c count runs forever; two Python lookaheads, handled apart.
@@ -654,7 +657,9 @@ func splitSegments(command string) []string {
 }
 
 // Check returns the findings for a command. An empty slice means nothing
-// flagged. Reasons are colloquial Malay; the caller renders the banner.
+// flagged. Every Reason is printed to the user, so each one is a short phrase
+// that says what the command does -- with one colour for both levels, the
+// wording is the only thing carrying severity.
 func Check(command string) []Finding {
 	if strings.TrimSpace(command) == "" {
 		return nil
@@ -672,12 +677,12 @@ func Check(command string) []Finding {
 	}
 	if gitCleanF.MatchString(scan) && gitCleanD.MatchString(scan) {
 		findings = append(findings, Finding{LevelDanger,
-			"git clean padam fail untracked tanpa boleh recover"})
+			"git clean deletes untracked files with no way back"})
 	}
 	if akRedirect.MatchString(scan) ||
 		(akTee.MatchString(scan) && !akTeeAppend.MatchString(scan)) {
 		findings = append(findings, Finding{LevelDanger,
-			"tindih authorized_keys -- boleh kunci kau keluar dari ssh"})
+			"overwrites authorized_keys -- can lock you out of ssh"})
 	}
 	for _, r := range wholeCaution {
 		if r.re.MatchString(scan) {
@@ -686,7 +691,7 @@ func Check(command string) []Finding {
 	}
 	if pingRe.MatchString(scan) && !pingCountRe.MatchString(scan) {
 		findings = append(findings, Finding{LevelCaution,
-			"ping tanpa -c akan jalan sampai kau interrupt"})
+			"ping without -c runs until you interrupt it"})
 	}
 
 	// Stateful cd tracking (see the Python comments for each guard).
@@ -733,7 +738,7 @@ func Check(command string) []Finding {
 		// A command name from substitution cannot be resolved statically.
 		if substHead.MatchString(toks[0]) {
 			findings = append(findings, Finding{LevelCaution,
-				"nama command datang dari substitution -- tak boleh sahkan apa yang akan jalan"})
+				"the command name comes from a substitution -- what will run cannot be checked"})
 			continue
 		}
 
@@ -763,7 +768,7 @@ func Check(command string) []Finding {
 			if len(positional) > 0 {
 				if crit, why := isCritical(positional[len(positional)-1]); crit {
 					findings = append(findings, Finding{LevelDanger,
-						"rsync --delete ke laluan kritikal: " + why})
+						"rsync --delete onto a critical path: " + why})
 				}
 			}
 		}
@@ -795,21 +800,21 @@ func Check(command string) []Finding {
 			}
 			if !hit && cwdIsCritical && anyGlob(args) {
 				findings = append(findings, Finding{LevelDanger,
-					verb + ": glob dalam directory kritikal yang dimasuki oleh cd sebelum ni"})
+					verb + ": glob inside a critical directory entered by an earlier cd"})
 				hit = true
 			}
 			if !hit && cwdAscended && anyGlob(args) {
 				findings = append(findings, Finding{LevelDanger, verb +
-					": glob delete dalam directory yang dicapai guna 'cd ..' -- target ialah " +
-					"parent tempat kau mula, yang ini tak boleh resolve"})
+					": glob delete in a directory reached with 'cd ..' -- the target is the " +
+					"parent of where you started, which cannot be resolved"})
 				hit = true
 			}
 			if !hit && !cdSeen && (flags["r"] || flags["R"]) {
 				positional := positionals(args)
 				if len(positional) > 0 && allWholeCwd(positional) {
 					findings = append(findings, Finding{LevelDanger, verb +
-						": recursive delete current directory (tak diketahui -- takde cd sebelum ni) " +
-						"tanpa subdirectory atau nama filter untuk hadkan"})
+						": recursive delete of the current directory (unknown -- no cd before this) " +
+						"with no subdirectory or name filter to narrow it"})
 					hit = true
 				}
 			}
@@ -818,8 +823,8 @@ func Check(command string) []Finding {
 					if !strings.HasPrefix(a, "-") &&
 						(placeholderRe.FindString(a) == a || placeholderHint.MatchString(a)) {
 						findings = append(findings, Finding{LevelDanger, verb +
-							": target ialah placeholder -- laluan sebenar yang kau letak akan " +
-							"dipadam kekal"})
+							": target is a placeholder -- the real path you put there is deleted " +
+							"for good"})
 						break
 					}
 				}
@@ -865,8 +870,8 @@ func Check(command string) []Finding {
 					}
 					if rootIsCwd && !findFilter.MatchString(seg) {
 						findings = append(findings, Finding{LevelDanger,
-							"find + delete: recursive delete bawah current directory tanpa " +
-								"nama/path filter untuk hadkan"})
+							"find + delete: recursive delete under the current directory with " +
+								"no name or path filter to narrow it"})
 					}
 				}
 			}
@@ -881,7 +886,7 @@ func Check(command string) []Finding {
 			recursive := flags["r"] || flags["R"]
 			for _, a := range rest(positional) {
 				crit, why := isCritical(a)
-				if crit && !recursive && strings.Contains(why, "variable tak di-expand") {
+				if crit && !recursive && why == reasonUnexpanded {
 					continue
 				}
 				if crit {
@@ -897,7 +902,7 @@ func Check(command string) []Finding {
 			if flags["f"] && len(args) > 0 {
 				if crit, why := isCritical(args[len(args)-1]); crit {
 					findings = append(findings, Finding{LevelDanger,
-						"ln -f: " + why + " (diganti oleh link baru)"})
+						"ln -f: " + why + " (replaced by the new link)"})
 				}
 			}
 		case verb == "install":
@@ -909,7 +914,7 @@ func Check(command string) []Finding {
 		case verb == "wipefs" || verb == "blkdiscard" || verb == "sgdisk":
 			for _, a := range args {
 				if devBlock.MatchString(a) {
-					findings = append(findings, Finding{LevelDanger, verb + ": wipe block device"})
+					findings = append(findings, Finding{LevelDanger, verb + ": wipes a block device"})
 					break
 				}
 			}
@@ -917,7 +922,7 @@ func Check(command string) []Finding {
 			for _, a := range args {
 				if crit, why := isCritical(a); crit {
 					findings = append(findings, Finding{LevelDanger,
-						"tee: " + why + " (ditulis oleh tee)"})
+						"tee: " + why + " (written over by tee)"})
 					break
 				}
 			}
@@ -926,7 +931,7 @@ func Check(command string) []Finding {
 				if strings.HasPrefix(a, "of=") {
 					if crit, why := isCritical(a[3:]); crit {
 						findings = append(findings, Finding{LevelDanger,
-							"dd: " + why + " (ditindih oleh dd)"})
+							"dd: " + why + " (overwritten by dd)"})
 					}
 					break
 				}
@@ -934,14 +939,14 @@ func Check(command string) []Finding {
 		}
 
 		if writeSystemDir.MatchString(seg) {
-			findings = append(findings, Finding{LevelCaution, "tulis ke directory sistem"})
+			findings = append(findings, Finding{LevelCaution, "writes into a system directory"})
 		}
 	}
 
 	if (placeholderRe.MatchString(clean) && !keystrokeOnly(clean)) ||
 		placeholderHint.MatchString(clean) {
 		findings = append(findings, Finding{LevelCaution,
-			"ada placeholder -- ganti dulu sebelum jalankan"})
+			"contains a placeholder -- replace it before running"})
 	}
 
 	return dedup(findings)

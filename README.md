@@ -55,13 +55,14 @@ $ camne cari file lagi besar dari 100MB
 find / -size +100M -type f -exec ls -lh {} \; | sort -n -k5
 
 $ camne nak delete semua file dalam /etc
-!! BAHAYA
+  camne warning: find + delete: target is the critical path /etc
 find /etc -type f -exec rm {} \;
 ```
 
-Dangerous commands get a red `!! BAHAYA` line; anything merely worth a second
-look gets a yellow `!  Awas` line. camne prints either way and executes
-neither.
+Anything the safety checker flags gets one bright-magenta `camne warning:` line
+per reason, on stderr, above the command. Dangerous and merely-worth-a-second-
+look commands share that one shape — the reason is what tells them apart. camne
+prints either way and executes neither.
 
 The command is syntax-highlighted and the warnings are coloured only when the
 output is a terminal. Pipe it anywhere (`camne ... | sh`, `$(camne ...)`) and
