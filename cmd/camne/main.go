@@ -75,20 +75,23 @@ func run(query string) int {
 	return 0
 }
 
-// render prints one safety word to errw and the command itself to out — and
-// that is ALL camne ever does with a command: print it. A BAHAYA command must
-// never be auto-run (constraint 5).
+// render prints the safety findings to errw and the command itself to out —
+// and that is ALL camne ever does with a command: print it. A flagged command
+// must never be auto-run (constraint 5).
+//
+// Every finding gets its own line, prefixed with the tool's own name so a
+// beginner can tell camne talking from the command it just produced. Danger and
+// caution share one shape and one colour on purpose: the reason is what says how
+// bad it is, so the reason is what gets printed.
 //
 // Each stream is asked about colour on its own: stdout is usually piped into a
 // shell while stderr is still the terminal the user is reading. The command is
 // highlighted only when out is a terminal, so `camne ... | sh` still receives
 // exactly the bytes it did before.
 func render(out, errw io.Writer, cmd string, findings []safety.Finding) {
-	switch safety.Worst(findings) {
-	case safety.LevelDanger:
-		fmt.Fprintln(errw, paint(enabled(errw), cDanger, "!! BAHAYA"))
-	case safety.LevelCaution:
-		fmt.Fprintln(errw, paint(enabled(errw), cCaution, "!  Awas"))
+	on := enabled(errw)
+	for _, f := range findings {
+		fmt.Fprintln(errw, "  "+paint(on, cWarn, "camne warning: "+f.Reason))
 	}
 	if enabled(out) {
 		cmd = highlight(cmd)

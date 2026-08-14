@@ -317,22 +317,22 @@ var mustBeCleanOfDangerSemantic = []string{
 	"iptables -L -n -v",
 }
 
-// (command, Malay reason substring that must NOT appear). Frags are the Malay
-// equivalents of the Python English frags, keyed to the ported reason strings.
+// (command, reason substring that must NOT appear), keyed to the reason
+// strings in safety.go.
 var mustNotFireSemantic = [][2]string{
-	{"cat ~/.ssh/id_rsa.pub", "papar private key"},
-	{"cat ~/.ssh/config", "papar private key"},
-	{"ssh-keygen -y -f ~/.ssh/id_rsa", "papar private key"},
-	{"chmod 600 ~/.ssh/id_rsa", "papar private key"},
-	{"chmod 755 ./bin", "boleh ditulis oleh semua user"},
-	{"chmod -R 755 ./mysite", "boleh ditulis oleh semua user"},
-	{"chmod 644 README.md", "boleh ditulis oleh semua user"},
-	{"chmod 775 ./team", "boleh ditulis oleh semua user"},
+	{"cat ~/.ssh/id_rsa.pub", "prints a private key"},
+	{"cat ~/.ssh/config", "prints a private key"},
+	{"ssh-keygen -y -f ~/.ssh/id_rsa", "prints a private key"},
+	{"chmod 600 ~/.ssh/id_rsa", "prints a private key"},
+	{"chmod 755 ./bin", "writable by every user"},
+	{"chmod -R 755 ./mysite", "writable by every user"},
+	{"chmod 644 README.md", "writable by every user"},
+	{"chmod 775 ./team", "writable by every user"},
 	{"chmod +x script.sh", "setgid"},
-	{"crontab -l", "ganti SELURUH crontab"},
-	{"cat ~/.bashrc", "jalan sendiri"},
-	{"source ~/.zshrc", "jalan sendiri"},
-	{"mount -o remount,rw /home", "remount root filesystem"},
+	{"crontab -l", "replaces the ENTIRE crontab"},
+	{"cat ~/.bashrc", "runs itself"},
+	{"source ~/.zshrc", "runs itself"},
+	{"mount -o remount,rw /home", "remounts the root filesystem"},
 	{"curl -s https://example.com | head", "raw network socket"},
 }
 
@@ -399,7 +399,7 @@ func TestMustCaution(t *testing.T) {
 func TestMustNotCautionKill(t *testing.T) {
 	for _, c := range mustNotCautionKill {
 		for _, f := range Check(c) {
-			if strings.Contains(f.Reason, "port atau pid literal") {
+			if strings.Contains(f.Reason, "literal pid or port number") {
 				t.Errorf("FALSE POSITIVE (kill-by-name should be quiet): %q", c)
 				break
 			}
