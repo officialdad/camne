@@ -16,15 +16,15 @@ func TestRender(t *testing.T) {
 		wantErr   string // everything stderr may contain, byte for byte
 	}{
 		{"danger", "rm -rf /", safety.LevelDanger,
-			"  camne warning: rm: target is the critical path /\n"},
+			"  camne warning: rm: target is the critical path /\n\n"},
 		{"caution", "sudo apt update", safety.LevelCaution,
-			"  camne warning: runs as root\n"},
+			"  camne warning: runs as root\n\n"},
 		{"both levels share the one shape", "sudo rm -rf /", safety.LevelDanger,
 			"  camne warning: runs as root\n" +
-				"  camne warning: rm: target is the critical path /\n"},
+				"  camne warning: rm: target is the critical path /\n\n"},
 		{"every finding gets a line", "rm -rf / ; shutdown -h now", safety.LevelDanger,
 			"  camne warning: shuts the machine down\n" +
-				"  camne warning: rm: target is the critical path /\n"},
+				"  camne warning: rm: target is the critical path /\n\n"},
 		{"safe prints the command only", "ls -lah", safety.LevelSafe, ""},
 	}
 	for _, tt := range tests {
@@ -45,9 +45,14 @@ func TestRender(t *testing.T) {
 			if errw.String() != tt.wantErr {
 				t.Errorf("stderr = %q, want %q", errw.String(), tt.wantErr)
 			}
-			// One line per finding, no reason dropped.
-			if n := strings.Count(errw.String(), "\n"); n != len(findings) {
-				t.Errorf("stderr has %d lines, want one per finding (%d)", n, len(findings))
+			// One line per finding, no reason dropped, plus the blank line
+			// that keeps the block off the command (none when there is no block).
+			want := len(findings)
+			if want > 0 {
+				want++
+			}
+			if n := strings.Count(errw.String(), "\n"); n != want {
+				t.Errorf("stderr has %d lines, want one per finding plus a blank (%d)", n, want)
 			}
 		})
 	}

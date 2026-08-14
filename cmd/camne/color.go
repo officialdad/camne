@@ -13,14 +13,16 @@ import (
 // cWarn breaks that on purpose. The warning block has to be visibly camne
 // speaking rather than more of the command printed under it, so it takes bright
 // magenta — Ansible's warning colour, and the one thing here allowed to shout.
-// Reserving bright magenta is why paths gave up their old \x1b[35m: two purples
-// a shade apart in the same terminal is worse than none. Paths are underlined
-// instead, which no theme can render as the background.
+//
+// It shares a hue with cPath, and that is fine: weight separates them, and they
+// never appear on the same line or even the same stream. Paths keep plain
+// magenta rather than moving. Underline would swallow the underscores in a
+// filename, and blue is the one colour a dark theme renders near-invisible.
 const (
 	reset   = "\x1b[0m"
 	cBinary = "\x1b[1;32m" // bold green
 	cFlag   = "\x1b[36m"   // cyan
-	cPath   = "\x1b[4m"    // underline, no hue
+	cPath   = "\x1b[35m"   // magenta
 	cString = "\x1b[33m"   // yellow
 	cOp     = "\x1b[1m"    // bold, no hue
 

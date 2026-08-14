@@ -93,6 +93,11 @@ func render(out, errw io.Writer, cmd string, findings []safety.Finding) {
 	for _, f := range findings {
 		fmt.Fprintln(errw, "  "+paint(on, cWarn, "camne warning: "+f.Reason))
 	}
+	// A blank line so the warning block never reads as the first line of the
+	// command. It goes to errw, not out: a piped stdout keeps its exact bytes.
+	if len(findings) > 0 {
+		fmt.Fprintln(errw)
+	}
 	if enabled(out) {
 		cmd = highlight(cmd)
 	}
