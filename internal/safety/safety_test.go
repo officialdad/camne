@@ -416,3 +416,42 @@ func TestNoReDoS(t *testing.T) {
 		t.Errorf("ReDoS: Check() on 200k chars took %s", dt)
 	}
 }
+
+// Keystroke answers are the literal thing to press, not a blank to fill in.
+// "how do I quit vim" is the most-asked beginner terminal question, and
+// warning "replace this first" on <Ctrl x> is the cry-wolf the audit warns
+// against. Reported as camne issue #23.
+func TestKeystrokeIsNotAPlaceholder(t *testing.T) {
+	quiet := []string{
+		"<Ctrl x>",
+		"<Ctrl + x>",
+		"<ESC>:q!<Enter>",
+		"<F1>",
+		"<Spacebar>",
+		"<Alt> + m",
+	}
+	for _, cmd := range quiet {
+		for _, f := range Check(cmd) {
+			if strings.Contains(f.Reason, "placeholder") {
+				t.Errorf("Check(%q) warned about a placeholder: %q", cmd, f.Reason)
+			}
+		}
+	}
+
+	loud := []string{
+		"docker image rm <image_name>",
+		"cp <source> <dest>",
+		"vim <file>", // a real blank, even though other rows use <ESC>
+	}
+	for _, cmd := range loud {
+		var got bool
+		for _, f := range Check(cmd) {
+			if strings.Contains(f.Reason, "placeholder") {
+				got = true
+			}
+		}
+		if !got {
+			t.Errorf("Check(%q) missed a genuine placeholder", cmd)
+		}
+	}
+}

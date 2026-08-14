@@ -568,6 +568,32 @@ var pingRe = regexp.MustCompile(`^\s*(sudo\s+)?ping\b`)
 var pingCountRe = regexp.MustCompile(`\s-[a-zA-Z]*c\b|\s-c\d`)
 
 var placeholderRe = regexp.MustCompile(`<[^<>\s][^<>]*>`)
+
+// keystrokeRe matches keyname notation: <Ctrl x>, <Ctrl + x>, <ESC>, <F1>,
+// <Enter>. These read like placeholders but are the literal answer to "how do
+// I quit vim", so warning "replace this first" on them is the cry-wolf the
+// module docstring warns about. A named key is not a blank to fill in.
+var keystrokeRe = regexp.MustCompile(
+	`(?i)^<(esc(ape)?|ctrl|alt|shift|meta|super|cmd|command|option|tab|enter|` +
+		`return|space(bar)?|backspace|del(ete)?|ins(ert)?|home|end|pgup|pgdn|` +
+		`page ?(up|down)|up|down|left|right|f[1-9][0-9]?)\b[^<>]*>$`)
+
+// keystrokeOnly reports that every angle-bracket group in the command names a
+// key, so nothing in it is a placeholder awaiting substitution. A command that
+// mixes both (`vim <file>` after pressing <ESC>) keeps the warning.
+func keystrokeOnly(clean string) bool {
+	groups := placeholderRe.FindAllString(clean, -1)
+	if len(groups) == 0 {
+		return false
+	}
+	for _, g := range groups {
+		if !keystrokeRe.MatchString(g) {
+			return false
+		}
+	}
+	return true
+}
+
 var placeholderHint = regexp.MustCompile(
 	`(/path/to/|/path/of/|\byour[-_]|\bmy[-_]|\bfilename\b|\bscript_name\b|` +
 		`\bcontainer[-_]id\b|example\.com|username/repo)`)
@@ -912,7 +938,8 @@ func Check(command string) []Finding {
 		}
 	}
 
-	if placeholderRe.MatchString(clean) || placeholderHint.MatchString(clean) {
+	if (placeholderRe.MatchString(clean) && !keystrokeOnly(clean)) ||
+		placeholderHint.MatchString(clean) {
 		findings = append(findings, Finding{LevelCaution,
 			"ada placeholder -- ganti dulu sebelum jalankan"})
 	}
