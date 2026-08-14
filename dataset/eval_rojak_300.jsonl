@@ -1,0 +1,300 @@
+{"id": "nl2sh_test:0", "register": "rojak", "nl": "nak list file in this directory", "cmd": "ls"}
+{"id": "nl2sh_test:2", "register": "rojak", "nl": "list all open files", "cmd": "lsof"}
+{"id": "nl2sh_test:4", "register": "rojak", "nl": "nak buat file /testbed/test.txt", "cmd": "touch /testbed/test.txt"}
+{"id": "nl2sh_test:6", "register": "rojak", "nl": "nak delete does_not_exist.txt ni.", "cmd": "rm does_not_exist.txt"}
+{"id": "nl2sh_test:5", "register": "rojak", "nl": "nak buat folder /testbed/test_dir je.", "cmd": "mkdir /testbed/test_dir"}
+{"id": "nl2sh_test:1", "register": "rojak", "nl": "nak tengok all files in this directory, even the hidden ones.", "cmd": "ls -a"}
+{"id": "nl2sh_test:3", "register": "rojak", "nl": "copy /testbed/hello.php, rename to /testbed/hello-COPY.php.", "cmd": "cp /testbed/hello.php /testbed/hello-COPY.php"}
+{"id": "nl2sh_test:8", "register": "rojak", "nl": "nak check current working directory ni?", "cmd": "pwd"}
+{"id": "nl2sh_test:9", "register": "rojak", "nl": "print current date and time.", "cmd": "date"}
+{"id": "nl2sh_test:10", "register": "rojak", "nl": "show current user now.", "cmd": "whoami"}
+{"id": "nl2sh_test:12", "register": "rojak", "nl": "show me the current shell", "cmd": "echo $0"}
+{"id": "nl2sh_test:11", "register": "rojak", "nl": "nak delete fake_dir ni", "cmd": "rmdir fake_dir"}
+{"id": "nl2sh_test:13", "register": "rojak", "nl": "print all the env vars", "cmd": "env"}
+{"id": "nl2sh_test:14", "register": "rojak", "nl": "show me current user's home directory je.", "cmd": "echo $HOME"}
+{"id": "nl2sh_test:15", "register": "rojak", "nl": "show me current user's path", "cmd": "echo $PATH"}
+{"id": "nl2sh_test:21", "register": "rojak", "nl": "show me shell history.", "cmd": "history"}
+{"id": "nl2sh_test:20", "register": "rojak", "nl": "print path bash executable ni.", "cmd": "which bash"}
+{"id": "nl2sh_test:16", "register": "rojak", "nl": "show me setup_nl2b_fs_1.sh file content", "cmd": "cat setup_nl2b_fs_1.sh"}
+{"id": "nl2sh_test:17", "register": "rojak", "nl": "show me first 5 lines of setup_nl2b_fs_1.sh file.", "cmd": "head -n 5 setup_nl2b_fs_1.sh"}
+{"id": "nl2sh_test:22", "register": "rojak", "nl": "show me system utilization stats", "cmd": "vmstat"}
+{"id": "nl2sh_test:18", "register": "rojak", "nl": "nak show last 5 lines of setup_nl2b_fs_1.sh file?", "cmd": "tail -n 5 setup_nl2b_fs_1.sh"}
+{"id": "nl2sh_test:23", "register": "rojak", "nl": "nak check uptime system now?", "cmd": "uptime"}
+{"id": "nl2sh_test:19", "register": "rojak", "nl": "show me line 10 of setup_nl2b_fs_1.sh.", "cmd": "sed -n 10p setup_nl2b_fs_1.sh"}
+{"id": "nl2sh_test:24", "register": "rojak", "nl": "nak print system load averages ni?", "cmd": "w"}
+{"id": "nl2sh_test:25", "register": "rojak", "nl": "nak print running process je?", "cmd": "ps"}
+{"id": "nl2sh_test:26", "register": "rojak", "nl": "Print all running processes in a tree format.", "cmd": "pstree"}
+{"id": "nl2sh_test:27", "register": "rojak", "nl": "print system memory usage", "cmd": "free"}
+{"id": "nl2sh_test:29", "register": "rojak", "nl": "nak check kernel version ni?", "cmd": "uname -a"}
+{"id": "nl2sh_test:28", "register": "rojak", "nl": "nak check disk usage kat system ni", "cmd": "df"}
+{"id": "nl2sh_test:30", "register": "rojak", "nl": "nak print hostname of this system?", "cmd": "hostname"}
+{"id": "nl2sh_test:31", "register": "rojak", "nl": "show me system IP address kat sini", "cmd": "hostname -I"}
+{"id": "nl2sh_test:33", "register": "rojak", "nl": "nak display network interfaces ni", "cmd": "ifconfig"}
+{"id": "nl2sh_test:32", "register": "rojak", "nl": "show me DNS server IP address kat system ni", "cmd": "cat /etc/resolv.conf | grep nameserver"}
+{"id": "nl2sh_test:34", "register": "rojak", "nl": "show me routing table", "cmd": "route"}
+{"id": "nl2sh_test:37", "register": "rojak", "nl": "show me OpenSSL version.", "cmd": "openssl version"}
+{"id": "nl2sh_test:35", "register": "rojak", "nl": "nak tengok last login users je", "cmd": "last"}
+{"id": "nl2sh_test:36", "register": "rojak", "nl": "print last login user, full name with domain", "cmd": "last -w"}
+{"id": "nl2sh_test:38", "register": "rojak", "nl": "base64 encode 'hello' this", "cmd": "echo -n 'hello' | base64"}
+{"id": "nl2sh_test:39", "register": "rojak", "nl": "nak check, decode 'aGVsbG8=' base64.", "cmd": "echo 'aGVsbG8=' | base64 -d"}
+{"id": "nl2sh_test:44", "register": "rojak", "nl": "show me curl package info.", "cmd": "apt show curl"}
+{"id": "nl2sh_test:45", "register": "rojak", "nl": "list background jobs", "cmd": "jobs"}
+{"id": "nl2sh_test:46", "register": "rojak", "nl": "print terminal type now.", "cmd": "echo $TERM"}
+{"id": "nl2sh_test:42", "register": "rojak", "nl": "nak gzip /testbed/hello.php, tapi keep the original file.", "cmd": "gzip -k /testbed/hello.php"}
+{"id": "nl2sh_test:41", "register": "rojak", "nl": "nak list stats and timestamp for file setup_nl2b_fs_1.sh ni?", "cmd": "stat setup_nl2b_fs_1.sh"}
+{"id": "nl2sh_test:40", "register": "rojak", "nl": "show me the lines with 'console' in setup_nl2b_fs_1.sh.", "cmd": "grep 'console' setup_nl2b_fs_1.sh"}
+{"id": "nl2sh_test:47", "register": "rojak", "nl": "show me current process priority.", "cmd": "nice"}
+{"id": "nl2sh_test:43", "register": "rojak", "nl": "nak tar file /testbed/hello.php to /testbed/hello.tar je", "cmd": "tar -cf /testbed/hello.tar /testbed/hello.php"}
+{"id": "nl2sh_test:48", "register": "rojak", "nl": "show me PID of this shell.", "cmd": "echo $$"}
+{"id": "nl2sh_test:50", "register": "rojak", "nl": "show me user's groups now", "cmd": "groups"}
+{"id": "nl2sh_test:52", "register": "rojak", "nl": "nak tengok cron tab je", "cmd": "crontab -l"}
+{"id": "nl2sh_test:51", "register": "rojak", "nl": "Print out user ID kat sini.", "cmd": "id"}
+{"id": "nl2sh_test:54", "register": "rojak", "nl": "list CPU info", "cmd": "lscpu"}
+{"id": "nl2sh_test:53", "register": "rojak", "nl": "nak check umask user ni", "cmd": "umask"}
+{"id": "nl2sh_test:49", "register": "rojak", "nl": "time how long command echo 'hello' jalan.", "cmd": "time echo 'hello'"}
+{"id": "nl2sh_test:55", "register": "rojak", "nl": "nak list memory info", "cmd": "lsmem"}
+{"id": "nl2sh_test:56", "register": "rojak", "nl": "show me the ssh version installed", "cmd": "ssh -V"}
+{"id": "nl2sh_test:57", "register": "rojak", "nl": "print bash profile kat home directory.", "cmd": "cat ~/.bashrc"}
+{"id": "nl2sh_test:59", "register": "rojak", "nl": "nak check all block devices je", "cmd": "lsblk"}
+{"id": "nl2sh_test:58", "register": "rojak", "nl": "nak show system locale", "cmd": "locale"}
+{"id": "nl2sh_test:60", "register": "rojak", "nl": "nak check all files bigger than 100MB, current dir.", "cmd": "find . -size +100M -print"}
+{"id": "nl2sh_test:62", "register": "rojak", "nl": "nak change owner /testbed/test.txt to 'nobody' je.", "cmd": "chown nobody /testbed/test.txt"}
+{"id": "nl2sh_test:61", "register": "rojak", "nl": "nak buat symbolic link, /testbed/link point to /testbed/hello.php", "cmd": "ln -s /testbed/hello.php /testbed/link"}
+{"id": "nl2sh_test:63", "register": "rojak", "nl": "change group for /testbed/test.txt to 'nogroup'.", "cmd": "chgrp nogroup /testbed/test.txt"}
+{"id": "nl2sh_test:64", "register": "rojak", "nl": "nak change permission /testbed/test.txt to read-only for everyone", "cmd": "chmod 444 /testbed/test.txt"}
+{"id": "nl2sh_test:68", "register": "rojak", "nl": "show me network stats.", "cmd": "netstat --statistics"}
+{"id": "nl2sh_test:67", "register": "rojak", "nl": "print out unique lines in setup_nl2b_fs_1.sh.", "cmd": "uniq setup_nl2b_fs_1.sh"}
+{"id": "nl2sh_test:69", "register": "rojak", "nl": "show me all network interface.", "cmd": "netstat -i"}
+{"id": "nl2sh_test:66", "register": "rojak", "nl": "print setup_nl2b_fs_1.sh lines alphabetically", "cmd": "sort setup_nl2b_fs_1.sh"}
+{"id": "nl2sh_test:65", "register": "rojak", "nl": "nak check lines, words, chars in setup_nl2b_fs_1.sh", "cmd": "wc setup_nl2b_fs_1.sh"}
+{"id": "nl2sh_test:70", "register": "rojak", "nl": "show me calendar for next 3 months", "cmd": "cal -3"}
+{"id": "nl2sh_test:71", "register": "rojak", "nl": "nak show daemon and services yang running now?", "cmd": "service --status-all"}
+{"id": "nl2sh_test:72", "register": "rojak", "nl": "check boot time of the system.", "cmd": "who -b"}
+{"id": "nl2sh_test:73", "register": "rojak", "nl": "wanna check swap usage now", "cmd": "swapon --show"}
+{"id": "nl2sh_test:74", "register": "rojak", "nl": "print list active kernel parameters.", "cmd": "sysctl -a"}
+{"id": "nl2sh_test:76", "register": "rojak", "nl": "list all available shells", "cmd": "cat /etc/shells"}
+{"id": "nl2sh_test:75", "register": "rojak", "nl": "check installed software packages", "cmd": "dpkg --get-selections"}
+{"id": "nl2sh_test:77", "register": "rojak", "nl": "list out all the users on the system.", "cmd": "getent passwd"}
+{"id": "nl2sh_test:78", "register": "rojak", "nl": "list all groups on the system.", "cmd": "getent group"}
+{"id": "nl2sh_test:80", "register": "rojak", "nl": "nak check DNS google.com", "cmd": "nslookup google.com"}
+{"id": "nl2sh_test:79", "register": "rojak", "nl": "extract the filename from /usr/local/bin/my_script.sh.", "cmd": "basename /usr/local/bin/my_script.sh"}
+{"id": "nl2sh_test:86", "register": "rojak", "nl": "print how many processor", "cmd": "nproc"}
+{"id": "nl2sh_test:85", "register": "rojak", "nl": "print out all system config variables.", "cmd": "getconf -a"}
+{"id": "nl2sh_test:83", "register": "rojak", "nl": "check file type for setup_nl2b_fs_1.sh.", "cmd": "file setup_nl2b_fs_1.sh"}
+{"id": "nl2sh_test:81", "register": "rojak", "nl": "nak extract directory from '/usr/local/bin/my_script.sh'?", "cmd": "dirname /usr/local/bin/my_script.sh"}
+{"id": "nl2sh_test:82", "register": "rojak", "nl": "nak send 'System maintenance in 10 minutes!' to all logged in users.", "cmd": "wall 'System maintenance in 10 minutes!'"}
+{"id": "nl2sh_test:87", "register": "rojak", "nl": "show max open file descriptors", "cmd": "ulimit -n"}
+{"id": "nl2sh_test:88", "register": "rojak", "nl": "Print max user processes.", "cmd": "ulimit -u"}
+{"id": "nl2sh_test:84", "register": "rojak", "nl": "print setup_nl2b_fs_1.sh, wrap lines to 40 chars.", "cmd": "fold -w 40 setup_nl2b_fs_1.sh"}
+{"id": "nl2sh_test:89", "register": "rojak", "nl": "nak print max CPU time?", "cmd": "ulimit -t"}
+{"id": "nl2sh_test:90", "register": "rojak", "nl": "show me the configured size of long integer", "cmd": "getconf LONG_BIT"}
+{"id": "nl2sh_test:91", "register": "rojak", "nl": "print directory tree two level deep", "cmd": "tree -L 2"}
+{"id": "nl2sh_test:93", "register": "rojak", "nl": "print number of file inside current directory", "cmd": "ls -a | wc -l"}
+{"id": "nl2sh_test:94", "register": "rojak", "nl": "print first line of setup_nl2b_fs_1.sh", "cmd": "sed -n '1p' setup_nl2b_fs_1.sh"}
+{"id": "nl2sh_test:95", "register": "rojak", "nl": "print last line of setup_nl2b_fs_1.sh kat sini.", "cmd": "sed -n '$p' setup_nl2b_fs_1.sh"}
+{"id": "nl2sh_test:92", "register": "rojak", "nl": "nak check how many times 'the' appear in setup_nl2b_fs_1.sh", "cmd": "grep -o 'the' setup_nl2b_fs_1.sh | wc -l"}
+{"id": "nl2sh_test:96", "register": "rojak", "nl": "print lines 3 to 5 of setup_nl2b_fs_1.sh", "cmd": "sed -n '3,5p' setup_nl2b_fs_1.sh"}
+{"id": "nl2sh_test:97", "register": "rojak", "nl": "print every other line of setup_nl2b_fs_1.sh", "cmd": "sed -n '1~2p' setup_nl2b_fs_1.sh"}
+{"id": "nl2sh_test:99", "register": "rojak", "nl": "check all empty files kat current directory, no need go into subfolders", "cmd": "find . -maxdepth 1 -type f -empty"}
+{"id": "nl2sh_test:98", "register": "rojak", "nl": "can print how many words in setup_nl2b_fs_1.sh file?", "cmd": "wc -w setup_nl2b_fs_1.sh"}
+{"id": "nl2sh_test:100", "register": "rojak", "nl": "show me lines in setup_nl2b_fs_1.sh, shorter than 20 chars.", "cmd": "awk 'length < 20' setup_nl2b_fs_1.sh"}
+{"id": "nl2sh_test:106", "register": "rojak", "nl": "print system's public IP address je", "cmd": "curl ipinfo.io/ip"}
+{"id": "nl2sh_test:101", "register": "rojak", "nl": "show lines in setup_nl2b_fs_1.sh file that got 'the'.", "cmd": "grep 'the' setup_nl2b_fs_1.sh"}
+{"id": "nl2sh_test:103", "register": "rojak", "nl": "nak show SHA512 digest for setup_nl2b_fs_1.sh?", "cmd": "sha512sum setup_nl2b_fs_1.sh"}
+{"id": "nl2sh_test:105", "register": "rojak", "nl": "nak create file 'world.txt', inside tu 'hello' je.", "cmd": "echo 'hello' > world.txt"}
+{"id": "nl2sh_test:102", "register": "rojak", "nl": "Print lines in setup_nl2b_fs_1.sh file that got 'the' and 'a'.", "cmd": "grep 'the' setup_nl2b_fs_1.sh | grep 'a'"}
+{"id": "nl2sh_test:104", "register": "rojak", "nl": "encrypt setup_nl2b_fs_1.sh, aes-256-cbc, password 'password', save to out.enc.", "cmd": "openssl enc -aes-256-cbc -in setup_nl2b_fs_1.sh -pass pass:password -out out.enc"}
+{"id": "nl2sh_test:109", "register": "rojak", "nl": "nak calculate md5 sum for all the files in \\$FILES?", "cmd": "cat $(echo $FILES | tr ' ' '\\n' | sort) | md5sum"}
+{"id": "nl2sh_test:108", "register": "rojak", "nl": "nak calculate md5 sum of md5 sum for all files under /testbed/dir2/subdir2, sorted by filename?", "cmd": "find /testbed/dir2/subdir2 -type f -print0 | sort -z | xargs -0 md5sum | awk '{print $1}' | md5sum"}
+{"id": "nl2sh_test:112", "register": "rojak", "nl": "change permission all PHP files under /testbed to 755, then print how many files kena change", "cmd": "find /testbed -name \"*.php\" -exec chmod 755 {} \\; -exec /bin/echo {} \\; | wc -l"}
+{"id": "nl2sh_test:113", "register": "rojak", "nl": "check if this shell kat dalam 'screen' process, print 'True' or 'False' je.", "cmd": "pstree -s $$ | grep -q \"screen\" && echo \"True\" || echo \"False\""}
+{"id": "nl2sh_test:110", "register": "rojak", "nl": "nak calculate MD5 of sorted list of MD5, all .py files under /testbed/dir1/subdir1", "cmd": "find /testbed/dir1/subdir1 -type f -name *.py -exec md5sum {} + | awk '{print $1}' | sort | md5sum"}
+{"id": "nl2sh_test:115", "register": "rojak", "nl": "nak compute mean word count of all *.txt files inside /testbed directory?", "cmd": "find /testbed -name '*.txt' -print0 | xargs -0 wc -w | awk 'END { print $1/(NR-1) }'"}
+{"id": "nl2sh_test:116", "register": "rojak", "nl": "nak compute mean word count for all *.txt files smaller than 6 words kat /testbed directory?", "cmd": "find /testbed -name '*.txt' -print0 | xargs -0 wc -w | awk '$1 < 6 {v += $1; c++} END {print v/c}'"}
+{"id": "nl2sh_test:111", "register": "rojak", "nl": "nak check disk usage for all .txt files kat /testbed directory, prepend hostname to the output", "cmd": "find /testbed -name \"*.txt\" -exec du {} + | awk -v hostname=\"$(hostname)\" '{print hostname, $0}'"}
+{"id": "nl2sh_test:119", "register": "rojak", "nl": "Convert first 16 chars in /testbed/textfile7.txt to one hex value.", "cmd": "head /testbed/textfile7.txt -c16 | od -tx1 -w16 | head -n1 | cut -d' ' -f2- | tr -d ' '"}
+{"id": "nl2sh_test:118", "register": "rojak", "nl": "nak check all .txt files in /testbed directory, show me the paths, then search for 'another' inside each file.", "cmd": "find /testbed -name \"*.txt\" \\( -exec echo {} \\; -o -exec true \\; \\) -exec grep another {} \\;"}
+{"id": "nl2sh_test:117", "register": "rojak", "nl": "copy all file got 'FooBar' path under /testbed to /testbed/dir3/subdir1/subsubdir1/tmp je.", "cmd": "find /testbed -path '*FooBar*' -print0 | xargs -0 -I{} cp -r {} /testbed/dir3/subdir1/subsubdir1/tmp"}
+{"id": "nl2sh_test:114", "register": "rojak", "nl": "check, if content of /testbed/dir3/subdir1/subsubdir1/textfile3.txt is subset of /testbed/dir2/subdir1/textfile2.txt, print 'True', else print 'False'", "cmd": "comm -23 <(sort /testbed/dir3/subdir1/subsubdir1/textfile3.txt | uniq) <(sort /testbed/dir2/subdir1/textfile2.txt | uniq) | head -1 | grep -q '.' && echo \"False\" || echo \"True\""}
+{"id": "nl2sh_test:122", "register": "rojak", "nl": "nak count all lines in all '.c' files inside /testbed directory, recursively je.", "cmd": "find /testbed -name \"*.c\" -print0 | xargs -0 cat | wc -l"}
+{"id": "nl2sh_test:120", "register": "rojak", "nl": "copy all file under /testbed like 'file.txt' ada 'FooBar' in path to current folder root, preserve mod, owner, timestamp.", "cmd": "find /testbed -type f -path '*FooBar*' | xargs -i cp -p \"{}\" ."}
+{"id": "nl2sh_test:121", "register": "rojak", "nl": "nak copy all files and folders below /testbed, nama dia ada 'FooBar', ke /testbed/dir3/subdir1/subsubdir1/tmp", "cmd": "find /testbed -name '*FooBar*' -print0 | xargs -0 -I{} cp -R {} /testbed/dir3/subdir1/subsubdir1/tmp"}
+{"id": "nl2sh_test:124", "register": "rojak", "nl": "check total lines of all php files in /testbed directory recursively", "cmd": "find /testbed/ -name '*.php' | xargs cat | wc -l"}
+{"id": "nl2sh_test:123", "register": "rojak", "nl": "nak count all lines in .php files, this directory + subfolders je", "cmd": "find . -type f -name '*php' | xargs cat | wc -l"}
+{"id": "nl2sh_test:125", "register": "rojak", "nl": "nak calculate md5sum for all '.py' files in /testbed folder and subfolders?", "cmd": "find /testbed -type f -name \"*.py\" -exec md5sum {} +"}
+{"id": "nl2sh_test:126", "register": "rojak", "nl": "count how many *.html files in /testbed directory tree that got 'foo' string inside.", "cmd": "find /testbed -name \"*.html\" | xargs grep -l foo | wc -l"}
+{"id": "nl2sh_test:129", "register": "rojak", "nl": "count how many reg files in ${DIRECTORY} tree name got vowel", "cmd": "find ${DIRECTORY} -type f -print | sed -e 's@^.*/@@' | grep '[aeiouyAEIOUY]' | wc -l"}
+{"id": "nl2sh_test:127", "register": "rojak", "nl": "count berapa file/directory '.php' kat /testbed directory tree then change permission to 755", "cmd": "find /testbed -name \"*.php\" -exec chmod 755 {} \\; -exec /bin/echo {} \\; | wc -l"}
+{"id": "nl2sh_test:130", "register": "rojak", "nl": "count file per extension unique dalam /testbed directory tree?", "cmd": "find /testbed -type f | sed -e 's/.*\\.//' | sed -e 's/.*\\///' | sort | uniq -c | sort -rn"}
+{"id": "nl2sh_test:128", "register": "rojak", "nl": "nak check berapa lines dalam semua file kat /testbed directory tree yang match pattern '*file*'.", "cmd": "find /testbed/ -name '*file*' | sort | xargs wc -l"}
+{"id": "nl2sh_test:132", "register": "rojak", "nl": "nak check how many files in /testbed folder and its subfolders", "cmd": "find /testbed -type f -exec ls -l {} \\; | wc -l"}
+{"id": "nl2sh_test:131", "register": "rojak", "nl": "nak check total lines in all .gz files kat /testbed directory after decompress", "cmd": "find /testbed -type f -name '*.gz' | xargs zcat | wc -l"}
+{"id": "nl2sh_test:133", "register": "rojak", "nl": "nak count line dalam each *.php file, sorted by file inside /testbed directory aje", "cmd": "find /testbed -name '*.php' -type f | sort | xargs wc -l"}
+{"id": "nl2sh_test:137", "register": "rojak", "nl": "count total lines PHP and JS files in /testbed.", "cmd": "find /testbed -name '*.js' -or -name '*.php' | xargs wc -l | grep 'total'  | awk '{print $1}'"}
+{"id": "nl2sh_test:134", "register": "rojak", "nl": "count line each *.php file inside /testbed directory, sort by line count, highest to lowest.", "cmd": "find /testbed -name '*.php' -type f | xargs wc -l | sort -nr"}
+{"id": "nl2sh_test:135", "register": "rojak", "nl": "check how many times each IP address appear in '/etc/networks' file, then print all addresses with count in descending order.", "cmd": "grep -oE '([0-9]{1,3}\\.){3}[0-9]{1,3}' /etc/networks | sort | uniq -c | sort -nr"}
+{"id": "nl2sh_test:136", "register": "rojak", "nl": "nak check, berapa baris ada alphanumeric symbols je in all the *.php files kat /testbed folder and its subfolders.", "cmd": "find /testbed -name '*.php' | xargs cat | awk '/[a-zA-Z0-9]/ {i++} END{print i}'"}
+{"id": "nl2sh_test:138", "register": "rojak", "nl": "buat 'abc.txt' empty file kat each 'dir1' inside 'testbed' directory?", "cmd": "find /testbed -type d -name \"dir1\" -print |  sed 's/$/\\/abc.txt/g' | xargs touch"}
+{"id": "nl2sh_test:139", "register": "rojak", "nl": "nak buat logs.tar.gz, all log older than one day, Ubuntu je", "cmd": "find /var/log/ -mtime +1 | xargs  tar -czvPf  /testbed/logs.tar.gz"}
+{"id": "nl2sh_test:141", "register": "rojak", "nl": "show me top 5 biggest files in /testbed folder and all sub-folders", "cmd": "find /testbed -type f -exec du -b {} + | sort -rh | head -n 5"}
+{"id": "nl2sh_test:140", "register": "rojak", "nl": "nak delete files in '/testbed/dir3/subdir1/subsubdir1/tmp' which older than 2 days je", "cmd": "find /testbed/dir3/subdir1/subsubdir1/tmp -type f -mtime +2 -print0 | xargs -0 rm -f"}
+{"id": "nl2sh_test:142", "register": "rojak", "nl": "show me top 5 smallest files in /testbed directory and subfolders, skip empty ones", "cmd": "find /testbed -type f -size +0c -exec du -b {} + | sort -n | head -n 5"}
+{"id": "nl2sh_test:144", "register": "rojak", "nl": "display top 5 biggest file size only inside /testbed directory", "cmd": "find /testbed -type f -maxdepth 1 -exec du -b {} + | sort -rh | head -n 5"}
+{"id": "nl2sh_test:143", "register": "rojak", "nl": "check 5 smallest files in /testbed directory and all its subfolders", "cmd": "find /testbed -type f -exec ls -s {} \\; | sort -n  | head -5"}
+{"id": "nl2sh_test:146", "register": "rojak", "nl": "Print out all duplicate filename, case insensitive one, kat /testbed directory tree.", "cmd": "find /testbed -type f | awk -F/ '{print $NF}' | sort -f | uniq -i -d"}
+{"id": "nl2sh_test:145", "register": "rojak", "nl": "nak check .java files kat testbed repo, yang ada 'Hello' string inside, then print out the filenames.", "cmd": "find /testbed -name \"*.java\" -exec grep -Hin Hello {} + | cut -d \":\" -f 1 | xargs -I{} basename {}"}
+{"id": "nl2sh_test:147", "register": "rojak", "nl": "check all unique file path under \"testbed/dir1\" compare to \"testbed/dir2\" ok", "cmd": "comm -23 <(find /testbed/dir1 | sed 's#/testbed/dir1/##' | sort) <(find /testbed/dir2 | sed 's#/testbed/dir2/##' | sort) | sed 's#^#/testbed/dir1/#'"}
+{"id": "nl2sh_test:149", "register": "rojak", "nl": "Print total lines of all *.java files in /testbed folder and subfolders.", "cmd": "find /testbed -name '*.java' -print0 |xargs -0 wc -l|grep 'total' |awk '{ print $1 }'"}
+{"id": "nl2sh_test:148", "register": "rojak", "nl": "nak check all file kat /testbed, find yang ada 'Hello', then print folder dia", "cmd": "grep -rl 'Hello' /testbed | xargs -I {} dirname {} | sort | uniq"}
+{"id": "nl2sh_test:152", "register": "rojak", "nl": "nak check php files inside /testbed directory, then find 'world' string in all those files.", "cmd": "find /testbed -name '*.php' -exec grep -iq \"world\" {} \\; -print"}
+{"id": "nl2sh_test:150", "register": "rojak", "nl": "nak create symlink FooBar je, /testbed/dir3/subdir1/subsubdir1 point to /", "cmd": "ln /testbed/dir3/subdir1/subsubdir1/FooBar -s /"}
+{"id": "nl2sh_test:151", "register": "rojak", "nl": "nak check file dalam /testbed/dir1, only the ones with sticky bit set and permission 553.", "cmd": "find /testbed/dir1 -perm 1553"}
+{"id": "nl2sh_test:155", "register": "rojak", "nl": "check /system directory, show me the tree.", "cmd": "tree /system"}
+{"id": "nl2sh_test:156", "register": "rojak", "nl": "nak list all files and dirs in /system/folder2 tree, including hidden ones.", "cmd": "tree -a /system/folder2"}
+{"id": "nl2sh_test:154", "register": "rojak", "nl": "find all files in '/system' that got 'foo' whole word, prepend number to each 'foo' je", "cmd": "grep -rnw /system -e \"foo\""}
+{"id": "nl2sh_test:157", "register": "rojak", "nl": "check all folders recursively in /system that got files like '.out'", "cmd": "find /system -type f -name \"*.out\" -print0 | xargs -0 -n1 dirname | sort -u"}
+{"id": "nl2sh_test:153", "register": "rojak", "nl": "nak check all file inside '/system/folder1' punya 'Hello' (case insensitive), prefix the string with its number in the file", "cmd": "grep -inr \"Hello\" /system/folder1"}
+{"id": "nl2sh_test:159", "register": "rojak", "nl": "nak delete all empty folder recursively kat /system/folder3/temp", "cmd": "find /system/folder3/temp -depth -type d -exec rmdir {} \\;"}
+{"id": "nl2sh_test:161", "register": "rojak", "nl": "nak clear semua file kat /system/folder1, skip je yang end with '.txt'", "cmd": "find /system/folder1 -type f -not -name '*txt' | xargs rm"}
+{"id": "nl2sh_test:158", "register": "rojak", "nl": "nak delete all *.txt files inside '/system' folder, confirm 'y' if got ask", "cmd": "yes y | rm -r /system/*.txt"}
+{"id": "nl2sh_test:160", "register": "rojak", "nl": "kena delete all empty folder under /system/folder3/temp recursively, print info msg for each delete, and supress error if folder not empty.", "cmd": "find /system/folder3/temp -type d -empty -exec rmdir -vp --ignore-fail-on-non-empty {} +"}
+{"id": "nl2sh_test:162", "register": "rojak", "nl": "rename recursively all files under /system/folder2, change 'special' to 'regular' je.", "cmd": "find /system/folder2 -type f -name '*special*' ! -path '*/special/*' -execdir bash -c 'mv \"$0\" \"${0/special/regular}\"' {} \\;"}
+{"id": "nl2sh_test:163", "register": "rojak", "nl": "cari 'foo' recursively dalam /system folder, then print output kat console + how many lines match.", "cmd": "grep -r \"foo\" /system | tee >(wc -l)"}
+{"id": "nl2sh_test:165", "register": "rojak", "nl": "nak check /system/folder2.tar.gz, unzip dia recursively to stdout, then find 'special' inside.", "cmd": "zcat -r /system/folder2.tar.gz | grep \"special\""}
+{"id": "nl2sh_test:164", "register": "rojak", "nl": "nak check all reg file kat /system/folder3/, just give me the file name, no folder path.", "cmd": "find /system/folder3/ -type f -exec basename {} \\;"}
+{"id": "nl2sh_test:167", "register": "rojak", "nl": "nak delete semua *.doc files je kat /system/folder1 tree.", "cmd": "find /system/folder1 -name '*.doc' -exec rm \"{}\" \\;"}
+{"id": "nl2sh_test:168", "register": "rojak", "nl": "nak delete all *.log files je kat /system/folder1 tree", "cmd": "find /system/folder1 -name '*.log' -print0 | xargs -0 rm"}
+{"id": "nl2sh_test:169", "register": "rojak", "nl": "nak delete semua *.txt files kat '/system' directory je, no subfolders", "cmd": "find /system -name '*.txt' -maxdepth 1 | xargs rm"}
+{"id": "nl2sh_test:166", "register": "rojak", "nl": "nak remove \\r at the end of each line in 'system/folder3/temp/temp1/text1.txt', display the result as printable characters or backslash escape", "cmd": "cat /system/folder3/temp/temp1/text1.txt | sed 's/\\r$//' | od -c"}
+{"id": "nl2sh_test:175", "register": "rojak", "nl": "Print last 5 lines of /system/folder1/data.csv", "cmd": "cat /system/folder1/data.csv | rev | cut -d, -f-5 | rev"}
+{"id": "nl2sh_test:174", "register": "rojak", "nl": "nak delete je all a.out, *.o, and core files under /system directory.", "cmd": "find /system \\( -name a.out -o -name '*.o' -o -name 'core' \\) -exec rm {} \\;"}
+{"id": "nl2sh_test:171", "register": "rojak", "nl": "nak delete all *.txt file kat /system/folder1, modified time more than 5 mins ago je", "cmd": "find /system/folder1 -mmin +5 -type f -name \"*.txt\" -delete"}
+{"id": "nl2sh_test:170", "register": "rojak", "nl": "nak delete all *.sql files kat '/system/folder3/backup_dbg' directory, last modified more than 25 days ago", "cmd": "find /system/folder3/backup_dbg/*.sql -mtime +25 -exec rm -f {} \\;"}
+{"id": "nl2sh_test:173", "register": "rojak", "nl": "nak delete all .sh files inside '/system/folder1' path je, but only the ones start with 'new'.", "cmd": "find /system/folder1 -name 'new*.sh' -exec rm -f '{}' \\;"}
+{"id": "nl2sh_test:176", "register": "rojak", "nl": "nak delete all \"temp\" folders kat dalam /system directory tree", "cmd": "find /system -name \"temp\" -type d -delete"}
+{"id": "nl2sh_test:172", "register": "rojak", "nl": "nak delete all .txt file under /system/folder1, except 'keep.txt', modified more than 5 mins ago. no subdirs", "cmd": "find /system/folder1 -maxdepth 1 -mmin +5 -type f -name \"*.txt\" ! -name \"keep.txt\" -delete"}
+{"id": "nl2sh_test:177", "register": "rojak", "nl": "nak clear semua empty file je kat /system/folder3/temp and below.", "cmd": "find /system/folder3/temp -type f -empty -print | xargs rm -f"}
+{"id": "nl2sh_test:182", "register": "rojak", "nl": "nak delete file size less than 1KB kat /system directory", "cmd": "find /system -type f -size -1k -exec rm {} +"}
+{"id": "nl2sh_test:181", "register": "rojak", "nl": "nak delete file text2, text3, text4 inside /system/folder1.", "cmd": "find /system/folder1 -name 'text[2-4]*' -exec rm {} \\;"}
+{"id": "nl2sh_test:178", "register": "rojak", "nl": "nak clear semua a.out and *.o inside /system directory tree, only those modified less than 7 days", "cmd": "find /system \\( -name a.out -o -name '*.o' \\) -mtime -7 -exec rm {} \\;"}
+{"id": "nl2sh_test:185", "register": "rojak", "nl": "nak delete all regular files dalam /system directory tree.", "cmd": "find /system -type f -exec rm {} +"}
+{"id": "nl2sh_test:183", "register": "rojak", "nl": "nak delete je file-file modified more than 31 days ago, recursively from /system.", "cmd": "find /system -type f -mtime +31 -exec rm -f {} \\;"}
+{"id": "nl2sh_test:184", "register": "rojak", "nl": "nak check '/system/folder3/temp/temp1/text1.txt', print je, no newline character.", "cmd": "paste -sd \"\" /system/folder3/temp/temp1/text1.txt"}
+{"id": "nl2sh_test:188", "register": "rojak", "nl": "show me how many sub-directories under /system.", "cmd": "find /system -type d | wc -l"}
+{"id": "nl2sh_test:186", "register": "rojak", "nl": "nak check which file diff between /system/folder1 and /system/folder2", "cmd": "diff -qr /system/folder1 /system/folder2 | sort"}
+{"id": "nl2sh_test:179", "register": "rojak", "nl": "nak check, delete all file and folder under '/system/folder3/temp' directory tree, those match with '.DS_Store', '._.DS_Store', '._*', '.TemporaryItems' or '.apdisk' pattern.", "cmd": "find /system/folder3/temp \\( -name '.DS_Store' -or -name '._.DS_Store' -or -name '._*' -or -name '.TemporaryItems' -or -name '.apdisk' \\) -exec rm -rf {} \\;"}
+{"id": "nl2sh_test:187", "register": "rojak", "nl": "nak check space kosong on file system with /system path, in MBs?", "cmd": "df -m /system"}
+{"id": "nl2sh_test:180", "register": "rojak", "nl": "nak check, buang everything in bracket, replace non-digit char with space in '1/2 [3] (27/03/2012 19:32:54) word word word word 4/5', make table format.", "cmd": "echo '1/2 [3] (27/03/2012 19:32:54) word word word word 4/5' | sed -e 's/(.*)//' -e 's/[^0-9]/ /g' | column -t"}
+{"id": "nl2sh_test:190", "register": "rojak", "nl": "nak buat symlink folder1 kat /system point to root folder", "cmd": "ln /system/folder1 -s /"}
+{"id": "nl2sh_test:193", "register": "rojak", "nl": "compress all files in /system folder, default depth, save to /backup, use cpio.", "cmd": "find /system -depth -print | cpio -dump /backup"}
+{"id": "nl2sh_test:191", "register": "rojak", "nl": "write now date time + ' 1' to console then append to /system/folder3/temp/empty.txt", "cmd": "echo $(date) \"1\" | tee -a /system/folder3/temp/empty.txt"}
+{"id": "nl2sh_test:192", "register": "rojak", "nl": "join all .txt files kat /system tree, make one file /system/folder3/temp/concat.txt", "cmd": "find /system -name \"*.txt\" -not -name \"concat.txt\" -print -exec cat {} \\; > /system/folder3/temp/concat.txt"}
+{"id": "nl2sh_test:196", "register": "rojak", "nl": "dump /system/text1.txt as ASCII characters", "cmd": "od -t c /system/text1.txt"}
+{"id": "nl2sh_test:195", "register": "rojak", "nl": "nak rename /system/folder3/temp/temp1 to /system/folder3/temp/temp1_old", "cmd": "mv /system/folder3/temp/temp1 /system/folder3/temp/temp1_old"}
+{"id": "nl2sh_test:189", "register": "rojak", "nl": "Simpanlah semua file in /system/folder1 modified past 60 days to /mytarfile.tgz, timestamp 2023-01-01, owner 0, group 0.", "cmd": "tar --mtime='2023-01-01' --owner=0 --group=0 -czf mytarfile.tgz `find /system/folder1 -mtime -60`"}
+{"id": "nl2sh_test:194", "register": "rojak", "nl": "copy all files inside /system directory, except the ones with 'text', to /system/folder3/backup_dbg/backup. No subdirectory stuff, okay?", "cmd": "find /system -maxdepth 1 -type f ! -name '*text*' -exec cp {} /system/folder3/backup_dbg/backup \\;"}
+{"id": "nl2sh_test:199", "register": "rojak", "nl": "nak search all file inside /system downwards, size > 10 bytes.", "cmd": "find /system -size +10c -print"}
+{"id": "nl2sh_test:200", "register": "rojak", "nl": "nak calculate md5sum for all .txt files under /system, then sort the output", "cmd": "find /system -type f -name '*.txt' -exec md5sum {} + | awk '{print $1}' | sort"}
+{"id": "nl2sh_test:201", "register": "rojak", "nl": "check host name in '/etc/hosts', print the IP, first awk field", "cmd": "more /etc/hosts | grep `hostname` | awk '{print $1}'"}
+{"id": "nl2sh_test:198", "register": "rojak", "nl": "nak download kat sini 'http://example.com/textfile.txt', terus simpan 'textfile.txt' dalam /system", "cmd": "curl http://example.com/textfile.txt -o /system/textfile.txt"}
+{"id": "nl2sh_test:202", "register": "rojak", "nl": "nak check file modified within 30 days, location /workspace", "cmd": "find /workspace -daystart -type f -mtime -30"}
+{"id": "nl2sh_test:203", "register": "rojak", "nl": "nak check file dalam /workspace, pattern *.c, size > 1KB", "cmd": "find /workspace -name '*.c' -size +1k -print"}
+{"id": "nl2sh_test:204", "register": "rojak", "nl": "nak tengok file-file kat /workspace directory, yang changed lebih dari satu hour ago", "cmd": "find /workspace -type f -cmin +60"}
+{"id": "nl2sh_test:205", "register": "rojak", "nl": "nak check file in /workspace path, last accessed more than 1 hour ago", "cmd": "find /workspace -type f -amin +60"}
+{"id": "nl2sh_test:208", "register": "rojak", "nl": "list all zero-byte file under /workspace.", "cmd": "find /workspace -empty -exec ls {} \\;"}
+{"id": "nl2sh_test:207", "register": "rojak", "nl": "list all the files, 0 byte je, kat /workspace directory.", "cmd": "find /workspace -empty"}
+{"id": "nl2sh_test:206", "register": "rojak", "nl": "list all the drectories kat /workspace directory, dont go inside sub directories", "cmd": "find /workspace -maxdepth 1 -type d"}
+{"id": "nl2sh_test:209", "register": "rojak", "nl": "nak check file > 1KB kat /workspace, terus delete", "cmd": "find /workspace -type f -size +1k -delete"}
+{"id": "nl2sh_test:210", "register": "rojak", "nl": "nak list all file in /workspace directory, group punya read permission je", "cmd": "find /workspace -perm 400 -type f -exec ls -l {} \\;"}
+{"id": "nl2sh_test:211", "register": "rojak", "nl": "nak check file-file in /workspace punya permission 777.", "cmd": "find /workspace -perm 777 -type f -exec ls -l {} \\;"}
+{"id": "nl2sh_test:212", "register": "rojak", "nl": "nak list details of all text files inside /workspace directory.", "cmd": "find /workspace -name \"*.txt\" -exec ls -ld {} \\;"}
+{"id": "nl2sh_test:216", "register": "rojak", "nl": "show me disk usage for files or folder in /workspace", "cmd": "du -sh /workspace"}
+{"id": "nl2sh_test:214", "register": "rojak", "nl": "move files kat /workspace, last accessed less than one day, to /.", "cmd": "find /workspace -atime -1 -type f -exec mv {} / \\;"}
+{"id": "nl2sh_test:213", "register": "rojak", "nl": "nak move all files from /workspace folder to / only, no need move inside subfolder.", "cmd": "find /workspace -maxdepth 1 -type f -exec mv -t / {} +"}
+{"id": "nl2sh_test:218", "register": "rojak", "nl": "show me top 3 biggest directory in /workspace.", "cmd": "du -a /workspace | sort -nr | head -n 3"}
+{"id": "nl2sh_test:197", "register": "rojak", "nl": "buat compress /system/folder1 to 'compress_folder1.tar.gz', date 2023-01-01, owner 0, group 0.", "cmd": "tar --mtime='2023-01-01' --owner=0 --group=0 -zcf compress_folder1.tar.gz /system/folder1"}
+{"id": "nl2sh_test:215", "register": "rojak", "nl": "show me all filenames in /workspace/dir1 got 'hello', case insensitive", "cmd": "find /workspace/dir1 -type f -exec grep -il 'hello' {} \\;"}
+{"id": "nl2sh_test:217", "register": "rojak", "nl": "nak check last word je dalam /workspace/dir1/long.txt", "cmd": "tac /workspace/dir1/long.txt | awk 'NF{print $NF; exit}'"}
+{"id": "nl2sh_test:219", "register": "rojak", "nl": "show first line of '/workspace/dir1/long.txt'.", "cmd": "head -n1 /workspace/dir1/long.txt"}
+{"id": "nl2sh_test:221", "register": "rojak", "nl": "nak prune semua file inside /workspace directory", "cmd": "find /workspace -type f -delete"}
+{"id": "nl2sh_test:220", "register": "rojak", "nl": "print last non-empty line of '/workspace/dir1/a.txt'.", "cmd": "tac /workspace/dir1/a.txt | grep -m 1 '.'"}
+{"id": "nl2sh_test:226", "register": "rojak", "nl": "nak check 'mysql' directory kat workspace je.", "cmd": "find  /workspace -name mysql -type d"}
+{"id": "nl2sh_test:225", "register": "rojak", "nl": "nak check file teks in /workspace folder, which cannot be write by others", "cmd": "find  /workspace -type f \\( -iname \"*.txt\" -not -perm -o=w \\)"}
+{"id": "nl2sh_test:223", "register": "rojak", "nl": "nak check all files in /workspace folder, sort by depth, show me the file names.", "cmd": "find /workspace -type f | awk -F/ '{print NF, $0}' | sort -n"}
+{"id": "nl2sh_test:222", "register": "rojak", "nl": "nak check file size kat /workspace, all files, between 1KB to 32KB je", "cmd": "find /workspace -type f -size +1k -size -32k"}
+{"id": "nl2sh_test:224", "register": "rojak", "nl": "nak check file in /workspace, size > 1KB, show me the biggest one.", "cmd": "find /workspace -type f -size +1k -exec ls -ls {} + | sort -n | tail -1"}
+{"id": "nl2sh_test:227", "register": "rojak", "nl": "Print out all duplicate filename, case insensitive, kat /workspace directory tree.", "cmd": "find /workspace -type f | awk -F/ '{print $NF}' | sort -f | uniq -i -d"}
+{"id": "nl2sh_test:228", "register": "rojak", "nl": "nak check old2.txt permission and creation time kat /workspace folder.", "cmd": "find /workspace -name old2.txt | xargs ls -tl"}
+{"id": "nl2sh_test:233", "register": "rojak", "nl": "copy kat /usr the whole /workspace directory structure.", "cmd": "find /workspace -type d -print|sed 's@^@/usr/@'|xargs mkdir -p"}
+{"id": "nl2sh_test:231", "register": "rojak", "nl": "nak check MD5 sum for all files in /workspace directory tree", "cmd": "find /workspace -type f -exec md5sum {} + | sort"}
+{"id": "nl2sh_test:230", "register": "rojak", "nl": "nak calculate MD5 sum for all files in /workspace directory, filename first je", "cmd": "find /workspace -type f -exec md5sum {} + | awk '{print $2 \" \" $1}'"}
+{"id": "nl2sh_test:229", "register": "rojak", "nl": "nak check 'hello' in all normal files inside /workspace folder, show me the file name that match.", "cmd": "find  /workspace -type f | xargs grep -l \"hello\""}
+{"id": "nl2sh_test:234", "register": "rojak", "nl": "show me long list oldest file under '/workspace' directory tree", "cmd": "find /workspace -type f -printf '%T+ %p\\n' | sort | head -n 1 | awk '{print $2}' | xargs ls -l"}
+{"id": "nl2sh_test:232", "register": "rojak", "nl": "nak check extension file unik, 3 to 6 char je, dalam /workspace directory tree", "cmd": "find /workspace -type f -name '*.*' | awk -F. 'NF>1 {ext=tolower($NF); if (length(ext) >= 3 && length(ext) <= 6) print ext}' | sort | uniq -c | wc -l"}
+{"id": "nl2sh_test:235", "register": "rojak", "nl": "nak check 2 biggest directory under /workspace, how?", "cmd": "find /workspace -type d -print0 | xargs -0 du | sort -n | tail -2 | cut -f2 | xargs -I{} du -sh {}"}
+{"id": "nl2sh_test:236", "register": "rojak", "nl": "list all files, path je, same content kat /workspace directory.", "cmd": "find /workspace -type f | xargs md5sum | sort | uniq -Dw32"}
+{"id": "nl2sh_test:237", "register": "rojak", "nl": "nak buat directory for each unique file path in '/workspace/files.txt'.", "cmd": "cat /workspace/files.txt |xargs -I {} dirname \"{}\"| sort -u | xargs -I{} mkdir -p \"{}\""}
+{"id": "nl2sh_test:239", "register": "rojak", "nl": "nak check all hidden files in /workspace directory only, no subfolders.", "cmd": "find /workspace -maxdepth 1 -type f -name '.*' -exec sh -c 'mv \"$0\" \"${0%/\\.*}/${0##*/.}\"' {} \\;"}
+{"id": "nl2sh_test:238", "register": "rojak", "nl": "nak show me total disk usage in bytes for all the files listed in /workspace/files.txt?", "cmd": "cat /workspace/files.txt | xargs du -b | tail -1 | awk '{print $1}'"}
+{"id": "nl2sh_test:244", "register": "rojak", "nl": "nak delete all hidden files je kat /workspace.", "cmd": "find /workspace -type f -name '.*' -delete"}
+{"id": "nl2sh_test:242", "register": "rojak", "nl": "count lines in /workspace/dir1/a.txt, skip empty lines and space only lines.", "cmd": "awk '!/^[[:space:]]*$/{++x} END{print x}' /workspace/dir1/a.txt"}
+{"id": "nl2sh_test:240", "register": "rojak", "nl": "can count diff lines in '/workspace/dir1/long.txt' and '/workspace/dir1/terminate.txt' je", "cmd": "diff /workspace/dir1/long.txt /workspace/dir1/terminate.txt | grep ^[\\>\\<] | wc -l"}
+{"id": "nl2sh_test:243", "register": "rojak", "nl": "nak buat symbolic link je kat \"~/newlinks\" for each file in /workspace/results.txt", "cmd": "cat /workspace/results.txt | xargs -I{} ln -s {} ~/newlinks"}
+{"id": "nl2sh_test:241", "register": "rojak", "nl": "check berapa lines diff je kat '/workspace/dir1/terminate.txt' and '/workspace/dir1/long.txt', 0 lines of context.", "cmd": "diff -U 0 /workspace/dir1/terminate.txt /workspace/dir1/long.txt | grep -v ^@ | wc -l"}
+{"id": "nl2sh_test:246", "register": "rojak", "nl": "nak check diff files kat /workspace/dir1 and /workspace/dir2?", "cmd": "diff <(ls /workspace/dir1) <(ls /workspace/dir2)"}
+{"id": "nl2sh_test:245", "register": "rojak", "nl": "nak show /workspace/dir1/long.txt as double precision floating point values", "cmd": "od -t fD /workspace/dir1/long.txt"}
+{"id": "nl2sh_test:247", "register": "rojak", "nl": "nak check size file '/workspace/dir1/sum.c' in bytes?", "cmd": "du -sb /workspace/dir1/sum.c | cut -f1"}
+{"id": "nl2sh_test:250", "register": "rojak", "nl": "Print percentage space used on /workspace directory.", "cmd": "df -k /workspace | tail -1 | awk '{print $5}'"}
+{"id": "nl2sh_test:249", "register": "rojak", "nl": "show me size and path of all files/folders in /workspace, sort by size descending.", "cmd": "du /workspace -a -h | sort -hr"}
+{"id": "nl2sh_test:248", "register": "rojak", "nl": "show last slash-separated part of each filename path kat /workspace/dir1/file.txt", "cmd": "rev /workspace/dir1/file.txt | cut -d/ -f1 | rev"}
+{"id": "nl2sh_test:252", "register": "rojak", "nl": "create empty file 'Icon' in workspace/ folder, end with carriage return.", "cmd": "echo $'workspace/Icon\\r' | xargs touch"}
+{"id": "nl2sh_test:253", "register": "rojak", "nl": "nak buat symlink /workspace/dir1 point to root folder je", "cmd": "ln /workspace/dir1 -s /"}
+{"id": "nl2sh_test:256", "register": "rojak", "nl": "nak check n buka semua gz archive kat /workspace directory tree.", "cmd": "find /workspace -name '*.gz' -print0 | xargs -0 gunzip"}
+{"id": "nl2sh_test:254", "register": "rojak", "nl": "nak display permission, user, group, full path all files in /workspace directory tree?", "cmd": "tree /workspace -p -u -g -f"}
+{"id": "nl2sh_test:255", "register": "rojak", "nl": "search 'hello' case insensitive kat all file under /workspace directory tree, show matched lines with their filenames je.", "cmd": "find /workspace -type f -print0  | xargs -0 grep -iH \"hello\""}
+{"id": "nl2sh_test:251", "register": "rojak", "nl": "nak print /workspace/dir1/long.txt, tapi reverse order je", "cmd": "nl /workspace/dir1/long.txt | sort -nr | cut -b8-"}
+{"id": "nl2sh_test:259", "register": "rojak", "nl": "check je build number kernel now, #104 kat sini.", "cmd": "uname -v | grep -o '#[0-9]\\+'"}
+{"id": "nl2sh_test:257", "register": "rojak", "nl": "nak check extract **/workspace/archive.tar.gz** to **/backup**.", "cmd": "gzip -dc /workspace/archive.tar.gz | tar -xf - -C /backup"}
+{"id": "nl2sh_test:258", "register": "rojak", "nl": "buat symlink je kat /workspace/dir1/terminate.txt, nama dia /workspace/test", "cmd": "ln /workspace/dir1/terminate.txt /workspace/test"}
+{"id": "nl2sh_test:261", "register": "rojak", "nl": "check file info for grep path", "cmd": "ls -ald `which grep`"}
+{"id": "nl2sh_test:260", "register": "rojak", "nl": "nak check reverse lookup for address 127.0.0.1.", "cmd": "dig -x 127.0.0.1"}
+{"id": "nl2sh_test:262", "register": "rojak", "nl": "nak extract host name part from 'http://www.google.com' ni?", "cmd": "echo \"http://www.google.com\" | cut -d'/' -f3"}
+{"id": "nl2sh_test:267", "register": "rojak", "nl": "print all readline bindings", "cmd": "bind -P"}
+{"id": "nl2sh_test:264", "register": "rojak", "nl": "nak show process tree ngan command line arguments je?", "cmd": "pstree -a"}
+{"id": "nl2sh_test:268", "register": "rojak", "nl": "list out bind function names with 'p' inside.", "cmd": "bind -l | grep p"}
+{"id": "nl2sh_test:263", "register": "rojak", "nl": "show me all env vars, but escape semicolons with backslash.", "cmd": "env | sed 's/;/\\\\;/g'"}
+{"id": "nl2sh_test:266", "register": "rojak", "nl": "print number 1 to 10, pakai ':' je.", "cmd": "yes | head -n10 | grep -n . | cut -d: -f1 | paste -sd:"}
+{"id": "nl2sh_test:265", "register": "rojak", "nl": "create 'dir' and 'subdir' folders, then 'subsubdir' also.", "cmd": "mkdir -p dir/subdir/subsubdir"}
+{"id": "nl2sh_test:269", "register": "rojak", "nl": "nak simpan first IP google.com dalam 'address' variable, then display the address.", "cmd": "address=$(dig +short google.com | grep -E '^[0-9.]+$' | head -n 1) && echo $address"}
+{"id": "nl2sh_test:270", "register": "rojak", "nl": "nak remove all except ';' and digit in ' Hello world;876 '?", "cmd": "echo '  Hello world;876\t  ' | tr -cd ';0-9'"}
+{"id": "nl2sh_test:271", "register": "rojak", "nl": "nak buang leading/trailing space/tab kat \" Hello world! \"", "cmd": "echo '  Hello world!\t  ' | sed -e 's/^[ \\t]*//' | sed -e 's/[ \\t]*$//'"}
+{"id": "nl2sh_test:275", "register": "rojak", "nl": "Print list unique user logged in.", "cmd": "who | cut -d' ' -f1 | sort | uniq"}
+{"id": "nl2sh_test:273", "register": "rojak", "nl": "nak check source file system kat current working directory ni?", "cmd": "df . | tail -1 | awk '{print $1}'"}
+{"id": "nl2sh_test:274", "register": "rojak", "nl": "nak tengok all var name got 'H' meh?", "cmd": "env | awk -F= '{if($1 ~ /H/) print $1}'"}
+{"id": "nl2sh_test:277", "register": "rojak", "nl": "print 99 '=' line.", "cmd": "seq -s= 100|tr -d '[:digit:]'"}
+{"id": "nl2sh_test:276", "register": "rojak", "nl": "nak check ping kat 192.168.1.1", "cmd": "ping -w 1 192.168.1.1"}
+{"id": "nl2sh_test:278", "register": "rojak", "nl": "nak check how many user logged in?", "cmd": "who | awk -F' ' '{print $1}' | sort -u | wc -l"}
+{"id": "nl2sh_test:281", "register": "rojak", "nl": "nak calculate sum all number from 1 to 10?", "cmd": "seq 10 | jq -s 'add'"}
+{"id": "nl2sh_test:280", "register": "rojak", "nl": "nak check group names je from /etc/group, extract, sort, then print", "cmd": "cut -d: -f1 /etc/group | sort"}
+{"id": "nl2sh_test:282", "register": "rojak", "nl": "count how many file and directory inside whole testbed directory", "cmd": "find /testbed | wc -l"}
+{"id": "nl2sh_test:283", "register": "rojak", "nl": "Print how many python files in testbed directory.", "cmd": "find testbed -type f -name \"*.py\" | wc -l"}
+{"id": "nl2sh_test:279", "register": "rojak", "nl": "show calendar for December 2120, previous, current, next month.", "cmd": "cal -3 12 2120"}
+{"id": "nl2sh_test:285", "register": "rojak", "nl": "nak check all file with 'Shell' inside testbed", "cmd": "find /testbed -type f -exec grep -l 'Shell' {} +"}
+{"id": "nl2sh_test:286", "register": "rojak", "nl": "nak check all symbolic link inside testbed directory", "cmd": "find /testbed -type l"}
+{"id": "nl2sh_test:284", "register": "rojak", "nl": "sort teksfile1.txt reverse alphabetical, save to textfile1_reverse_sorted.txt.", "cmd": "sort -r /testbed/dir1/textfile1.txt > /testbed/dir1/textfile1_reverse_sorted.txt"}
+{"id": "nl2sh_test:289", "register": "rojak", "nl": "check how many line in files under /testbed/dir2.", "cmd": "grep -rl . /testbed/dir2 | xargs wc -l"}
+{"id": "nl2sh_test:287", "register": "rojak", "nl": "nak check total size semua file inside testbed/, then save to total_size.txt", "cmd": "du -sh testbed/ | awk '{print $1}' > total_size.txt"}
+{"id": "nl2sh_test:288", "register": "rojak", "nl": "nak list all files in /testbed/dir1 and sort by size in human-readable format", "cmd": "ls -lhS /testbed/dir1"}
+{"id": "nl2sh_test:290", "register": "rojak", "nl": "Print name and size of top 3 biggest files inside /testbed/dir3.", "cmd": "find /testbed/dir3 -type f -exec ls -lhS {} + | sort -rh -k5 | head -n 3"}
+{"id": "nl2sh_test:292", "register": "rojak", "nl": "nak tengok all subdir kat /testbed which not called subdir1.", "cmd": "ls -d /testbed/*/ | grep -v /subdir1/"}
+{"id": "nl2sh_test:293", "register": "rojak", "nl": "nak check all file ada 'text file' string inside /testbed", "cmd": "grep -r 'text file' /testbed"}
+{"id": "nl2sh_test:291", "register": "rojak", "nl": "nak find all files modified dalam last 2 hours, then compress je into tarball named archive.tar.gz, put kat /testbed.", "cmd": "find /testbed -type f -mmin -120 -print0 | xargs -0 tar -czf /testbed/archive.tar.gz"}
+{"id": "nl2sh_test:294", "register": "rojak", "nl": "nak compute MD5 hash for all files under /testbed and store the output in a file named hashes.txt, same directory?", "cmd": "find /testbed -type f -exec md5sum {} + > /testbed/hashes.txt"}
+{"id": "nl2sh_test:295", "register": "rojak", "nl": "Print last 10 lines kat file /testbed/dir3/subdir1/subsubdir1/textfile3.txt.", "cmd": "tail -n 10 /testbed/dir3/subdir1/subsubdir1/textfile3.txt"}
+{"id": "nl2sh_test:297", "register": "rojak", "nl": "nak check semua file kat /testbed modified dalam last 24 hours, then print the path je", "cmd": "find /testbed -type f -mtime -1 -print"}
+{"id": "nl2sh_test:298", "register": "rojak", "nl": "nak check all file dalam /testbed directory, replace 'Hello' with 'Hi' in-place.", "cmd": "grep -rl \"Hello\" /testbed | xargs sed -i 's/Hello/Hi/g'"}
+{"id": "nl2sh_test:296", "register": "rojak", "nl": "Print line number and content for all lines with 'value3' in /testbed/dir1/subdir1/jsonfile1.json, ya.", "cmd": "grep -n 'value3' /testbed/dir1/subdir1/jsonfile1.json"}
+{"id": "nl2sh_test:299", "register": "rojak", "nl": "nak display textfile3.txt and textfile4.txt side by side, with line numbers and a separator in between.", "cmd": "paste <(nl /testbed/dir3/subdir1/subsubdir1/textfile3.txt) <(nl /testbed/dir1/subdir1/textfile4.txt)"}
+{"id": "nl2sh_test:7", "register": "rojak", "nl": "print 'hello world'.", "cmd": "echo hello world"}
+{"id": "nl2sh_test:107", "register": "rojak", "nl": "nak check md5 duplicate for all '.java' files in /testbed directory", "cmd": "md5sum /testbed/*.java | awk '{print $1}' | sort | uniq -d"}
+{"id": "nl2sh_test:272", "register": "rojak", "nl": "nak trim 3 last chars from \"987654321\".", "cmd": "echo 987654321 | rev | cut -c 4- | rev"}

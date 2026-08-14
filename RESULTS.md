@@ -72,3 +72,34 @@ actual use case, was not.
 tasks in rojak, scorer untouched. No rojak NL2SH benchmark existed before
 this one.
 
+| model | BM | rojak | EN | mean |
+|---|---|---|---|---|
+| nl2sh-1.5b (shipping today) | 0.297 | 0.430 | **0.593** | 0.440 |
+| run 3 | **0.440** | 0.477 | 0.507 | 0.474 |
+| run 4 | 0.417 | **0.490** | 0.533 | **0.480** |
+
+The column earns its keep immediately. The shipping model scores far better
+on rojak (0.430) than on Malay (0.297) — the English technical nouns carry
+it, which is the same reason rojak is what people type. And it separates two
+tunes that the endpoint registers could not: against the shipping model,
+run 4's rojak gain is significant (+0.060, p = 0.044) and run 3's is not
+(+0.047, p = 0.125), while the two tunes cannot be told apart from each
+other (p = 0.70).
+
+## Decision: run 4
+
+Run 4 wins rojak, wins the mean, and is the only tune whose gain on the
+register camne actually receives is significant. Against the shipping model:
+
+| register | change | p |
+|---|---|---|
+| BM | +0.120 | 0.0002 |
+| rojak | +0.060 | 0.044 |
+| EN | -0.060 | 0.050 |
+
+The English number is the honest caveat: at 300 tasks the difference is not
+resolvable, so this is "cannot distinguish", not "as good as". Two of three
+registers improve significantly and the third cannot be called either way —
+for a tool whose input is Malay and rojak, that is the trade to take, and it
+is stated here rather than buried.
+
