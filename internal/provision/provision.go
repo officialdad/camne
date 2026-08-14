@@ -16,13 +16,13 @@ import (
 // without warning, so camne never tracks "latest".
 const llamaBuild = "b10333"
 
-// The English NL2SH model, used deliberately until the BM bake-off
-// (milestone 3). Swapping the model means changing these three
-// consts and nothing else.
+// The BM model: Qwen2.5-Coder-1.5B-Instruct tuned on the four-register pool
+// (RESULTS.md carries the numbers and the caveat). Swapping the model means
+// changing these three consts and nothing else.
 const (
-	ModelFile   = "nl2sh-1.5b-Q4_K_M.gguf"
-	ModelURL    = "https://huggingface.co/ThorOdinson246/nl2sh-1.5b-Q4_K_M/resolve/main/" + ModelFile
-	ModelSHA256 = "6f8a17a11129a31074c944f4c2602453fafd9de43bdaeb1630a8f511ec820f71"
+	ModelFile   = "camne-1.5b-Q4_K_M.gguf"
+	ModelURL    = "https://huggingface.co/opariffazman/camne-1.5b-Q4_K_M/resolve/main/" + ModelFile
+	ModelSHA256 = "391648d84328250969dd738d47ef87418332d795181e33c0e1274e77d5434fe8"
 	// ModelSize is the exact GGUF byte size, from the Hugging Face LFS
 	// metadata for the pinned revision.
 	ModelSize int64 = 986048000

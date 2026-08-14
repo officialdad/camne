@@ -4,9 +4,15 @@
   python3 bench.py out/qwen-v2-Q4_K_M.gguf --name camne-qwen
 
 A GPU number would be a lie about the machine camne runs on (4 cores, 8 GB,
-no GPU), so this never passes -ngl. Reports the metrics the benchmark
-protocol asks for: tok/s, warm latency (median of >= 12), cold start, RSS,
-and size on disk, at 2/4/6/8 threads.
+no GPU), so this forces `-ngl 0`. Omitting the flag is NOT enough: llama.cpp
+defaults `--n-gpu-layers` to `auto` and silently offloads when a GPU exists,
+which reads as 200 tok/s instead of 38 and an RSS smaller than the weights.
+
+Reports the metrics the benchmark protocol asks for: tok/s, warm latency
+(median of >= 12), cold start, RSS, and size on disk, at 2/4/6/8 threads.
+
+The host CPU is still faster than the 4-core target box, so these are an
+upper bound for the machine camne is designed for, not a simulation of it.
 """
 import argparse
 import json
@@ -61,7 +67,7 @@ def rss_mb(pid):
 def sweep(model, threads):
     proc = subprocess.Popen(
         ["llama-server", "-m", model, "-t", str(threads), "-c", "2048",
-         "--no-webui", "--port", str(PORT)],
+         "-ngl", "0", "--no-webui", "--port", str(PORT)],
         stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     try:
         t0 = time.monotonic()

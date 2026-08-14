@@ -103,3 +103,35 @@ registers improve significantly and the third cannot be called either way —
 for a tool whose input is Malay and rojak, that is the trade to take, and it
 is stated here rather than buried.
 
+
+## Performance on CPU
+
+llama.cpp defaults `--n-gpu-layers` to `auto` and offloads silently when a
+GPU is present, so `bench.py` forces `-ngl 0`. Omitting the flag reported
+200 tok/s and an RSS *smaller than the weights* — a GPU measurement wearing a
+CPU label, which is the one number this project must never publish.
+
+camne-1.5b-Q4_K_M, 986 MB on disk, no GPU:
+
+| threads | tok/s | warm s | cold s | RSS MB |
+|---|---|---|---|---|
+| 2 | 26.0 | 0.806 | 1.66 | 1627 |
+| 4 | 40.0 | 0.490 | 1.97 | 1627 |
+| 6 | 43.9 | 0.399 | 1.38 | 1628 |
+| 8 | 45.0 | 0.354 | 1.49 | 1628 |
+
+Budget is warm < 1.5 s, cold < 5 s, RSS < 2.5 GB. All four thread counts
+clear it, at 65% of the memory budget.
+
+Two caveats, both worth stating rather than rounding away:
+
+**This CPU is faster than the target box.** These are an upper bound for a
+4-core student laptop, not a simulation of one. A true target-box number
+needs the hardware or a throttled VM.
+
+**Threads are not purely memory-bandwidth-bound here.** Going 2 -> 4 threads
+buys +54% tok/s, which the "half the cores" default was not expecting.
+`engine.go` gives a 4-core machine 2 threads, so it lands at 26 tok/s and
+0.806 s warm — inside budget, with the machine left responsive for whatever
+else the user is doing. Keeping the conservative default, and recording here
+that the headroom exists if warm latency ever becomes the complaint.
