@@ -434,7 +434,7 @@ TASKS = [
 HOLDOUT = [
     {
         "task": "holdout: empty a file",
-        "ok": r"\b(truncate|: ?>|>\s*\S|cp /dev/null|echo -n)",
+        "ok": r"\btruncate\b|(^|\s|:)>\s*\S|cp /dev/null|echo -n",
         "p": {
             "en": "empty the file app.log without deleting it",
             "rojak": "nak kosongkan file app.log tapi jangan delete",
@@ -504,7 +504,7 @@ HOLDOUT = [
     },
     {
         "task": "holdout: printenv",
-        "ok": r"\b(printenv|echo \$HOME|env)\b",
+        "ok": r"\b(printenv|env)\b|echo \W*\$\{?HOME",
         "p": {
             "en": "print the value of the HOME variable",
             "rojak": "nak print value env HOME",
@@ -584,6 +584,8 @@ def main():
     ap.add_argument("--server", default=PINNED if os.path.exists(PINNED) else "llama-server")
     ap.add_argument("--threads", type=int, default=4)
     ap.add_argument("--out", default="out/probe.jsonl")
+    ap.add_argument("--rescore", metavar="JSONL",
+                    help="re-apply the current regexes to a saved run; no server")
     args = ap.parse_args()
 
     # The probe must not score its own training data. dataset/basics.txt is
@@ -600,6 +602,16 @@ def main():
                   if p.lower() in train]
         if leaked:
             raise SystemExit(f"probe prompts present in basics.txt: {leaked}")
+
+    if args.rescore:
+        okre = {t["task"]: t["ok"] for t in TASKS + HOLDOUT}
+        okre.update({("homograph", p): r for _, p, r in HOMOGRAPH})
+        rows = [json.loads(l) for l in open(args.rescore, encoding="utf-8")]
+        for r in rows:
+            pat = okre[("homograph", r["prompt"])] if r["task"] == "homograph" else okre[r["task"]]
+            r["ok"] = bool(re.search(pat, r["got"]))
+        report(rows)
+        return
 
     proc = boot(args.server, args.model, args.threads)
     rows = []
@@ -626,7 +638,10 @@ def main():
     with open(args.out, "w") as f:
         for r in rows:
             f.write(json.dumps(r, ensure_ascii=False) + "\n")
+    report(rows)
 
+
+def report(rows):
     # group axes into the families we actually want to compare
     def family(axis):
         if axis.startswith("count"):
