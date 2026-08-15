@@ -104,6 +104,62 @@ for a tool whose input is Malay and rojak, that is the trade to take, and it
 is stated here rather than buried.
 
 
+## The SEA-LION arm
+
+Issue #2 asked for a bake-off, so the other candidate was tuned on the same
+pool with the same recipe — one variable changed, the base model:
+`aisingapore/Gemma-SEA-LION-v4.5-E2B-IT` in place of
+Qwen2.5-Coder-1.5B-Instruct.
+9,599 steps, 9 h 05 m on the GPU.
+
+| model | BM | rojak | EN | size | tok/s @4t | RSS |
+|---|---|---|---|---|---|---|
+| camne-1.5b (run 4) | **0.417** | **0.490** | **0.533** | **986 MB** | **40.0** | **1.63 GB** |
+| sealion tune | 0.277 | 0.243 | 0.303 | 3428 MB | 20.3 | 4.18 GB |
+
+It loses every register, and loses worst on rojak — the one that matters. It
+is also 3.5x the disk, half the speed, and **4.18 GB resident against a 2.5 GB
+budget**, so constraint 3 rules it out even if the accuracy had gone the other
+way.
+
+Why it lost is not what the loss curve suggested. SEA-LION bottomed out at
+0.067 against Qwen's 0.54 on identical data, which reads as memorisation —
+but a loss curve cannot separate "learned the task" from "memorised the
+answers", so that was inference, not evidence.
+
+The evidence points elsewhere. Measured against its own English:
+
+| model | EN | BM | BM - EN |
+|---|---|---|---|
+| SEA-LION | 0.303 | 0.277 | **-0.026** |
+| camne-1.5b (run 4) | 0.533 | 0.417 | -0.116 |
+
+SEA-LION's Malay penalty is a quarter of Qwen's. Relative to what it can do
+in English, it handles Malay *better* — which is exactly what a SEA-language
+model should do, and it means the Malay is the part that works. What fails is
+the shell, in every register at once:
+
+```
+print hello world                        => hello world
+copy /testbed/hello.php to hello-COPY    => mv ...     (move, not copy)
+nak buat file /testbed/test.txt          => touch {/testbed/test.txt}
+list open files                          => ls /proc/<pid>/fd   (not lsof)
+```
+
+Wrong verb, brace syntax error, a placeholder standing in for the tool, and
+one answer that is not a command at all. `Gemma-SEA-LION-v4.5-E2B-IT` is a
+general instruct model; `Qwen2.5-Coder-1.5B-Instruct` is a code model, and
+the output of this task is code, not prose. Language ability was never the
+bottleneck, so the base chosen for its language ability had nothing to
+contribute.
+
+The lesson generalises past this arm: for NL2SH the base's *code* ability
+dominates, and a language-specialised base has to make that up before its
+language advantage counts for anything.
+
+The bake-off is closed. Run 4 ships; SEA-LION is not a candidate at any size.
+
+
 ## Performance on CPU
 
 llama.cpp defaults `--n-gpu-layers` to `auto` and offloads silently when a
@@ -135,3 +191,128 @@ buys +54% tok/s, which the "half the cores" default was not expecting.
 0.806 s warm — inside budget, with the machine left responsive for whatever
 else the user is doing. Keeping the conservative default, and recording here
 that the headroom exists if warm latency ever becomes the complaint.
+
+
+## Known defect: the BM column is not measuring BM
+
+Found 2026-08-15, after run 4 shipped, from a user report that
+`camne nak buat fail baru` returns `echo "fail" > /tmp/fail.txt`. It does,
+because the model has never seen `fail` mean *file*.
+
+`dataset/stoplist.py` rewrites Malaysian technical nouns to English. That is
+correct for **rojak**, whose definition is Malay grammar around English nouns.
+It was applied to all four registers, which erased the vocabulary from the
+pool entirely:
+
+| word | in raw translations | in training pool |
+|---|---|---|
+| fail | 29,576 | 29 |
+| direktori | 14,711 | 0 |
+| arahan | 3,524 | 0 |
+| kata laluan | 618 | 0 |
+| pelayan | 813 | 0 |
+| cakera | 560 | 0 |
+| skrip | 826 | 0 |
+
+`file` appears 84,820 times against `fail`'s 29. The "formal BM" register is
+therefore formal BM grammar carrying 100% English vocabulary, and a user
+typing genuine Malay hits tokens the model saw zero times.
+
+The registers did not otherwise collapse — mean inter-register token overlap
+is 0.09 to 0.27, so they differ properly by grammar and particles. The defect
+is specific to nouns.
+
+`eval_bm_300.jsonl` was built through the same `clean()` and inherits it:
+124 occurrences of `file`, 41 of `folder`, zero of `direktori`. Prompts read
+`nak tengok file terbuka je`. That is rojak. **So the BM and rojak columns
+above measure nearly the same register, and the BM number is not evidence
+about Malay vocabulary.** The run-to-run comparisons stay valid — every row
+was scored on the same sets — but the absolute BM figure will fall once the
+eval set is rebuilt honestly.
+
+Fix costs no GPU for the data half: `out/rows.jsonl` and
+`out/extra_rows.jsonl` retain the raw vocabulary. Split `STOPLIST` into the
+Indonesian-to-Malaysian half (always applied) and the BM-to-English half
+(rojak only), then re-run clean, disambiguate, and pool. Only the retrain
+needs the GPU.
+
+
+## Runs 5 and 6: the register-aware pool
+
+Three pipeline defects were fixed together (see the Known defect section and
+`dataset/README.md`): the stoplist split so Malay nouns survive outside rojak,
+verb augmentation so `cipta` and `padam` exist in colloquial at all, and a
+tool rebalance against a pool where `shuf` outweighed `touch` 11 to 1.
+
+Run 5 took all three. Run 6 removed one variable — the core-tool upsampling —
+after run 5 came back worse than the model it was meant to replace.
+
+| model | BM* | rojak | EN |
+|---|---|---|---|
+| run 4 (shipping) | 0.430 | 0.490 | 0.533 |
+| run 5 (+ upsampling) | 0.453 | 0.477 | 0.493 |
+| **run 6 (no upsampling)** | **0.467** | **0.497** | **0.553** |
+
+\* BM on the rebuilt eval set. `eval_bm_300.jsonl` had gone through the same
+merged stoplist as the training pool, so it read `nak tengok file terbuka je`
+— rojak, not BM. 80 of 300 rows changed. Run 4 was re-scored on the new set
+rather than compared against its old 0.417, which would have measured the
+yardstick instead of the model. `eval_rojak_300.jsonl` came out byte-identical,
+which is the confirmation the split is right: rojak is *defined* by English
+nouns, so the surviving half of the stoplist is the half that applies to it.
+
+**The upsampling was the harm.** Run 6 beats run 5 on English by +0.060,
+p = 0.041 — the only significant result in the set. 27% of run 5's pool was
+duplicate rows and one prompt appeared 150 times, which is a partial second
+epoch on a subset, the failure mode run 2 already established. Its lower
+training loss said nothing: it was re-answering rows it had already seen.
+
+**Run 6 is not distinguishable from run 4.** BM +0.037 (p = 0.207), rojak
++0.007 (p = 0.904), EN +0.020 (p = 0.519). Aggregated over all 900 tasks it is
+105 wins to 86, p = 0.193 — indicative only, three sets are not one sample.
+Positive in direction everywhere, resolvable nowhere.
+
+### What the probe measured that ALFA could not
+
+`training/probe.py` asks the same 15 tasks in many phrasings — different verb,
+Malay noun instead of English, a count, a different register — and scores at
+tool level. ALFA gives every task exactly one phrasing, so it is structurally
+blind to this.
+
+| family | run 4 | run 6 | n |
+|---|---|---|---|
+| BM vocabulary (`fail`, `direktori`) | 0.69 | **0.85** | 13 |
+| BM verb (`cipta`, `padam`, `salin`) | 0.56 | **0.78** | 9 |
+| formal | 0.73 | 0.73 | 15 |
+| english | 1.00 | 0.93 | 15 |
+| rojak | 0.87 | 0.80 | 15 |
+| colloquial | 1.00 | 0.57 | 7 |
+
+The two families the fixes targeted moved, and they are the two with usable
+n. The rest moved down at n = 5 to 7, which is not enough to read.
+
+### The finding that matters more than either run
+
+`create a file` fails in run 6 across every phrasing — `fossil add`,
+`skicka`, `mktemp`. It failed in run 5 too, so the duplication was not the
+cause. The pool is:
+
+```
+"buat/cipta/create + file" prompts    run 4 pool: touch 4.3%   run 6 pool: touch 4.9%
+plain `touch <file>` rows             116, all phrased "buat file kosong <name>"
+```
+
+Neither pool teaches "create a new file". Run 4 answering `touch file.txt` —
+the README's headline example — was luck, not learning. The single most basic
+terminal task is uncovered in every pool version we have built.
+
+### Decision: keep run 4 shipped
+
+Run 6 cannot be distinguished from run 4 on the benchmark, breaks the demo
+example, and shows small probe regressions alongside its real gains. Shipping
+on a directional aggregate is the claim this file exists to prevent.
+
+What the three runs did buy is a correct pipeline: Malay vocabulary is in the
+pool, verbs are covered, the longest-match ordering bug is gone, and there is
+now a check that can see phrasing failures at all. The gap left is coverage of
+the tasks a beginner actually starts with, which is small and hand-writable.

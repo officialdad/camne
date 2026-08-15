@@ -11,8 +11,16 @@ from stoplist import clean
 from verify import check
 
 # --- stoplist ---------------------------------------------------------------
-assert clean("camne nak padam fail ni", "colloquial") == "nak padam file ni"
+# Two jobs, two lists. Indonesian is corrected in every register; English
+# technical nouns are forced only into rojak, the register defined by carrying
+# them. Merging the two took `fail` from 29,576 raw rows to 29 and made the BM
+# eval set measure rojak by accident (RESULTS.md, "Known defect"). Each pair
+# below is the same input in two registers — that contrast is the check.
+assert clean("camne nak padam fail ni", "colloquial") == "nak padam fail ni"
+assert clean("camne nak padam fail ni", "rojak") == "nak padam file ni"
 assert clean("sila muat turun fail itu dari pelayan", "formal") == \
+    "sila muat turun fail itu dari pelayan"
+assert clean("sila muat turun fail itu dari pelayan", "rojak") == \
     "sila download file itu dari server"
 # longest-first: "muat turun" must not decay via a shorter rule
 assert "download" in clean("muat turun", "rojak")
@@ -22,7 +30,12 @@ assert clean("job tu failed ke", "rojak") == "job tu failed ke"
 assert clean("delete the fail log", "english") == "delete the fail log"
 # Indonesian -> BM/English
 # gimana -> macam mana (ID fix), which is then stripped as an opener
-assert clean("gimana bisa hapus berkas ini", "colloquial") == "boleh buang file ini"
+# `berkas` is Indonesian, so it is corrected everywhere — but to `fail`, not
+# straight to `file`; rojak then takes the last hop. `hapus` is Malaysian and
+# is left alone: normalising it to `buang` flattened the verb variety that
+# augment_verbs.py exists to restore.
+assert clean("gimana bisa hapus berkas ini", "colloquial") == "boleh hapus fail ini"
+assert clean("gimana bisa hapus berkas ini", "rojak") == "boleh hapus file ini"
 # translated technical nouns forced back to English
 assert clean("padam baldi S3 di pelabuhan 8080", "formal") == \
     "padam bucket S3 di port 8080"
@@ -67,13 +80,20 @@ assert clean("Mengarkibkan folder ini", "formal") == "Mengarkibkan folder ini"
 
 # --- affixed Indonesian forms the bare-stem rules missed --------------------
 assert clean("Mengunduh dan menghapus berkas lama", "formal") == \
-    "Download dan membuang file lama"
-assert clean("Memuat turun laporan ini", "formal") == "Download laporan ini"
+    "Muat turun dan membuang fail lama"
+# the chain: memuat turun (ID) -> muat turun (BM) -> download (rojak only)
+assert clean("Memuat turun laporan ini", "formal") == "Muat turun laporan ini"
+# lowercase: the capital-restore is formal-only, by design
+assert clean("Memuat turun laporan ini", "rojak") == "download laporan ini"
 assert clean("cari regex je dalam folder-folder tu", "colloquial") == \
     "cari regex je dalam folder tu"
-# technical nouns the translator "corrected" into textbook BM
+# technical nouns the translator "corrected" into textbook BM — rojak only
 assert clean("Senaraikan pengguna dalam repositori", "formal") == \
-    "Senaraikan user dalam repo"
+    "Senaraikan pengguna dalam repositori"
+# `senaraikan` keeps its affix — \b stops `senarai` matching inside it, which
+# is the intended ceiling of a boundary-only replace
+assert clean("senaraikan pengguna dalam repositori", "rojak") == \
+    "senaraikan user dalam repo"
 
 # --- lah/la/ah never belong on a question -----------------------------------
 assert clean("nak check disk space lah", "rojak") == "nak check disk space"

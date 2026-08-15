@@ -13,10 +13,35 @@ registers.py  # raw CSV → out/rows.jsonl      (drives a local LLM endpoint, re
 stoplist.py   # out/rows.jsonl → out/rows.clean.jsonl  (force technical nouns back to English, marker stats)
 verify.py     # asserts every command byte-identical to source; nonzero exit on drift
 
-# after both pools are cleaned and concatenated into out/pool.jsonl:
-disambiguate.py  # out/pool.jsonl → out/pool.train.jsonl  (drop keybinding junk,
-                 # name the tool in prompts that map to many commands)
+# after all three pools are cleaned and concatenated into out/pool_v3.jsonl:
+disambiguate.py   # → out/pool_v3.train.jsonl  name the tool in prompts that
+                  # map to many commands, drop same-prompt-same-tool dupes
+augment_verbs.py  # → out/pool_v3.aug.jsonl    fill in Malay verbs the
+                  # translator never reached for (`cipta` had 2 rows)
+rebalance.py      # → out/pool_v3.bal.jsonl    fix the tool-frequency
+                  # inversion (`shuf` outweighed `touch` 11 to 1)
 ```
+
+Full rebuild from raw, no GPU:
+
+```sh
+for f in rows tldr_rows extra_rows; do python3 stoplist.py out/$f.jsonl out/$f.clean.jsonl; done
+cat out/rows.clean.jsonl out/tldr_rows.clean.jsonl out/extra_rows.clean.jsonl > out/pool_v3.jsonl
+python3 verify.py raw/nl2sh_train.csv out/rows.clean.jsonl
+python3 disambiguate.py  out/pool_v3.jsonl     out/pool_v3.train.jsonl
+python3 augment_verbs.py out/pool_v3.train.jsonl out/pool_v3.aug.jsonl --floor 2500
+python3 rebalance.py     out/pool_v3.aug.jsonl   out/pool_v3.bal.jsonl
+python3 test_stoplist.py
+```
+
+## Registers are not interchangeable
+
+`stoplist.py` runs two separate jobs and they must not be merged again.
+Indonesian is corrected in every register. English technical nouns are forced
+only into **rojak**, the register defined by carrying them. Running that half
+over formal and colloquial is what took `fail` from 29,576 raw rows to 29 and
+made the BM eval set measure rojak by accident — see the "Known defect"
+section of [`../RESULTS.md`](../RESULTS.md). `test_stoplist.py` is the guard.
 
 Eval set (300 InterCode-ALFA prompts, colloquial only):
 

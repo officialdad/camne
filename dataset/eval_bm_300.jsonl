@@ -1,10 +1,10 @@
-{"id": "nl2sh_test:2", "register": "colloquial", "nl": "nak tengok file terbuka je", "cmd": "lsof"}
+{"id": "nl2sh_test:2", "register": "colloquial", "nl": "nak tengok fail terbuka je", "cmd": "lsof"}
 {"id": "nl2sh_test:7", "register": "colloquial", "nl": "nak print 'hello world' kat sini", "cmd": "echo hello world"}
-{"id": "nl2sh_test:5", "register": "colloquial", "nl": "buat folder /testbed/test_dir la", "cmd": "mkdir /testbed/test_dir"}
+{"id": "nl2sh_test:5", "register": "colloquial", "nl": "buat folder /testbed/test_dir", "cmd": "mkdir /testbed/test_dir"}
 {"id": "nl2sh_test:0", "register": "colloquial", "nl": "tolong list file kat sini", "cmd": "ls"}
-{"id": "nl2sh_test:4", "register": "colloquial", "nl": "buat file /testbed/test.txt la", "cmd": "touch /testbed/test.txt"}
+{"id": "nl2sh_test:4", "register": "colloquial", "nl": "buat file /testbed/test.txt", "cmd": "touch /testbed/test.txt"}
 {"id": "nl2sh_test:6", "register": "colloquial", "nl": "tolong delete does_not_exist.txt", "cmd": "rm does_not_exist.txt"}
-{"id": "nl2sh_test:1", "register": "colloquial", "nl": "nak tengok semua file kat sini, termasuk yg tersembunyi", "cmd": "ls -a"}
+{"id": "nl2sh_test:1", "register": "colloquial", "nl": "nak tengok semua fail kat sini, termasuk yg tersembunyi", "cmd": "ls -a"}
 {"id": "nl2sh_test:3", "register": "colloquial", "nl": "nak copy /testbed/hello.php jadi /testbed/hello-COPY.php", "cmd": "cp /testbed/hello.php /testbed/hello-COPY.php"}
 {"id": "nl2sh_test:8", "register": "colloquial", "nl": "nak tengok folder sekarang", "cmd": "pwd"}
 {"id": "nl2sh_test:10", "register": "colloquial", "nl": "nak tengok user sekarang", "cmd": "whoami"}
@@ -24,27 +24,27 @@
 {"id": "nl2sh_test:19", "register": "colloquial", "nl": "tengkiu, baris ke-10 setup_nl2b_fs_1.sh", "cmd": "sed -n 10p setup_nl2b_fs_1.sh"}
 {"id": "nl2sh_test:24", "register": "colloquial", "nl": "nak tengok beban sistem", "cmd": "w"}
 {"id": "nl2sh_test:25", "register": "colloquial", "nl": "tlg print semua process yg aktif", "cmd": "ps"}
-{"id": "nl2sh_test:27", "register": "colloquial", "nl": "nak tengok memory guna je", "cmd": "free"}
-{"id": "nl2sh_test:26", "register": "colloquial", "nl": "nak tengok list process kat sini dalam bentuk tree", "cmd": "pstree"}
+{"id": "nl2sh_test:27", "register": "colloquial", "nl": "nak tengok memori guna je", "cmd": "free"}
+{"id": "nl2sh_test:26", "register": "colloquial", "nl": "nak tengok list proses kat sini dalam bentuk tree", "cmd": "pstree"}
 {"id": "nl2sh_test:29", "register": "colloquial", "nl": "nak tengok kernel version", "cmd": "uname -a"}
 {"id": "nl2sh_test:30", "register": "colloquial", "nl": "nak tengok hostname", "cmd": "hostname"}
 {"id": "nl2sh_test:28", "register": "colloquial", "nl": "tlg print disk usage", "cmd": "df"}
 {"id": "nl2sh_test:31", "register": "colloquial", "nl": "nak tengok IP address sistem ni", "cmd": "hostname -I"}
 {"id": "nl2sh_test:32", "register": "colloquial", "nl": "nak tengok DNS server IP", "cmd": "cat /etc/resolv.conf | grep nameserver"}
 {"id": "nl2sh_test:34", "register": "colloquial", "nl": "nak tengok routing table ni", "cmd": "route"}
-{"id": "nl2sh_test:33", "register": "colloquial", "nl": "nak tengok interface network", "cmd": "ifconfig"}
-{"id": "nl2sh_test:37", "register": "colloquial", "nl": "openssl version tengok la", "cmd": "openssl version"}
+{"id": "nl2sh_test:33", "register": "colloquial", "nl": "nak tengok interface rangkaian", "cmd": "ifconfig"}
+{"id": "nl2sh_test:37", "register": "colloquial", "nl": "openssl version tengok", "cmd": "openssl version"}
 {"id": "nl2sh_test:35", "register": "colloquial", "nl": "nak tengok user login last je", "cmd": "last"}
 {"id": "nl2sh_test:36", "register": "colloquial", "nl": "nak tengok user log last je, nama penuh + domain semua", "cmd": "last -w"}
 {"id": "nl2sh_test:38", "register": "colloquial", "nl": "nak encode 'hello' base64 je", "cmd": "echo -n 'hello' | base64"}
-{"id": "nl2sh_test:39", "register": "colloquial", "nl": "dekod 'aGVsbG8=' ni la", "cmd": "echo 'aGVsbG8=' | base64 -d"}
+{"id": "nl2sh_test:39", "register": "colloquial", "nl": "dekod 'aGVsbG8=' ni", "cmd": "echo 'aGVsbG8=' | base64 -d"}
 {"id": "nl2sh_test:44", "register": "colloquial", "nl": "nak tengok info curl package", "cmd": "apt show curl"}
 {"id": "nl2sh_test:45", "register": "colloquial", "nl": "nak tengok job latar belakang", "cmd": "jobs"}
 {"id": "nl2sh_test:41", "register": "colloquial", "nl": "nak tengok stats dan timestamp setup_nl2b_fs_1.sh", "cmd": "stat setup_nl2b_fs_1.sh"}
-{"id": "nl2sh_test:42", "register": "colloquial", "nl": "nak gzip /testbed/hello.php je, tapi jangan buang file asal", "cmd": "gzip -k /testbed/hello.php"}
+{"id": "nl2sh_test:42", "register": "colloquial", "nl": "nak gzip /testbed/hello.php je, tapi jangan buang fail asal", "cmd": "gzip -k /testbed/hello.php"}
 {"id": "nl2sh_test:46", "register": "colloquial", "nl": "nak tengok terminal type ni", "cmd": "echo $TERM"}
 {"id": "nl2sh_test:40", "register": "colloquial", "nl": "nak tengok baris ada 'console' dalam setup_nl2b_fs_1.sh je", "cmd": "grep 'console' setup_nl2b_fs_1.sh"}
-{"id": "nl2sh_test:47", "register": "colloquial", "nl": "nak tengok priority process sekarang?", "cmd": "nice"}
+{"id": "nl2sh_test:47", "register": "colloquial", "nl": "nak tengok priority proses sekarang?", "cmd": "nice"}
 {"id": "nl2sh_test:43", "register": "colloquial", "nl": "tar /testbed/hello.php je kat /testbed/hello.tar", "cmd": "tar -cf /testbed/hello.tar /testbed/hello.php"}
 {"id": "nl2sh_test:48", "register": "colloquial", "nl": "nak tengok PID shell ni", "cmd": "echo $$"}
 {"id": "nl2sh_test:52", "register": "colloquial", "nl": "nak tengok crontab", "cmd": "crontab -l"}
@@ -52,20 +52,20 @@
 {"id": "nl2sh_test:50", "register": "colloquial", "nl": "tlg print group user ni", "cmd": "groups"}
 {"id": "nl2sh_test:53", "register": "colloquial", "nl": "nak tengok umask aku sekarang", "cmd": "umask"}
 {"id": "nl2sh_test:49", "register": "colloquial", "nl": "nak tengok berapa lama echo 'hello' ni execute", "cmd": "time echo 'hello'"}
-{"id": "nl2sh_test:55", "register": "colloquial", "nl": "tlg list memory info", "cmd": "lsmem"}
+{"id": "nl2sh_test:55", "register": "colloquial", "nl": "tlg list memori info", "cmd": "lsmem"}
 {"id": "nl2sh_test:54", "register": "colloquial", "nl": "nak tengok info CPU je", "cmd": "lscpu"}
 {"id": "nl2sh_test:56", "register": "colloquial", "nl": "nak tengok versi ssh yang dah install", "cmd": "ssh -V"}
 {"id": "nl2sh_test:58", "register": "colloquial", "nl": "nak tengok locale sistem", "cmd": "locale"}
 {"id": "nl2sh_test:57", "register": "colloquial", "nl": "nak tengok bash profile kat rumah", "cmd": "cat ~/.bashrc"}
 {"id": "nl2sh_test:59", "register": "colloquial", "nl": "nak tengok blok device je", "cmd": "lsblk"}
 {"id": "nl2sh_test:60", "register": "colloquial", "nl": "cari file > 100MB kat sini", "cmd": "find . -size +100M -print"}
-{"id": "nl2sh_test:62", "register": "colloquial", "nl": "tolong ubah owner /testbed/test.txt jadi nobody la", "cmd": "chown nobody /testbed/test.txt"}
-{"id": "nl2sh_test:61", "register": "colloquial", "nl": "buat link /testbed/link point ke /testbed/hello.php la", "cmd": "ln -s /testbed/hello.php /testbed/link"}
+{"id": "nl2sh_test:62", "register": "colloquial", "nl": "tolong ubah owner /testbed/test.txt jadi nobody", "cmd": "chown nobody /testbed/test.txt"}
+{"id": "nl2sh_test:61", "register": "colloquial", "nl": "buat link /testbed/link point ke /testbed/hello.php", "cmd": "ln -s /testbed/hello.php /testbed/link"}
 {"id": "nl2sh_test:63", "register": "colloquial", "nl": "nak tukar group /testbed/test.txt jadi 'nogroup' je", "cmd": "chgrp nogroup /testbed/test.txt"}
 {"id": "nl2sh_test:64", "register": "colloquial", "nl": "nak jadikan /testbed/test.txt cuma boleh baca kat semua je", "cmd": "chmod 444 /testbed/test.txt"}
-{"id": "nl2sh_test:68", "register": "colloquial", "nl": "nak tengok stat network", "cmd": "netstat --statistics"}
+{"id": "nl2sh_test:68", "register": "colloquial", "nl": "nak tengok stat rangkaian", "cmd": "netstat --statistics"}
 {"id": "nl2sh_test:67", "register": "colloquial", "nl": "tlg print baris unik setup_nl2b_fs_1.sh je", "cmd": "uniq setup_nl2b_fs_1.sh"}
-{"id": "nl2sh_test:66", "register": "colloquial", "nl": "nak tengok setup_nl2b_fs_1.sh, sort abjad la", "cmd": "sort setup_nl2b_fs_1.sh"}
+{"id": "nl2sh_test:66", "register": "colloquial", "nl": "nak tengok setup_nl2b_fs_1.sh, sort abjad", "cmd": "sort setup_nl2b_fs_1.sh"}
 {"id": "nl2sh_test:65", "register": "colloquial", "nl": "nak tengok baris, kata, char dalam setup_nl2b_fs_1.sh", "cmd": "wc setup_nl2b_fs_1.sh"}
 {"id": "nl2sh_test:69", "register": "colloquial", "nl": "teng ok interfeis network", "cmd": "netstat -i"}
 {"id": "nl2sh_test:70", "register": "colloquial", "nl": "nak tengok kalendar 3 bulan depan", "cmd": "cal -3"}
@@ -74,21 +74,21 @@
 {"id": "nl2sh_test:73", "register": "colloquial", "nl": "nak tengok swap usage skrg", "cmd": "swapon --show"}
 {"id": "nl2sh_test:76", "register": "colloquial", "nl": "nak tengok shell available je", "cmd": "cat /etc/shells"}
 {"id": "nl2sh_test:74", "register": "colloquial", "nl": "nak tengok parameter kernel aktif je", "cmd": "sysctl -a"}
-{"id": "nl2sh_test:77", "register": "colloquial", "nl": "list semua user je la", "cmd": "getent passwd"}
+{"id": "nl2sh_test:77", "register": "colloquial", "nl": "list semua user je", "cmd": "getent passwd"}
 {"id": "nl2sh_test:75", "register": "colloquial", "nl": "nak tengok semua apps yang dah install je", "cmd": "dpkg --get-selections"}
 {"id": "nl2sh_test:78", "register": "colloquial", "nl": "nak tengok semua group kat system ni", "cmd": "getent group"}
 {"id": "nl2sh_test:80", "register": "colloquial", "nl": "nak tengok DNS google.com", "cmd": "nslookup google.com"}
-{"id": "nl2sh_test:79", "register": "colloquial", "nl": "nak tengok nama file je kat '/usr/local/bin/my_script.sh'?", "cmd": "basename /usr/local/bin/my_script.sh"}
+{"id": "nl2sh_test:79", "register": "colloquial", "nl": "nak tengok nama fail je kat '/usr/local/bin/my_script.sh'?", "cmd": "basename /usr/local/bin/my_script.sh"}
 {"id": "nl2sh_test:85", "register": "colloquial", "nl": "nak tengok semua config vars", "cmd": "getconf -a"}
 {"id": "nl2sh_test:86", "register": "colloquial", "nl": "nak tengok berapa processor", "cmd": "nproc"}
-{"id": "nl2sh_test:81", "register": "colloquial", "nl": "nak tengok folder je kat '/usr/local/bin/my_script.sh'?", "cmd": "dirname /usr/local/bin/my_script.sh"}
+{"id": "nl2sh_test:81", "register": "colloquial", "nl": "nak tengok direktori je kat '/usr/local/bin/my_script.sh'?", "cmd": "dirname /usr/local/bin/my_script.sh"}
 {"id": "nl2sh_test:83", "register": "colloquial", "nl": "nak tengok jenis setup_nl2b_fs_1.sh ni", "cmd": "file setup_nl2b_fs_1.sh"}
 {"id": "nl2sh_test:87", "register": "colloquial", "nl": "nak tengok max open file descriptor", "cmd": "ulimit -n"}
-{"id": "nl2sh_test:82", "register": "colloquial", "nl": "tolong hantar 'Sistem akan dipelihara dalam 10 minit!' kat semua user yang login la", "cmd": "wall 'System maintenance in 10 minutes!'"}
+{"id": "nl2sh_test:82", "register": "colloquial", "nl": "tolong hantar 'Sistem akan dipelihara dalam 10 minit!' kat semua user yang login", "cmd": "wall 'System maintenance in 10 minutes!'"}
 {"id": "nl2sh_test:84", "register": "colloquial", "nl": "nak tengok setup_nl2b_fs_1.sh, setiap baris 40 char je", "cmd": "fold -w 40 setup_nl2b_fs_1.sh"}
-{"id": "nl2sh_test:88", "register": "colloquial", "nl": "nak tengok max process user je", "cmd": "ulimit -u"}
+{"id": "nl2sh_test:88", "register": "colloquial", "nl": "nak tengok max proses user je", "cmd": "ulimit -u"}
 {"id": "nl2sh_test:89", "register": "colloquial", "nl": "nak tengok max CPU time", "cmd": "ulimit -t"}
-{"id": "nl2sh_test:91", "register": "colloquial", "nl": "nak tengok tree folder dua level je", "cmd": "tree -L 2"}
+{"id": "nl2sh_test:91", "register": "colloquial", "nl": "nak tengok tree direktori dua level je", "cmd": "tree -L 2"}
 {"id": "nl2sh_test:90", "register": "colloquial", "nl": "nak tengok saiz integer panjang yang diset je", "cmd": "getconf LONG_BIT"}
 {"id": "nl2sh_test:93", "register": "colloquial", "nl": "nak tengok berapa file kat sini", "cmd": "ls -a | wc -l"}
 {"id": "nl2sh_test:92", "register": "colloquial", "nl": "nak tengok berapa kali 'the' dalam setup_nl2b_fs_1.sh tu?", "cmd": "grep -o 'the' setup_nl2b_fs_1.sh | wc -l"}
@@ -103,19 +103,19 @@
 {"id": "nl2sh_test:101", "register": "colloquial", "nl": "nak tengok baris kat setup_nl2b_fs_1.sh yang ada 'the' je", "cmd": "grep 'the' setup_nl2b_fs_1.sh"}
 {"id": "nl2sh_test:105", "register": "colloquial", "nl": "buat file 'world.txt' isi 'hello' je", "cmd": "echo 'hello' > world.txt"}
 {"id": "nl2sh_test:103", "register": "colloquial", "nl": "nak tengok sha512 digest setup_nl2b_fs_1.sh ni", "cmd": "sha512sum setup_nl2b_fs_1.sh"}
-{"id": "nl2sh_test:102", "register": "colloquial", "nl": "nak tengok baris kat setup_nl2b_fs_1.sh yg ada 'the' dan 'a' la", "cmd": "grep 'the' setup_nl2b_fs_1.sh | grep 'a'"}
+{"id": "nl2sh_test:102", "register": "colloquial", "nl": "nak tengok baris kat setup_nl2b_fs_1.sh yg ada 'the' dan 'a'", "cmd": "grep 'the' setup_nl2b_fs_1.sh | grep 'a'"}
 {"id": "nl2sh_test:107", "register": "colloquial", "nl": "nak senarai MD5 duplicate semua .java file kat /testbed", "cmd": "md5sum /testbed/*.java | awk '{print $1}' | sort | uniq -d"}
 {"id": "nl2sh_test:109", "register": "colloquial", "nl": "nak kira md5 sum semua file kat '$FILES' ni", "cmd": "cat $(echo $FILES | tr ' ' '\\n' | sort) | md5sum"}
-{"id": "nl2sh_test:104", "register": "colloquial", "nl": "nak encrypt setup_nl2b_fs_1.sh pakai aes-256-cbc, password 'password', simpan jadi out.enc", "cmd": "openssl enc -aes-256-cbc -in setup_nl2b_fs_1.sh -pass pass:password -out out.enc"}
+{"id": "nl2sh_test:104", "register": "colloquial", "nl": "nak encrypt setup_nl2b_fs_1.sh pakai aes-256-cbc, kata laluan 'password', simpan jadi out.enc", "cmd": "openssl enc -aes-256-cbc -in setup_nl2b_fs_1.sh -pass pass:password -out out.enc"}
 {"id": "nl2sh_test:108", "register": "colloquial", "nl": "nak kira MD5 sum dari MD5 sum semua file kat /testbed/dir2/subdir2, sorted by filename", "cmd": "find /testbed/dir2/subdir2 -type f -print0 | sort -z | xargs -0 md5sum | awk '{print $1}' | md5sum"}
 {"id": "nl2sh_test:113", "register": "colloquial", "nl": "nak tengok dah ke kat dalam screen ni?", "cmd": "pstree -s $$ | grep -q \"screen\" && echo \"True\" || echo \"False\""}
 {"id": "nl2sh_test:111", "register": "colloquial", "nl": "nak tengok total disk usage semua .txt file kat /testbed, depan nama hos system", "cmd": "find /testbed -name \"*.txt\" -exec du {} + | awk -v hostname=\"$(hostname)\" '{print hostname, $0}'"}
 {"id": "nl2sh_test:110", "register": "colloquial", "nl": "nak kira MD5 sum semua .py file kat /testbed/dir1/subdir1, sorted by MD5 sum pula", "cmd": "find /testbed/dir1/subdir1 -type f -name *.py -exec md5sum {} + | awk '{print $1}' | sort | md5sum"}
 {"id": "nl2sh_test:112", "register": "colloquial", "nl": "nak ubah semua PHP file kat /testbed jadi 755, terus print berapa file diubah", "cmd": "find /testbed -name \"*.php\" -exec chmod 755 {} \\; -exec /bin/echo {} \\; | wc -l"}
-{"id": "nl2sh_test:115", "register": "colloquial", "nl": "tolong count word semua .txt kat /testbed, ambik purata la", "cmd": "find /testbed -name '*.txt' -print0 | xargs -0 wc -w | awk 'END { print $1/(NR-1) }'"}
-{"id": "nl2sh_test:116", "register": "colloquial", "nl": "nak kira purata jumlah kata file .txt < 6 kata kat /testbed je", "cmd": "find /testbed -name '*.txt' -print0 | xargs -0 wc -w | awk '$1 < 6 {v += $1; c++} END {print v/c}'"}
+{"id": "nl2sh_test:115", "register": "colloquial", "nl": "tolong count word semua .txt kat /testbed, ambik purata", "cmd": "find /testbed -name '*.txt' -print0 | xargs -0 wc -w | awk 'END { print $1/(NR-1) }'"}
+{"id": "nl2sh_test:116", "register": "colloquial", "nl": "nak kira purata jumlah kata fail .txt < 6 kata kat /testbed je", "cmd": "find /testbed -name '*.txt' -print0 | xargs -0 wc -w | awk '$1 < 6 {v += $1; c++} END {print v/c}'"}
 {"id": "nl2sh_test:118", "register": "colloquial", "nl": "nak tengok semua .txt file kat /testbed, print path dia, then cari 'another' dalam setiap file tu", "cmd": "find /testbed -name \"*.txt\" \\( -exec echo {} \\; -o -exec true \\; \\) -exec grep another {} \\;"}
-{"id": "nl2sh_test:114", "register": "colloquial", "nl": "nak tengok file /testbed/dir3/subdir1/subsubdir1/textfile3.txt subset ke dalam /testbed/dir2/subdir1/textfile2.txt, true/false je la", "cmd": "comm -23 <(sort /testbed/dir3/subdir1/subsubdir1/textfile3.txt | uniq) <(sort /testbed/dir2/subdir1/textfile2.txt | uniq) | head -1 | grep -q '.' && echo \"False\" || echo \"True\""}
+{"id": "nl2sh_test:114", "register": "colloquial", "nl": "nak tengok file /testbed/dir3/subdir1/subsubdir1/textfile3.txt subset ke dalam /testbed/dir2/subdir1/textfile2.txt, true/false je", "cmd": "comm -23 <(sort /testbed/dir3/subdir1/subsubdir1/textfile3.txt | uniq) <(sort /testbed/dir2/subdir1/textfile2.txt | uniq) | head -1 | grep -q '.' && echo \"False\" || echo \"True\""}
 {"id": "nl2sh_test:119", "register": "colloquial", "nl": "nak convert 16 char awal /testbed/textfile7.txt jadi satu hex value", "cmd": "head /testbed/textfile7.txt -c16 | od -tx1 -w16 | head -n1 | cut -d' ' -f2- | tr -d ' '"}
 {"id": "nl2sh_test:122", "register": "colloquial", "nl": "nak tengok jumlah baris semua file .c kat /testbed ni, recursively", "cmd": "find /testbed -name \"*.c\" -print0 | xargs -0 cat | wc -l"}
 {"id": "nl2sh_test:117", "register": "colloquial", "nl": "nak copy semua file ada 'FooBar' kat path bawah /testbed, ke /testbed/dir3/subdir1/subsubdir1/tmp je", "cmd": "find /testbed -path '*FooBar*' -print0 | xargs -0 -I{} cp -r {} /testbed/dir3/subdir1/subsubdir1/tmp"}
@@ -125,36 +125,36 @@
 {"id": "nl2sh_test:124", "register": "colloquial", "nl": "nak tengok line semua php file kat /testbed rekursif", "cmd": "find /testbed/ -name '*.php' | xargs cat | wc -l"}
 {"id": "nl2sh_test:125", "register": "colloquial", "nl": "nak tengok md5sum semua .py file kat /testbed folder je", "cmd": "find /testbed -type f -name \"*.py\" -exec md5sum {} +"}
 {"id": "nl2sh_test:126", "register": "colloquial", "nl": "nak tengok berapa file .html kat /testbed yang ada 'foo' dalam dia", "cmd": "find /testbed -name \"*.html\" | xargs grep -l foo | wc -l"}
-{"id": "nl2sh_test:128", "register": "colloquial", "nl": "nak tengok berapa baris file kat /testbed yang nama dia ada '*file*' ah", "cmd": "find /testbed/ -name '*file*' | sort | xargs wc -l"}
+{"id": "nl2sh_test:128", "register": "colloquial", "nl": "nak tengok berapa baris file kat /testbed yang nama dia ada '*file*'", "cmd": "find /testbed/ -name '*file*' | sort | xargs wc -l"}
 {"id": "nl2sh_test:127", "register": "colloquial", "nl": "nak tengok berapa file/folder .php kat /testbed, terus ubah izin ke 755", "cmd": "find /testbed -name \"*.php\" -exec chmod 755 {} \\; -exec /bin/echo {} \\; | wc -l"}
-{"id": "nl2sh_test:129", "register": "colloquial", "nl": "nak kira file biasa kat ${DIRECTORY} punya nama ada vokal berapa ye?", "cmd": "find ${DIRECTORY} -type f -print | sed -e 's@^.*/@@' | grep '[aeiouyAEIOUY]' | wc -l"}
-{"id": "nl2sh_test:130", "register": "colloquial", "nl": "nak tengok bilangan file setiap ekstensi kat /testbed", "cmd": "find /testbed -type f | sed -e 's/.*\\.//' | sed -e 's/.*\\///' | sort | uniq -c | sort -rn"}
+{"id": "nl2sh_test:129", "register": "colloquial", "nl": "nak kira fail biasa kat ${DIRECTORY} punya nama ada vokal berapa ye?", "cmd": "find ${DIRECTORY} -type f -print | sed -e 's@^.*/@@' | grep '[aeiouyAEIOUY]' | wc -l"}
+{"id": "nl2sh_test:130", "register": "colloquial", "nl": "nak tengok bilangan file setiap extension kat /testbed", "cmd": "find /testbed -type f | sed -e 's/.*\\.//' | sed -e 's/.*\\///' | sort | uniq -c | sort -rn"}
 {"id": "nl2sh_test:132", "register": "colloquial", "nl": "nak tengok semua file kat /testbed folder je berapa ramai", "cmd": "find /testbed -type f -exec ls -l {} \\; | wc -l"}
 {"id": "nl2sh_test:131", "register": "colloquial", "nl": "tolong kira baris semua .gz file kat /testbed lepas diunzip", "cmd": "find /testbed -type f -name '*.gz' | xargs zcat | wc -l"}
 {"id": "nl2sh_test:133", "register": "colloquial", "nl": "tlg count baris kat semua .php file dalam /testbed folder, sorted by file je", "cmd": "find /testbed -name '*.php' -type f | sort | xargs wc -l"}
-{"id": "nl2sh_test:134", "register": "colloquial", "nl": "nak tengok bilangan baris kat setiap .php dalam /testbed, sort turun la", "cmd": "find /testbed -name '*.php' -type f | xargs wc -l | sort -nr"}
+{"id": "nl2sh_test:134", "register": "colloquial", "nl": "nak tengok bilangan baris kat setiap .php dalam /testbed, sort turun", "cmd": "find /testbed -name '*.php' -type f | xargs wc -l | sort -nr"}
 {"id": "nl2sh_test:137", "register": "colloquial", "nl": "tolong count baris semua file PHP dan JS kat /testbed", "cmd": "find /testbed -name '*.js' -or -name '*.php' | xargs wc -l | grep 'total'  | awk '{print $1}'"}
-{"id": "nl2sh_test:136", "register": "colloquial", "nl": "nak kira baris alphanumeric je kat semua php file dalam /testbed folder la", "cmd": "find /testbed -name '*.php' | xargs cat | awk '/[a-zA-Z0-9]/ {i++} END{print i}'"}
+{"id": "nl2sh_test:136", "register": "colloquial", "nl": "nak kira baris alphanumeric je kat semua php file dalam /testbed folder", "cmd": "find /testbed -name '*.php' | xargs cat | awk '/[a-zA-Z0-9]/ {i++} END{print i}'"}
 {"id": "nl2sh_test:135", "register": "colloquial", "nl": "nak tengok semua alamat IP dalam /etc/networks, kira kemunculannya, terus sort descending show", "cmd": "grep -oE '([0-9]{1,3}\\.){3}[0-9]{1,3}' /etc/networks | sort | uniq -c | sort -nr"}
-{"id": "nl2sh_test:138", "register": "colloquial", "nl": "nak buat 'abc.txt' kosong kat setiap 'dir1' dalam 'testbed' la", "cmd": "find /testbed -type d -name \"dir1\" -print |  sed 's/$/\\/abc.txt/g' | xargs touch"}
+{"id": "nl2sh_test:138", "register": "colloquial", "nl": "nak buat 'abc.txt' kosong kat setiap 'dir1' dalam 'testbed'", "cmd": "find /testbed -type d -name \"dir1\" -print |  sed 's/$/\\/abc.txt/g' | xargs touch"}
 {"id": "nl2sh_test:139", "register": "colloquial", "nl": "nak buat `logs.tar.gz` semua log Ubuntu lebih dari sehari je", "cmd": "find /var/log/ -mtime +1 | xargs  tar -czvPf  /testbed/logs.tar.gz"}
 {"id": "nl2sh_test:140", "register": "colloquial", "nl": "tolong delete file kat /testbed/dir3/subdir1/subsubdir1/tmp yang dah lebih 2 hari", "cmd": "find /testbed/dir3/subdir1/subsubdir1/tmp -type f -mtime +2 -print0 | xargs -0 rm -f"}
-{"id": "nl2sh_test:141", "register": "colloquial", "nl": "nak tengok 5 file terbesar kat /testbed je la", "cmd": "find /testbed -type f -exec du -b {} + | sort -rh | head -n 5"}
-{"id": "nl2sh_test:142", "register": "colloquial", "nl": "nak tengok 5 file kecik je kat /testbed ni, skip file kosong", "cmd": "find /testbed -type f -size +0c -exec du -b {} + | sort -n | head -n 5"}
+{"id": "nl2sh_test:141", "register": "colloquial", "nl": "nak tengok 5 fail terbesar kat /testbed je", "cmd": "find /testbed -type f -exec du -b {} + | sort -rh | head -n 5"}
+{"id": "nl2sh_test:142", "register": "colloquial", "nl": "nak tengok 5 fail kecik je kat /testbed ni, skip fail kosong", "cmd": "find /testbed -type f -size +0c -exec du -b {} + | sort -n | head -n 5"}
 {"id": "nl2sh_test:144", "register": "colloquial", "nl": "tlg show 5 file terbesar je kat /testbed", "cmd": "find /testbed -type f -maxdepth 1 -exec du -b {} + | sort -rh | head -n 5"}
-{"id": "nl2sh_test:143", "register": "colloquial", "nl": "nak tengok 5 file kecik-kecik je kat /testbed ni", "cmd": "find /testbed -type f -exec ls -s {} \\; | sort -n  | head -5"}
+{"id": "nl2sh_test:143", "register": "colloquial", "nl": "nak tengok 5 fail kecik-kecik je kat /testbed ni", "cmd": "find /testbed -type f -exec ls -s {} \\; | sort -n  | head -5"}
 {"id": "nl2sh_test:146", "register": "colloquial", "nl": "nak tengok file duplicate kat /testbed, case insensitive je", "cmd": "find /testbed -type f | awk -F/ '{print $NF}' | sort -f | uniq -i -d"}
 {"id": "nl2sh_test:145", "register": "colloquial", "nl": "cari file .java kat testbed folder yang ada 'Hello', print nama je", "cmd": "find /testbed -name \"*.java\" -exec grep -Hin Hello {} + | cut -d \":\" -f 1 | xargs -I{} basename {}"}
 {"id": "nl2sh_test:147", "register": "colloquial", "nl": "nak tengok path file unik kat \"testbed/dir1\" tapi bukan \"testbed/dir2\" je", "cmd": "comm -23 <(find /testbed/dir1 | sed 's#/testbed/dir1/##' | sort) <(find /testbed/dir2 | sed 's#/testbed/dir2/##' | sort) | sed 's#^#/testbed/dir1/#'"}
 {"id": "nl2sh_test:148", "register": "colloquial", "nl": "nak tengok folder mana ada 'Hello' dalam /testbed?", "cmd": "grep -rl 'Hello' /testbed | xargs -I {} dirname {} | sort | uniq"}
-{"id": "nl2sh_test:149", "register": "colloquial", "nl": "nak tengok jumlah baris semua java file kat /testbed je lah", "cmd": "find /testbed -name '*.java' -print0 |xargs -0 wc -l|grep 'total' |awk '{ print $1 }'"}
+{"id": "nl2sh_test:149", "register": "colloquial", "nl": "nak tengok jumlah baris semua java file kat /testbed je", "cmd": "find /testbed -name '*.java' -print0 |xargs -0 wc -l|grep 'total' |awk '{ print $1 }'"}
 {"id": "nl2sh_test:152", "register": "colloquial", "nl": "cari file php kat /testbed, lepas tu dalam semua tu search 'world'lah", "cmd": "find /testbed -name '*.php' -exec grep -iq \"world\" {} \\; -print"}
 {"id": "nl2sh_test:151", "register": "colloquial", "nl": "cari file kat /testbed/dir1 punya sticky bit + permission 553", "cmd": "find /testbed/dir1 -perm 1553"}
 {"id": "nl2sh_test:150", "register": "colloquial", "nl": "nak buat link simb, nama FooBar kat /testbed/dir3/subdir1/subsubdir1 arah root / je", "cmd": "ln /testbed/dir3/subdir1/subsubdir1/FooBar -s /"}
 {"id": "nl2sh_test:155", "register": "colloquial", "nl": "nak tengok tree listing /system", "cmd": "tree /system"}
-{"id": "nl2sh_test:154", "register": "colloquial", "nl": "nak tengok semua file kat '/system' punya 'foo' penuh, depan dia letak nombor je la", "cmd": "grep -rnw /system -e \"foo\""}
-{"id": "nl2sh_test:157", "register": "colloquial", "nl": "nak tengok semua folder kat '/system' yang ada file *.out je la", "cmd": "find /system -type f -name \"*.out\" -print0 | xargs -0 -n1 dirname | sort -u"}
-{"id": "nl2sh_test:153", "register": "colloquial", "nl": "nak tengok semua file kat '/system/folder1' yang ada 'Hello' (case tak kira), depan 'Hello' tu letak nombor dia dalam file ah", "cmd": "grep -inr \"Hello\" /system/folder1"}
+{"id": "nl2sh_test:154", "register": "colloquial", "nl": "nak tengok semua file kat '/system' punya 'foo' penuh, depan dia letak nombor je", "cmd": "grep -rnw /system -e \"foo\""}
+{"id": "nl2sh_test:157", "register": "colloquial", "nl": "nak tengok semua folder kat '/system' yang ada file *.out je", "cmd": "find /system -type f -name \"*.out\" -print0 | xargs -0 -n1 dirname | sort -u"}
+{"id": "nl2sh_test:153", "register": "colloquial", "nl": "nak tengok semua file kat '/system/folder1' yang ada 'Hello' (case tak kira), depan 'Hello' tu letak nombor dia dalam file", "cmd": "grep -inr \"Hello\" /system/folder1"}
 {"id": "nl2sh_test:156", "register": "colloquial", "nl": "nak tengok semua file je folder kat '/system/folder2' ni, termasuk yang tersembunyi, boleh tak?", "cmd": "tree -a /system/folder2"}
 {"id": "nl2sh_test:159", "register": "colloquial", "nl": "tolong delete folder kosong semua kat /system/folder3/temp secara rekursif", "cmd": "find /system/folder3/temp -depth -type d -exec rmdir {} \\;"}
 {"id": "nl2sh_test:158", "register": "colloquial", "nl": "buang semua *.txt kat /system folder, confirm 'y' kalau ada tanya", "cmd": "yes y | rm -r /system/*.txt"}
@@ -166,17 +166,17 @@
 {"id": "nl2sh_test:167", "register": "colloquial", "nl": "tlg delete semua *.doc kat /system/folder1", "cmd": "find /system/folder1 -name '*.doc' -exec rm \"{}\" \\;"}
 {"id": "nl2sh_test:165", "register": "colloquial", "nl": "nak unzip tar.gz tu secara rekursif kat stdout, terus cari 'special' je", "cmd": "zcat -r /system/folder2.tar.gz | grep \"special\""}
 {"id": "nl2sh_test:168", "register": "colloquial", "nl": "tolong buang semua *.log kat /system/folder1", "cmd": "find /system/folder1 -name '*.log' -print0 | xargs -0 rm"}
-{"id": "nl2sh_test:169", "register": "colloquial", "nl": "tlg buang semua *.txt kat /system folder je, tak masuk subfolder", "cmd": "find /system -name '*.txt' -maxdepth 1 | xargs rm"}
+{"id": "nl2sh_test:169", "register": "colloquial", "nl": "tlg buang semua *.txt kat /system direktori je, tak masuk subfolder", "cmd": "find /system -name '*.txt' -maxdepth 1 | xargs rm"}
 {"id": "nl2sh_test:166", "register": "colloquial", "nl": "nak buang '\\r' kat akhir setiap baris dalam 'system/folder3/temp/temp1/text1.txt' je, lepas tu tunjuk hasil dia", "cmd": "cat /system/folder3/temp/temp1/text1.txt | sed 's/\\r$//' | od -c"}
 {"id": "nl2sh_test:171", "register": "colloquial", "nl": "tolong delete semua *.txt kat /system/folder1 yang modified > 5 minit lepas", "cmd": "find /system/folder1 -mmin +5 -type f -name \"*.txt\" -delete"}
 {"id": "nl2sh_test:174", "register": "colloquial", "nl": "tolong buang semua a.out, *.o, core file kat /system", "cmd": "find /system \\( -name a.out -o -name '*.o' -o -name 'core' \\) -exec rm {} \\;"}
 {"id": "nl2sh_test:170", "register": "colloquial", "nl": "tolong delete semua *.sql file kat '/system/folder3/backup_dbg' yang dah last modified >25 days", "cmd": "find /system/folder3/backup_dbg/*.sql -mtime +25 -exec rm -f {} \\;"}
 {"id": "nl2sh_test:175", "register": "colloquial", "nl": "tlg print 5 baris terakhir data.csv ni kat /system/folder1", "cmd": "cat /system/folder1/data.csv | rev | cut -d, -f-5 | rev"}
-{"id": "nl2sh_test:173", "register": "colloquial", "nl": "tlg buang semua .sh kat '/system/folder1' yg nama dia start 'new' je lah", "cmd": "find /system/folder1 -name 'new*.sh' -exec rm -f '{}' \\;"}
+{"id": "nl2sh_test:173", "register": "colloquial", "nl": "tlg buang semua .sh kat '/system/folder1' yg nama dia start 'new' je", "cmd": "find /system/folder1 -name 'new*.sh' -exec rm -f '{}' \\;"}
 {"id": "nl2sh_test:172", "register": "colloquial", "nl": "tolong delete semua *.txt kat /system/folder1 kecuali keep.txt je, yang modified lebih 5 minit lepas, jangan masuk subfolder", "cmd": "find /system/folder1 -maxdepth 1 -mmin +5 -type f -name \"*.txt\" ! -name \"keep.txt\" -delete"}
-{"id": "nl2sh_test:176", "register": "colloquial", "nl": "tlg delete semua folder 'temp' kat /system la", "cmd": "find /system -name \"temp\" -type d -delete"}
+{"id": "nl2sh_test:176", "register": "colloquial", "nl": "tlg delete semua folder 'temp' kat /system", "cmd": "find /system -name \"temp\" -type d -delete"}
 {"id": "nl2sh_test:177", "register": "colloquial", "nl": "tolong buang semua file kosong kat /system/folder3/temp ke bawah", "cmd": "find /system/folder3/temp -type f -empty -print | xargs rm -f"}
-{"id": "nl2sh_test:181", "register": "colloquial", "nl": "buang file text2, text3, text4 kat /system/folder1 je la", "cmd": "find /system/folder1 -name 'text[2-4]*' -exec rm {} \\;"}
+{"id": "nl2sh_test:181", "register": "colloquial", "nl": "buang file text2, text3, text4 kat /system/folder1 je", "cmd": "find /system/folder1 -name 'text[2-4]*' -exec rm {} \\;"}
 {"id": "nl2sh_test:178", "register": "colloquial", "nl": "tlg buang semua file a.out dan *.o kat /system yang modified kurang dari 7 hari je", "cmd": "find /system \\( -name a.out -o -name '*.o' \\) -mtime -7 -exec rm {} \\;"}
 {"id": "nl2sh_test:182", "register": "colloquial", "nl": "tlg delete file kat /system saiz kurang 1KB je", "cmd": "find /system -type f -size -1k -exec rm {} +"}
 {"id": "nl2sh_test:183", "register": "colloquial", "nl": "tlg buang file mod 31 hari lepas kat /system, rekursif", "cmd": "find /system -type f -mtime +31 -exec rm -f {} \\;"}
@@ -185,57 +185,57 @@
 {"id": "nl2sh_test:188", "register": "colloquial", "nl": "nak tengok berapa subfolder kat /system tu?", "cmd": "find /system -type d | wc -l"}
 {"id": "nl2sh_test:179", "register": "colloquial", "nl": "tlg buang semua file/folder kat '/system/folder3/temp' yang nama dia macam '.DS_Store', '._.DS_Store', '._*', '.TemporaryItems' or '.apdisk' je", "cmd": "find /system/folder3/temp \\( -name '.DS_Store' -or -name '._.DS_Store' -or -name '._*' -or -name '.TemporaryItems' -or -name '.apdisk' \\) -exec rm -rf {} \\;"}
 {"id": "nl2sh_test:187", "register": "colloquial", "nl": "nak tengok space kosong kat /system directory dalam MB je", "cmd": "df -m /system"}
-{"id": "nl2sh_test:186", "register": "colloquial", "nl": "nak tengok file lain kat /system/folder1 dan /system/folder2 je lah", "cmd": "diff -qr /system/folder1 /system/folder2 | sort"}
-{"id": "nl2sh_test:180", "register": "colloquial", "nl": "nak buang semua dalam kurungan, tukar bukan angka jadi space, table je ah: 1/2 [3] (27/03/2012 19:32:54) word word word word 4/5", "cmd": "echo '1/2 [3] (27/03/2012 19:32:54) word word word word 4/5' | sed -e 's/(.*)//' -e 's/[^0-9]/ /g' | column -t"}
+{"id": "nl2sh_test:186", "register": "colloquial", "nl": "nak tengok file lain kat /system/folder1 dan /system/folder2 je", "cmd": "diff -qr /system/folder1 /system/folder2 | sort"}
+{"id": "nl2sh_test:180", "register": "colloquial", "nl": "nak buang semua dalam kurungan, tukar bukan angka jadi space, table je: 1/2 [3] (27/03/2012 19:32:54) word word word word 4/5", "cmd": "echo '1/2 [3] (27/03/2012 19:32:54) word word word word 4/5' | sed -e 's/(.*)//' -e 's/[^0-9]/ /g' | column -t"}
 {"id": "nl2sh_test:190", "register": "colloquial", "nl": "nak buat link folder1 kat /system arah /", "cmd": "ln /system/folder1 -s /"}
 {"id": "nl2sh_test:193", "register": "colloquial", "nl": "nak compress semua file kat /system je, default depth, ke /backup guna cpio", "cmd": "find /system -depth -print | cpio -dump /backup"}
 {"id": "nl2sh_test:191", "register": "colloquial", "nl": "nak tulis tarikh masa sekarang + ' 1' kat konsol, terus append ke /system/folder3/temp/empty.txt", "cmd": "echo $(date) \"1\" | tee -a /system/folder3/temp/empty.txt"}
 {"id": "nl2sh_test:192", "register": "colloquial", "nl": "nak concat semua .txt kat /system jadi satu file /system/folder3/temp/concat.txt", "cmd": "find /system -name \"*.txt\" -not -name \"concat.txt\" -print -exec cat {} \\; > /system/folder3/temp/concat.txt"}
 {"id": "nl2sh_test:195", "register": "colloquial", "nl": "rename /system/folder3/temp/temp1 to /system/folder3/temp/temp1_old", "cmd": "mv /system/folder3/temp/temp1 /system/folder3/temp/temp1_old"}
 {"id": "nl2sh_test:196", "register": "colloquial", "nl": "tlg dump '/system/text1.txt' as ASCII je", "cmd": "od -t c /system/text1.txt"}
-{"id": "nl2sh_test:194", "register": "colloquial", "nl": "copy semua file kat /system (kecuali yang ada 'text') ke /system/folder3/backup_dbg/backup je lah, jangan masuk subfolder", "cmd": "find /system -maxdepth 1 -type f ! -name '*text*' -exec cp {} /system/folder3/backup_dbg/backup \\;"}
-{"id": "nl2sh_test:189", "register": "colloquial", "nl": "nak taruh semua file di /system/folder1 yang diubah dalam 60 hari lepas ke /mytarfile.tgz la, date 2023-01-01, owner 0, group 0", "cmd": "tar --mtime='2023-01-01' --owner=0 --group=0 -czf mytarfile.tgz `find /system/folder1 -mtime -60`"}
+{"id": "nl2sh_test:194", "register": "colloquial", "nl": "copy semua file kat /system (kecuali yang ada 'text') ke /system/folder3/backup_dbg/backup je, jangan masuk subfolder", "cmd": "find /system -maxdepth 1 -type f ! -name '*text*' -exec cp {} /system/folder3/backup_dbg/backup \\;"}
+{"id": "nl2sh_test:189", "register": "colloquial", "nl": "nak taruh semua file di /system/folder1 yang diubah dalam 60 hari lepas ke /mytarfile.tgz, date 2023-01-01, owner 0, group 0", "cmd": "tar --mtime='2023-01-01' --owner=0 --group=0 -czf mytarfile.tgz `find /system/folder1 -mtime -60`"}
 {"id": "nl2sh_test:199", "register": "colloquial", "nl": "cari file saiz > 10 byte kat /system bawah", "cmd": "find /system -size +10c -print"}
 {"id": "nl2sh_test:202", "register": "colloquial", "nl": "cari file mod 30 hari kat /workspace", "cmd": "find /workspace -daystart -type f -mtime -30"}
 {"id": "nl2sh_test:197", "register": "colloquial", "nl": "nak buat tar.gz /system/folder1 jadi 'compress_folder1.tar.gz' punya timestamp 2023-01-01, owner 0, group 0", "cmd": "tar --mtime='2023-01-01' --owner=0 --group=0 -zcf compress_folder1.tar.gz /system/folder1"}
 {"id": "nl2sh_test:198", "register": "colloquial", "nl": "download 'http://example.com/textfile.txt' kat sini, simpan jadi 'textfile.txt' dalam /system", "cmd": "curl http://example.com/textfile.txt -o /system/textfile.txt"}
 {"id": "nl2sh_test:201", "register": "colloquial", "nl": "cari nama hos dalam /etc/hosts, awk field pertama IP tu je", "cmd": "more /etc/hosts | grep `hostname` | awk '{print $1}'"}
 {"id": "nl2sh_test:200", "register": "colloquial", "nl": "nak tengok md5sum semua .txt kat /system, terus sort hasil dia", "cmd": "find /system -type f -name '*.txt' -exec md5sum {} + | awk '{print $1}' | sort"}
-{"id": "nl2sh_test:203", "register": "colloquial", "nl": "nak tengok file *.c kat /workspace yang size lebih 1KB je", "cmd": "find /workspace -name '*.c' -size +1k -print"}
+{"id": "nl2sh_test:203", "register": "colloquial", "nl": "nak tengok fail *.c kat /workspace yang size lebih 1KB je", "cmd": "find /workspace -name '*.c' -size +1k -print"}
 {"id": "nl2sh_test:204", "register": "colloquial", "nl": "cari file kat /workspace je, yang update lebih dr 1 jam lepas", "cmd": "find /workspace -type f -cmin +60"}
 {"id": "nl2sh_test:205", "register": "colloquial", "nl": "cari file kat /workspace punya subfolder, yang last access lebih sejam lepas", "cmd": "find /workspace -type f -amin +60"}
 {"id": "nl2sh_test:208", "register": "colloquial", "nl": "nak tengok file kosong kat /workspace je?", "cmd": "find /workspace -empty -exec ls {} \\;"}
 {"id": "nl2sh_test:207", "register": "colloquial", "nl": "tlg list semua file kat /workspace saiz 0 byte je", "cmd": "find /workspace -empty"}
 {"id": "nl2sh_test:206", "register": "colloquial", "nl": "nak tengok semua folder kat /workspace je, tak masuk subfolder", "cmd": "find /workspace -maxdepth 1 -type d"}
 {"id": "nl2sh_test:210", "register": "colloquial", "nl": "nak tengok file kat /workspace yang group punya baca je permission?", "cmd": "find /workspace -perm 400 -type f -exec ls -l {} \\;"}
-{"id": "nl2sh_test:209", "register": "colloquial", "nl": "nak buang file besar je (lebih 1KB) kat /workspace", "cmd": "find /workspace -type f -size +1k -delete"}
+{"id": "nl2sh_test:209", "register": "colloquial", "nl": "nak buang fail besar je (lebih 1KB) kat /workspace", "cmd": "find /workspace -type f -size +1k -delete"}
 {"id": "nl2sh_test:212", "register": "colloquial", "nl": "nak tengok semua txt file kat /workspace", "cmd": "find /workspace -name \"*.txt\" -exec ls -ld {} \\;"}
 {"id": "nl2sh_test:211", "register": "colloquial", "nl": "nak tengok file kat /workspace yg permission 777 je", "cmd": "find /workspace -perm 777 -type f -exec ls -l {} \\;"}
-{"id": "nl2sh_test:216", "register": "colloquial", "nl": "nak tengok disk usage folder /workspace la", "cmd": "du -sh /workspace"}
+{"id": "nl2sh_test:216", "register": "colloquial", "nl": "nak tengok disk usage folder /workspace", "cmd": "du -sh /workspace"}
 {"id": "nl2sh_test:214", "register": "colloquial", "nl": "nak move file kat /workspace yang last accessed kurang dari sehari ke /.", "cmd": "find /workspace -atime -1 -type f -exec mv {} / \\;"}
-{"id": "nl2sh_test:218", "register": "colloquial", "nl": "nak tengok 3 folder paling besar kat /workspace", "cmd": "du -a /workspace | sort -nr | head -n 3"}
+{"id": "nl2sh_test:218", "register": "colloquial", "nl": "nak tengok 3 direktori paling besar kat /workspace", "cmd": "du -a /workspace | sort -nr | head -n 3"}
 {"id": "nl2sh_test:213", "register": "colloquial", "nl": "nak move semua file kat /workspace ke / je, tapi jangan masuk subfoldernya", "cmd": "find /workspace -maxdepth 1 -type f -exec mv -t / {} +"}
 {"id": "nl2sh_test:217", "register": "colloquial", "nl": "nak tengok perkataan terakhir kat /workspace/dir1/long.txt", "cmd": "tac /workspace/dir1/long.txt | awk 'NF{print $NF; exit}'"}
 {"id": "nl2sh_test:219", "register": "colloquial", "nl": "tolong print baris pertama long.txt kat /workspace/dir1 je", "cmd": "head -n1 /workspace/dir1/long.txt"}
 {"id": "nl2sh_test:215", "register": "colloquial", "nl": "nak tengok semua file kat /workspace/dir1 ada 'hello' (case-insensitive) je nama dia", "cmd": "find /workspace/dir1 -type f -exec grep -il 'hello' {} \\;"}
 {"id": "nl2sh_test:220", "register": "colloquial", "nl": "nak tengok baris terakhir tak kosong kat '/workspace/dir1/a.txt'", "cmd": "tac /workspace/dir1/a.txt | grep -m 1 '.'"}
 {"id": "nl2sh_test:221", "register": "colloquial", "nl": "tlg buang semua file kat /workspace", "cmd": "find /workspace -type f -delete"}
-{"id": "nl2sh_test:226", "register": "colloquial", "nl": "cari folder 'mysql' kat workspace ah", "cmd": "find  /workspace -name mysql -type d"}
-{"id": "nl2sh_test:224", "register": "colloquial", "nl": "cari file >1KB kat /workspace folder, tunjuk yang paling besar je", "cmd": "find /workspace -type f -size +1k -exec ls -ls {} + | sort -n | tail -1"}
+{"id": "nl2sh_test:226", "register": "colloquial", "nl": "cari direktori 'mysql' kat workspace", "cmd": "find  /workspace -name mysql -type d"}
+{"id": "nl2sh_test:224", "register": "colloquial", "nl": "cari fail >1KB kat /workspace folder, tunjuk yang paling besar je", "cmd": "find /workspace -type f -size +1k -exec ls -ls {} + | sort -n | tail -1"}
 {"id": "nl2sh_test:225", "register": "colloquial", "nl": "cari file teks kat /workspace tu yang takde permission tulis lain-lain", "cmd": "find  /workspace -type f \\( -iname \"*.txt\" -not -perm -o=w \\)"}
-{"id": "nl2sh_test:223", "register": "colloquial", "nl": "nak tengok semua file kat /workspace, sort by depth, show file name je lah", "cmd": "find /workspace -type f | awk -F/ '{print NF, $0}' | sort -n"}
+{"id": "nl2sh_test:223", "register": "colloquial", "nl": "nak tengok semua file kat /workspace, sort by depth, show file name je", "cmd": "find /workspace -type f | awk -F/ '{print NF, $0}' | sort -n"}
 {"id": "nl2sh_test:222", "register": "colloquial", "nl": "cari file kat /workspace saiz >1KB <32KB je", "cmd": "find /workspace -type f -size +1k -size -32k"}
 {"id": "nl2sh_test:227", "register": "colloquial", "nl": "nak tengok file duplicate kat /workspace, case insensitive semua", "cmd": "find /workspace -type f | awk -F/ '{print $NF}' | sort -f | uniq -i -d"}
 {"id": "nl2sh_test:228", "register": "colloquial", "nl": "cari file old2.txt kat /workspace, tengok permission dia dan bila dicipta", "cmd": "find /workspace -name old2.txt | xargs ls -tl"}
-{"id": "nl2sh_test:229", "register": "colloquial", "nl": "cari 'hello' dalam semua file biasa kat /workspace, tunjukkan nama file tu la", "cmd": "find  /workspace -type f | xargs grep -l \"hello\""}
+{"id": "nl2sh_test:229", "register": "colloquial", "nl": "cari 'hello' dalam semua fail biasa kat /workspace, tunjukkan nama fail tu", "cmd": "find  /workspace -type f | xargs grep -l \"hello\""}
 {"id": "nl2sh_test:231", "register": "colloquial", "nl": "nak tengok md5 semua file kat /workspace", "cmd": "find /workspace -type f -exec md5sum {} + | sort"}
-{"id": "nl2sh_test:233", "register": "colloquial", "nl": "nak copy folder /workspace ke /usr punya struktur semua lah", "cmd": "find /workspace -type d -print|sed 's@^@/usr/@'|xargs mkdir -p"}
-{"id": "nl2sh_test:230", "register": "colloquial", "nl": "nak tengok md5 semua file kat /workspace, depan nama file la", "cmd": "find /workspace -type f -exec md5sum {} + | awk '{print $2 \" \" $1}'"}
+{"id": "nl2sh_test:233", "register": "colloquial", "nl": "nak copy folder /workspace ke /usr punya struktur semua", "cmd": "find /workspace -type d -print|sed 's@^@/usr/@'|xargs mkdir -p"}
+{"id": "nl2sh_test:230", "register": "colloquial", "nl": "nak tengok md5 semua file kat /workspace, depan nama file", "cmd": "find /workspace -type f -exec md5sum {} + | awk '{print $2 \" \" $1}'"}
 {"id": "nl2sh_test:235", "register": "colloquial", "nl": "nak tengok 2 folder paling besar kat /workspace", "cmd": "find /workspace -type d -print0 | xargs -0 du | sort -n | tail -2 | cut -f2 | xargs -I{} du -sh {}"}
-{"id": "nl2sh_test:232", "register": "colloquial", "nl": "nak tengok extension file unik 3-6 huruf kat /workspace folder semua ada berapa?", "cmd": "find /workspace -type f -name '*.*' | awk -F. 'NF>1 {ext=tolower($NF); if (length(ext) >= 3 && length(ext) <= 6) print ext}' | sort | uniq -c | wc -l"}
-{"id": "nl2sh_test:234", "register": "colloquial", "nl": "nak tengok file paling lama kat '/workspace' punya listing lengkap ah", "cmd": "find /workspace -type f -printf '%T+ %p\\n' | sort | head -n 1 | awk '{print $2}' | xargs ls -l"}
+{"id": "nl2sh_test:232", "register": "colloquial", "nl": "nak tengok extension fail unik 3-6 huruf kat /workspace folder semua ada berapa?", "cmd": "find /workspace -type f -name '*.*' | awk -F. 'NF>1 {ext=tolower($NF); if (length(ext) >= 3 && length(ext) <= 6) print ext}' | sort | uniq -c | wc -l"}
+{"id": "nl2sh_test:234", "register": "colloquial", "nl": "nak tengok file paling lama kat '/workspace' punya listing lengkap", "cmd": "find /workspace -type f -printf '%T+ %p\\n' | sort | head -n 1 | awk '{print $2}' | xargs ls -l"}
 {"id": "nl2sh_test:236", "register": "colloquial", "nl": "nak tengok semua file sama content kat /workspace path dia", "cmd": "find /workspace -type f | xargs md5sum | sort | uniq -Dw32"}
-{"id": "nl2sh_test:237", "register": "colloquial", "nl": "tolong buat folder kat setiap path file dalam /workspace/files.txt je", "cmd": "cat /workspace/files.txt |xargs -I {} dirname \"{}\"| sort -u | xargs -I{} mkdir -p \"{}\""}
+{"id": "nl2sh_test:237", "register": "colloquial", "nl": "tolong buat folder kat setiap path fail dalam /workspace/files.txt je", "cmd": "cat /workspace/files.txt |xargs -I {} dirname \"{}\"| sort -u | xargs -I{} mkdir -p \"{}\""}
 {"id": "nl2sh_test:239", "register": "colloquial", "nl": "nak tengok semua file tersembunyi kat /workspace je, bukan dalam subfolder", "cmd": "find /workspace -maxdepth 1 -type f -name '.*' -exec sh -c 'mv \"$0\" \"${0%/\\.*}/${0##*/.}\"' {} \\;"}
 {"id": "nl2sh_test:238", "register": "colloquial", "nl": "nak tengok total disk usage dalam byte semua file kat /workspace/files.txt", "cmd": "cat /workspace/files.txt | xargs du -b | tail -1 | awk '{print $1}'"}
 {"id": "nl2sh_test:244", "register": "colloquial", "nl": "tlg delete semua file tersembunyi kat /workspace", "cmd": "find /workspace -type f -name '.*' -delete"}
@@ -252,34 +252,34 @@
 {"id": "nl2sh_test:248", "register": "colloquial", "nl": "nak tengok part akhir file path setiap file kat /workspace/dir1/file.txt, yang dipisah pakai slash", "cmd": "rev /workspace/dir1/file.txt | cut -d/ -f1 | rev"}
 {"id": "nl2sh_test:253", "register": "colloquial", "nl": "buat link simb ke root folder kat /workspace/dir1", "cmd": "ln /workspace/dir1 -s /"}
 {"id": "nl2sh_test:252", "register": "colloquial", "nl": "nak buat file kosong 'Icon' kat workspace, mesti ada enter kat akhir nama dia", "cmd": "echo $'workspace/Icon\\r' | xargs touch"}
-{"id": "nl2sh_test:256", "register": "colloquial", "nl": "tolong extract semua .gz kat /workspace la", "cmd": "find /workspace -name '*.gz' -print0 | xargs -0 gunzip"}
+{"id": "nl2sh_test:256", "register": "colloquial", "nl": "tolong extract semua .gz kat /workspace", "cmd": "find /workspace -name '*.gz' -print0 | xargs -0 gunzip"}
 {"id": "nl2sh_test:254", "register": "colloquial", "nl": "nak tengok permission, user, group, full path semua file kat /workspace", "cmd": "tree /workspace -p -u -g -f"}
-{"id": "nl2sh_test:255", "register": "colloquial", "nl": "cari 'hello' semua file kat /workspace, tunjukkan baris yang match dgn nama file", "cmd": "find /workspace -type f -print0  | xargs -0 grep -iH \"hello\""}
+{"id": "nl2sh_test:255", "register": "colloquial", "nl": "cari 'hello' semua fail kat /workspace, tunjukkan baris yang match dgn nama fail", "cmd": "find /workspace -type f -print0  | xargs -0 grep -iH \"hello\""}
 {"id": "nl2sh_test:259", "register": "colloquial", "nl": "nak tengok build number kernel je, tu #104", "cmd": "uname -v | grep -o '#[0-9]\\+'"}
-{"id": "nl2sh_test:257", "register": "colloquial", "nl": "tlg extract '/workspace/archive.tar.gz' kat '/backup' la", "cmd": "gzip -dc /workspace/archive.tar.gz | tar -xf - -C /backup"}
-{"id": "nl2sh_test:261", "register": "colloquial", "nl": "nak tengok info file grep ni", "cmd": "ls -ald `which grep`"}
+{"id": "nl2sh_test:257", "register": "colloquial", "nl": "tlg extract '/workspace/archive.tar.gz' kat '/backup'", "cmd": "gzip -dc /workspace/archive.tar.gz | tar -xf - -C /backup"}
+{"id": "nl2sh_test:261", "register": "colloquial", "nl": "nak tengok info fail grep ni", "cmd": "ls -ald `which grep`"}
 {"id": "nl2sh_test:260", "register": "colloquial", "nl": "nak tengok reverse lookup 127.0.0.1", "cmd": "dig -x 127.0.0.1"}
-{"id": "nl2sh_test:258", "register": "colloquial", "nl": "nak buat link simbolik '/workspace/test' ke '/workspace/dir1/terminate.txt' lah", "cmd": "ln /workspace/dir1/terminate.txt /workspace/test"}
+{"id": "nl2sh_test:258", "register": "colloquial", "nl": "nak buat link simbolik '/workspace/test' ke '/workspace/dir1/terminate.txt'", "cmd": "ln /workspace/dir1/terminate.txt /workspace/test"}
 {"id": "nl2sh_test:262", "register": "colloquial", "nl": "nak ambik nama host je kat 'http://www.google.com'", "cmd": "echo \"http://www.google.com\" | cut -d'/' -f3"}
 {"id": "nl2sh_test:264", "register": "colloquial", "nl": "nak tengok semua process tree ngan argumen command line dia", "cmd": "pstree -a"}
 {"id": "nl2sh_test:263", "register": "colloquial", "nl": "nak tengok semua env vars dgn escape semicolon pakai backslash", "cmd": "env | sed 's/;/\\\\;/g'"}
 {"id": "nl2sh_test:267", "register": "colloquial", "nl": "nak tengok semua readline binding-nya", "cmd": "bind -P"}
-{"id": "nl2sh_test:265", "register": "colloquial", "nl": "nak buat folder dir, subdir, terus subsubdir la", "cmd": "mkdir -p dir/subdir/subsubdir"}
+{"id": "nl2sh_test:265", "register": "colloquial", "nl": "nak buat folder dir, subdir, terus subsubdir", "cmd": "mkdir -p dir/subdir/subsubdir"}
 {"id": "nl2sh_test:266", "register": "colloquial", "nl": "nak print nombor 1-10 dipisahkan : je", "cmd": "yes | head -n10 | grep -n . | cut -d: -f1 | paste -sd:"}
-{"id": "nl2sh_test:268", "register": "colloquial", "nl": "tlg list bind fungsi ada 'p' lah", "cmd": "bind -l | grep p"}
-{"id": "nl2sh_test:269", "register": "colloquial", "nl": "nak save IP pertama google.com kat 'address' then show la", "cmd": "address=$(dig +short google.com | grep -E '^[0-9.]+$' | head -n 1) && echo $address"}
-{"id": "nl2sh_test:273", "register": "colloquial", "nl": "nak tengok source directory ni lah", "cmd": "df . | tail -1 | awk '{print $1}'"}
-{"id": "nl2sh_test:271", "register": "colloquial", "nl": "trim ' Hello world! ' lah", "cmd": "echo '  Hello world!\t  ' | sed -e 's/^[ \\t]*//' | sed -e 's/[ \\t]*$//'"}
-{"id": "nl2sh_test:275", "register": "colloquial", "nl": "nak tengok list user login je lah", "cmd": "who | cut -d' ' -f1 | sort | uniq"}
-{"id": "nl2sh_test:272", "register": "colloquial", "nl": "buang 3 aksar terakhir tu kat '987654321' la", "cmd": "echo 987654321 | rev | cut -c 4- | rev"}
-{"id": "nl2sh_test:270", "register": "colloquial", "nl": "tlg buang semua selain ';' dan angka kat sini \" Hello world;876 \" la", "cmd": "echo '  Hello world;876\t  ' | tr -cd ';0-9'"}
+{"id": "nl2sh_test:268", "register": "colloquial", "nl": "tlg list bind fungsi ada 'p'", "cmd": "bind -l | grep p"}
+{"id": "nl2sh_test:269", "register": "colloquial", "nl": "nak save IP pertama google.com kat 'address' then show", "cmd": "address=$(dig +short google.com | grep -E '^[0-9.]+$' | head -n 1) && echo $address"}
+{"id": "nl2sh_test:273", "register": "colloquial", "nl": "nak tengok source directory ni", "cmd": "df . | tail -1 | awk '{print $1}'"}
+{"id": "nl2sh_test:271", "register": "colloquial", "nl": "trim ' Hello world! '", "cmd": "echo '  Hello world!\t  ' | sed -e 's/^[ \\t]*//' | sed -e 's/[ \\t]*$//'"}
+{"id": "nl2sh_test:275", "register": "colloquial", "nl": "nak tengok list user login je", "cmd": "who | cut -d' ' -f1 | sort | uniq"}
+{"id": "nl2sh_test:272", "register": "colloquial", "nl": "buang 3 aksar terakhir tu kat '987654321'", "cmd": "echo 987654321 | rev | cut -c 4- | rev"}
+{"id": "nl2sh_test:270", "register": "colloquial", "nl": "tlg buang semua selain ';' dan angka kat sini \" Hello world;876 \"", "cmd": "echo '  Hello world;876\t  ' | tr -cd ';0-9'"}
 {"id": "nl2sh_test:274", "register": "colloquial", "nl": "nak tengok nama variable semua yg ada 'H' je?", "cmd": "env | awk -F= '{if($1 ~ /H/) print $1}'"}
 {"id": "nl2sh_test:277", "register": "colloquial", "nl": "nak print 99 '=' je", "cmd": "seq -s= 100|tr -d '[:digit:]'"}
-{"id": "nl2sh_test:276", "register": "colloquial", "nl": "ping 192.168.1.1 lah", "cmd": "ping -w 1 192.168.1.1"}
+{"id": "nl2sh_test:276", "register": "colloquial", "nl": "ping 192.168.1.1", "cmd": "ping -w 1 192.168.1.1"}
 {"id": "nl2sh_test:278", "register": "colloquial", "nl": "tlg kira user login skrg", "cmd": "who | awk -F' ' '{print $1}' | sort -u | wc -l"}
 {"id": "nl2sh_test:283", "register": "colloquial", "nl": "nak tengok berapa file Python kat testbed folder?", "cmd": "find testbed -type f -name \"*.py\" | wc -l"}
 {"id": "nl2sh_test:281", "register": "colloquial", "nl": "nak kira jumlah semua nombor 1 sampai 10 je?", "cmd": "seq 10 | jq -s 'add'"}
-{"id": "nl2sh_test:282", "register": "colloquial", "nl": "nak tengok berapa file + folder kat folder testbed semua", "cmd": "find /testbed | wc -l"}
+{"id": "nl2sh_test:282", "register": "colloquial", "nl": "nak tengok berapa file + folder kat direktori testbed semua", "cmd": "find /testbed | wc -l"}
 {"id": "nl2sh_test:280", "register": "colloquial", "nl": "nak tengok nama kumpulan je kat /etc/group, sort then print", "cmd": "cut -d: -f1 /etc/group | sort"}
 {"id": "nl2sh_test:279", "register": "colloquial", "nl": "nak tengok kalendar Disember 2120, semua bulan - lepas, sekarang, depan je", "cmd": "cal -3 12 2120"}
 {"id": "nl2sh_test:285", "register": "colloquial", "nl": "cari file 'Shell' kat testbed", "cmd": "find /testbed -type f -exec grep -l 'Shell' {} +"}
@@ -288,13 +288,13 @@
 {"id": "nl2sh_test:289", "register": "colloquial", "nl": "nak tengok berapa baris semua file kat /testbed/dir2 ni?", "cmd": "grep -rl . /testbed/dir2 | xargs wc -l"}
 {"id": "nl2sh_test:287", "register": "colloquial", "nl": "nak tengok total saiz semua file kat testbed/ terus save ke total_size.txt", "cmd": "du -sh testbed/ | awk '{print $1}' > total_size.txt"}
 {"id": "nl2sh_test:293", "register": "colloquial", "nl": "cari file 'text file' kat /testbed", "cmd": "grep -r 'text file' /testbed"}
-{"id": "nl2sh_test:290", "register": "colloquial", "nl": "nak tengok 3 file terbesar kat /testbed/dir3, nama dan saiz je", "cmd": "find /testbed/dir3 -type f -exec ls -lhS {} + | sort -rh -k5 | head -n 3"}
+{"id": "nl2sh_test:290", "register": "colloquial", "nl": "nak tengok 3 fail terbesar kat /testbed/dir3, nama dan saiz je", "cmd": "find /testbed/dir3 -type f -exec ls -lhS {} + | sort -rh -k5 | head -n 3"}
 {"id": "nl2sh_test:292", "register": "colloquial", "nl": "tolong list subdir kat /testbed yang bukan subdir1 je", "cmd": "ls -d /testbed/*/ | grep -v /subdir1/"}
 {"id": "nl2sh_test:288", "register": "colloquial", "nl": "nak tengok semua file kat /testbed/dir1, sort by size dalam format human-readable", "cmd": "ls -lhS /testbed/dir1"}
 {"id": "nl2sh_test:291", "register": "colloquial", "nl": "nak cari semua file diubah 2 jam lepas, terus zip jadi archive.tar.gz kat /testbed", "cmd": "find /testbed -type f -mmin -120 -print0 | xargs -0 tar -czf /testbed/archive.tar.gz"}
-{"id": "nl2sh_test:294", "register": "colloquial", "nl": "nak dapat MD5 semua file kat /testbed, simpan kat hashes.txt dalam folder tu je", "cmd": "find /testbed -type f -exec md5sum {} + > /testbed/hashes.txt"}
+{"id": "nl2sh_test:294", "register": "colloquial", "nl": "nak dapat MD5 semua file kat /testbed, simpan kat hashes.txt dalam direktori tu je", "cmd": "find /testbed -type f -exec md5sum {} + > /testbed/hashes.txt"}
 {"id": "nl2sh_test:297", "register": "colloquial", "nl": "cari je file kat /testbed last 24 jam modified, print path", "cmd": "find /testbed -type f -mtime -1 -print"}
 {"id": "nl2sh_test:295", "register": "colloquial", "nl": "nak tengok 10 baris terakhir file /testbed/dir3/subdir1/subsubdir1/textfile3.txt je", "cmd": "tail -n 10 /testbed/dir3/subdir1/subsubdir1/textfile3.txt"}
-{"id": "nl2sh_test:296", "register": "colloquial", "nl": "tolong tengok baris mana ada 'value3' kat /testbed/dir1/subdir1/jsonfile1.json, show number je la", "cmd": "grep -n 'value3' /testbed/dir1/subdir1/jsonfile1.json"}
+{"id": "nl2sh_test:296", "register": "colloquial", "nl": "tolong tengok baris mana ada 'value3' kat /testbed/dir1/subdir1/jsonfile1.json, show number je", "cmd": "grep -n 'value3' /testbed/dir1/subdir1/jsonfile1.json"}
 {"id": "nl2sh_test:298", "register": "colloquial", "nl": "nak cari semua file kat /testbed punya folder punya subfolder, yang ada 'Hello', terus tukar jadi 'Hi' je", "cmd": "grep -rl \"Hello\" /testbed | xargs sed -i 's/Hello/Hi/g'"}
-{"id": "nl2sh_test:299", "register": "colloquial", "nl": "nak tengok textfile3.txt dan textfile4.txt side by side, ada nombor baris, tengah dia ada pemisah lah", "cmd": "paste <(nl /testbed/dir3/subdir1/subsubdir1/textfile3.txt) <(nl /testbed/dir1/subdir1/textfile4.txt)"}
+{"id": "nl2sh_test:299", "register": "colloquial", "nl": "nak tengok textfile3.txt dan textfile4.txt side by side, ada nombor baris, tengah dia ada pemisah", "cmd": "paste <(nl /testbed/dir3/subdir1/subsubdir1/textfile3.txt) <(nl /testbed/dir1/subdir1/textfile4.txt)"}
