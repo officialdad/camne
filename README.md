@@ -98,15 +98,20 @@ somewhere.
 scorer, 300 tasks per register. Rojak — Malay grammar around English technical
 nouns — is what people actually type, so it is the column that matters.
 
-| model | BM | rojak | EN | size | tok/s @4t | RSS |
-|---|---|---|---|---|---|---|
-| nl2sh-1.5b (the English model camne used to ship) | 0.297 | 0.430 | **0.593** | 986 MB | 40 | 1.6 GB |
-| **camne-1.5b** | **0.417** | **0.490** | 0.533 | 986 MB | 40 | 1.6 GB |
+| model | BM | rojak | EN | beginner tasks* | size | tok/s @4t | RSS |
+|---|---|---|---|---|---|---|---|
+| nl2sh-1.5b (the English model camne used to ship) | 0.310 | 0.447 | **0.603** | — | 986 MB | 40 | 1.6 GB |
+| camne-1.5b, previous revision | 0.437 | 0.490 | 0.553 | 0.79 | 986 MB | 40 | 1.6 GB |
+| **camne-1.5b, this revision** | **0.487** | 0.490 | 0.543 | **0.90** | 986 MB | 37 | 1.6 GB |
 
-Malay +0.120 (p=0.0002) and rojak +0.060 (p=0.044) against the model it
-replaces. English is −0.060 at p=0.050, which 300 tasks cannot resolve — so
-the honest claim is "cannot distinguish", not "as good as". Speed and memory
-are unchanged: same base, same quantisation, same file size.
+\* `training/probe.py`: 35 beginner tasks asked in 177 phrasings the training
+data does not contain, scored on whether the right tool comes back.
+
+Against the English model: Malay +0.177 (p = 3e-08), rojak +0.043 (p = 0.13,
+unresolved at 300 tasks), English −0.060 (p = 0.036) — a real regression,
+stated. Against the previous revision the benchmark cannot tell them apart;
+the beginner probe can (+0.11, p = 0.002). Speed and memory are unchanged:
+same base, same quantisation, same file size.
 
 Full method, the runs that failed, and why, in [RESULTS.md](RESULTS.md).
 
