@@ -17,6 +17,17 @@ import (
 // surprise network use, but nothing is gated — without these two files camne
 // cannot answer a single question, so there is no second choice to offer.
 func ensureProvisioned(st provision.Status) bool {
+	// A model cached before camne recorded digests is usually already the
+	// pinned one. A few seconds of hashing beats a gigabyte off the network.
+	if st.Model == provision.ModelUnrecorded {
+		fmt.Fprintln(os.Stderr, "Checking the model already on this computer...")
+		if provision.AdoptModel(st.ModelPath) {
+			st.Model = provision.ModelReady
+		}
+	}
+	if st.ServerOK && st.ModelOK() {
+		return true
+	}
 	asset, err := provision.LlamaAsset(runtime.GOOS, runtime.GOARCH)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
@@ -26,14 +37,21 @@ func ensureProvisioned(st provision.Status) bool {
 	if !st.ServerOK {
 		total += asset.Size
 	}
-	if !st.ModelOK {
+	if !st.ModelOK() {
 		total += provision.ModelSize
 	}
-	fmt.Fprintf(os.Stderr, "camne is setting itself up — downloading %d MB (once only; after this it all works offline):\n", total/1_000_000)
+	// A model that is merely out of date is an upgrade, not a first run, and
+	// saying "setting itself up" to someone who has used camne for months reads
+	// as camne having lost its files.
+	opening := "camne is setting itself up"
+	if st.Model == provision.ModelStale || st.Model == provision.ModelUnrecorded {
+		opening = "camne has a newer model"
+	}
+	fmt.Fprintf(os.Stderr, "%s — downloading %d MB (once only; after this it all works offline):\n", opening, total/1_000_000)
 	if !st.ServerOK {
 		fmt.Fprintf(os.Stderr, "  llama-server  %d MB\n", asset.Size/1_000_000)
 	}
-	if !st.ModelOK {
+	if !st.ModelOK() {
 		fmt.Fprintf(os.Stderr, "  model         %d MB\n", provision.ModelSize/1_000_000)
 	}
 	if st.LibcNote != "" {
@@ -45,10 +63,10 @@ func ensureProvisioned(st provision.Status) bool {
 			return false
 		}
 	}
-	if !st.ModelOK {
+	if !st.ModelOK() {
 		fmt.Fprintln(os.Stderr, "Downloading the model...")
 		if err := withProgress(st.ModelPath, provision.ModelSize, func() error {
-			return provision.Download(provision.ModelURL, st.ModelPath, provision.ModelSize, provision.ModelSHA256)
+			return provision.DownloadModel(st.ModelPath)
 		}); err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			return false

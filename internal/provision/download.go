@@ -268,21 +268,29 @@ func downloadWhole(url, part string) error {
 	return nil
 }
 
-// verifyAndRename hashes the complete .part and only then renames it to dest.
-// The whole file is re-read from disk because a resumed download never saw
-// the earlier bytes in-stream — one code path, no trust in prior runs.
-func verifyAndRename(part, dest, wantSHA256 string) error {
-	f, err := os.Open(part)
+// hashFile is the sha256 of a whole file on disk, read back from disk rather
+// than trusted from a stream: a resumed download never saw its earlier bytes.
+func hashFile(path string) (string, error) {
+	f, err := os.Open(path)
 	if err != nil {
-		return fmt.Errorf("could not read the downloaded file back — run camne again to download a fresh copy: %w", err)
+		return "", err
 	}
 	h := sha256.New()
 	_, err = io.Copy(h, f)
 	f.Close()
 	if err != nil {
+		return "", err
+	}
+	return hex.EncodeToString(h.Sum(nil)), nil
+}
+
+// verifyAndRename hashes the complete .part and only then renames it to dest.
+func verifyAndRename(part, dest, wantSHA256 string) error {
+	got, err := hashFile(part)
+	if err != nil {
 		return fmt.Errorf("could not read the downloaded file back — run camne again to download a fresh copy: %w", err)
 	}
-	if got := hex.EncodeToString(h.Sum(nil)); got != wantSHA256 {
+	if got != wantSHA256 {
 		os.Remove(part)
 		return fmt.Errorf("the download is damaged (checksum does not match) — the bad file has been deleted, run camne again to download a fresh copy")
 	}
