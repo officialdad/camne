@@ -10,6 +10,7 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
+	"strings"
 )
 
 // Pinned llama.cpp release tag. A new upstream build can change behaviour
@@ -99,15 +100,125 @@ func ModelPath() (string, error) {
 	return filepath.Join(d, "models", ModelFile), nil
 }
 
+// sidecarPath names the file that records the digest of the model beside it.
+// The identity of a cached model is its digest, not its name: a re-tune of the
+// same base ships under the same name at the same byte size, so a name-and-size
+// check leaves every existing install on the old weights forever (issue #38).
+func sidecarPath(modelPath string) string { return modelPath + ".sha256" }
+
+// ModelState is what the file in the cache actually is.
+type ModelState int
+
+const (
+	ModelReady      ModelState = iota // the pinned model, digest recorded
+	ModelMissing                      // nothing at that path
+	ModelDamaged                      // wrong size: truncated, or not the model at all
+	ModelUnrecorded                   // right size, no digest recorded (cached before camne kept one)
+	ModelStale                        // a digest is recorded and it is not the pinned one
+)
+
+// String is printed by `camne doctor`, so it is plain English rather than the
+// constant's name: "model: missing" for a file that is visibly on disk is
+// exactly the confusing error the user-facing text rules forbid.
+func (s ModelState) String() string {
+	switch s {
+	case ModelReady:
+		return "found"
+	case ModelDamaged:
+		return "damaged"
+	case ModelUnrecorded:
+		return "unverified"
+	case ModelStale:
+		return "out of date"
+	}
+	return "missing"
+}
+
+// modelState decides what is on disk without hashing it. The size is a cheap
+// pre-filter that catches a truncated file, and the sidecar carries the digest
+// that WAS verified — against the whole gigabyte, at download time. Rehashing
+// ~1 GB on every run would cost far more than it is worth.
+func modelState(path string, size int64, want string) ModelState {
+	fi, err := os.Stat(path)
+	if err != nil {
+		return ModelMissing
+	}
+	if fi.Size() != size {
+		return ModelDamaged
+	}
+	sum, err := os.ReadFile(sidecarPath(path))
+	if err != nil {
+		return ModelUnrecorded
+	}
+	if strings.TrimSpace(string(sum)) != want {
+		return ModelStale
+	}
+	return ModelReady
+}
+
+func writeSidecar(modelPath, sum string) error {
+	if err := os.WriteFile(sidecarPath(modelPath), []byte(sum+"\n"), 0o644); err != nil {
+		return fmt.Errorf("the model is downloaded but its checksum could not be saved — check you have free space on your disk, then try again: %w", err)
+	}
+	return nil
+}
+
+// AdoptModel rescues a model cached before camne recorded digests: hashing the
+// file once takes seconds, re-downloading a gigabyte over someone's phone does
+// not. It reports whether the bytes on disk ARE the pinned model, recording the
+// digest when they are. Anything else — a recorded digest that already
+// disagreed, the wrong size, different bytes — is left for the download to fix.
+func AdoptModel(path string) bool { return adoptModel(path, ModelSize, ModelSHA256) }
+
+func adoptModel(path string, size int64, want string) bool {
+	if modelState(path, size, want) != ModelUnrecorded {
+		return false
+	}
+	if sum, err := hashFile(path); err != nil || sum != want {
+		return false
+	}
+	return writeSidecar(path, want) == nil
+}
+
+// DownloadModel fetches the pinned GGUF, records its digest beside it, and only
+// then clears out what an earlier model left behind. That order is the point:
+// the old weights are what camne answers from until the new ones are verified
+// and in place, so a download that dies half way still leaves a working install.
+func DownloadModel(dest string) error {
+	if err := Download(ModelURL, dest, ModelSize, ModelSHA256); err != nil {
+		return err
+	}
+	if err := writeSidecar(dest, ModelSHA256); err != nil {
+		return err
+	}
+	removeOtherModels(dest)
+	return nil
+}
+
+// removeOtherModels deletes everything in the models folder that is not the
+// current model or its sidecar — otherwise a model that ships under a new name
+// strands a gigabyte on disk at every swap.
+func removeOtherModels(dest string) {
+	names, _ := filepath.Glob(filepath.Join(filepath.Dir(dest), "*"))
+	for _, n := range names {
+		if n != dest && n != sidecarPath(dest) {
+			os.Remove(n)
+		}
+	}
+}
+
 // Status reports what is already provisioned. Used by `camne doctor`.
 type Status struct {
 	CacheDir   string
 	ServerPath string
 	ServerOK   bool
 	ModelPath  string
-	ModelOK    bool
+	Model      ModelState
 	LibcNote   string // non-empty when this Linux libc cannot run the prebuilt
 }
+
+// ModelOK reports whether the cached model needs nothing done to it.
+func (st Status) ModelOK() bool { return st.Model == ModelReady }
 
 // GetStatus inspects the cache. It changes nothing.
 func GetStatus() (Status, error) {
@@ -122,11 +233,7 @@ func GetStatus() (Status, error) {
 		st.ServerOK = true
 	}
 	st.ModelPath, _ = ModelPath()
-	// Size check only: the full sha256 was verified before the file got this
-	// name, and hashing ~1 GB on every doctor run would be slower than useful.
-	if fi, err := os.Stat(st.ModelPath); err == nil && fi.Size() == ModelSize {
-		st.ModelOK = true
-	}
+	st.Model = modelState(st.ModelPath, ModelSize, ModelSHA256)
 	st.LibcNote = libcNote()
 	return st, nil
 }

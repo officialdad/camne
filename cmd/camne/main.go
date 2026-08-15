@@ -58,7 +58,7 @@ func run(query string) int {
 		fmt.Fprintln(os.Stderr, err)
 		return 1
 	}
-	if !st.ServerOK || !st.ModelOK {
+	if !st.ServerOK || !st.ModelOK() {
 		if !ensureProvisioned(st) {
 			return 1
 		}
@@ -135,28 +135,45 @@ func doctor() {
 		fmt.Fprintln(os.Stderr, err) // provision errors are already written for the user
 		os.Exit(1)
 	}
-	mark := func(ok bool) string {
-		if ok {
-			return "[found]   "
-		}
-		return "[missing] "
+	// One padded tag column for both lines: the model has more to say than
+	// found-or-missing, and "missing" for a file sitting on disk is a lie.
+	tag := func(word string) string { return fmt.Sprintf("%-14s", "["+word+"]") }
+	serverWord := "missing"
+	if st.ServerOK {
+		serverWord = "found"
 	}
 	fmt.Println("camne doctor — what camne needs, and what it already has")
 	fmt.Println()
-	fmt.Println(mark(st.ServerOK) + "llama-server : " + st.ServerPath)
-	fmt.Printf("%smodel        : %s (about %d MB)\n",
-		mark(st.ModelOK), st.ModelPath, provision.ModelSize/1_000_000)
+	fmt.Println(tag(serverWord) + "llama-server : " + st.ServerPath)
+	// No "about": the state column is four characters wider than the found/
+	// missing pair it replaced, and a doctor line that wraps in an 80-column
+	// terminal is harder to read than a rounded number is imprecise.
+	fmt.Printf("%smodel        : %s (%d MB)\n",
+		tag(st.Model.String()), st.ModelPath, provision.ModelSize/1_000_000)
 	if st.LibcNote != "" {
 		fmt.Println()
 		fmt.Println("Heads up: " + st.LibcNote)
 	}
 	fmt.Println()
-	if st.ServerOK && st.ModelOK {
+	if st.ServerOK && st.ModelOK() {
 		fmt.Println("All set — camne is ready to use.")
 		return
 	}
-	fmt.Println("Just type your question — camne downloads whatever is missing")
-	fmt.Println("first, then answers.")
+	var note string
+	switch st.Model {
+	case provision.ModelStale:
+		note = "The model on this computer is an older one than this camne expects."
+	case provision.ModelUnrecorded:
+		note = "The model on this computer was saved before camne started recording\n" +
+			"checksums, so camne has to check it once before trusting it."
+	case provision.ModelDamaged:
+		note = "The model file is the wrong size — a download that was cut off."
+	}
+	if note != "" {
+		fmt.Println(note)
+		fmt.Println()
+	}
+	fmt.Println("Just type your question — camne sorts this out first, then answers.")
 }
 
 func usage() {
