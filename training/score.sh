@@ -3,8 +3,9 @@
 # Needs docker. The embed shim replaces an ollama install: same mxbai F16
 # weights, served by llama-server, on the URL the scorer hardcodes.
 #
-#   ./score.sh qwen          # scores out/answers_qwen_{en,bm}.jsonl
-#   ./score.sh ""            # scores the untuned baseline out/answers_{en,bm}.jsonl
+#   ./score.sh qwen                     # scores out/answers_qwen_{en,bm}.jsonl
+#   ./score.sh ""                       # scores the untuned baseline
+#   ./score.sh qwen out/answers_x.jsonl # ...plus any extra files, same server
 set -euo pipefail
 NAME=${1-}
 SUFFIX=${NAME:+_$NAME}
@@ -24,3 +25,9 @@ done
 
 uv run eval_score.py --answers "out/answers${SUFFIX}_en.jsonl"
 uv run eval_score.py --answers "out/answers${SUFFIX}_bm.jsonl"
+# Extra answer files scored inside the same embed-server lifetime; starting a
+# second one per file is minutes of model load for nothing.
+shift || true
+for extra in "$@"; do
+  uv run eval_score.py --answers "$extra"
+done
