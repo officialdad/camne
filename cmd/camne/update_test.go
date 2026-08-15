@@ -139,9 +139,12 @@ func TestShouldCheck(t *testing.T) {
 	}
 
 	// touch on an existing stamp has to move the mtime forward, or the
-	// throttle would only ever work once.
+	// throttle would only ever work once. These two assertions measure a real
+	// mtime, so they take their reference from the real clock — pairing the
+	// frozen `now` above with a real touch made this test expire on
+	// 2026-08-15, when now+48h stopped being 24 h clear of time.Now().
 	touch(fresh)
-	if !shouldCheck("v0.3.1", fresh, true, now.Add(48*time.Hour)) {
+	if !shouldCheck("v0.3.1", fresh, true, time.Now().Add(48*time.Hour)) {
 		t.Error("shouldCheck 48 h after a touch = false, want true")
 	}
 	if shouldCheck("v0.3.1", fresh, true, time.Now()) {
