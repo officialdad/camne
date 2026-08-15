@@ -17,6 +17,9 @@ import (
 // surprise network use, but nothing is gated — without these two files camne
 // cannot answer a single question, so there is no second choice to offer.
 func ensureProvisioned(st provision.Status) bool {
+	// Reached only when something has to be fetched or re-checked: the first
+	// launch, a repair, or a new model. That is the moment the wordmark is for.
+	banner(os.Stderr)
 	// A model cached before camne recorded digests is usually already the
 	// pinned one. A few seconds of hashing beats a gigabyte off the network.
 	if st.Model == provision.ModelUnrecorded {

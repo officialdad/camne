@@ -232,6 +232,7 @@ func selfUpdate(tag string) error {
 		os.Remove(staged)
 		return err
 	}
+	banner(os.Stderr)
 	fmt.Fprintf(os.Stderr, "Done — camne %s.\n", tag)
 	return nil
 }

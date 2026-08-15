@@ -145,7 +145,10 @@ func doctor() {
 	fmt.Println("camne doctor — what camne needs, and what it already has")
 	fmt.Println()
 	fmt.Println(tag(serverWord) + "llama-server : " + st.ServerPath)
-	fmt.Printf("%smodel        : %s (about %d MB)\n",
+	// No "about": the state column is four characters wider than the found/
+	// missing pair it replaced, and a doctor line that wraps in an 80-column
+	// terminal is harder to read than a rounded number is imprecise.
+	fmt.Printf("%smodel        : %s (%d MB)\n",
 		tag(st.Model.String()), st.ModelPath, provision.ModelSize/1_000_000)
 	if st.LibcNote != "" {
 		fmt.Println()
