@@ -1,0 +1,2008 @@
+# Hand-written beginner tasks. One block per command, blank line between.
+#   cmd: <the command, byte-identical in every row>
+#   F: formal BM            (one or more, separated by " | ")
+#   C: colloquial BM
+#   R: rojak
+#   E: English
+# Real filenames, no path/to placeholders. Held-out probe tasks are NOT in
+# this file — see training/probe.py HOLDOUT and RESULTS.md.
+
+## --- files: create ---------------------------------------------------------
+
+cmd: touch notes.txt
+F: Cipta satu fail baharu bernama notes.txt | Wujudkan fail kosong notes.txt
+C: nak buat fail baru nama notes.txt | tolong buat fail notes.txt | buat file baru notes.txt | nak cipta fail notes.txt kat sini | mcm mana nak buat fail baru notes.txt
+R: nak create file baru notes.txt | create new file notes.txt kat sini | tolong buat file notes.txt | nak buat empty file notes.txt
+E: create a new file called notes.txt | make an empty file notes.txt | create notes.txt
+
+cmd: touch todo.md
+F: Cipta fail baharu todo.md
+C: buat fail todo.md | nak buat fail baru todo.md
+R: nak create file todo.md | buat new file todo.md
+E: create a file named todo.md | new file todo.md
+
+cmd: touch a.txt b.txt c.txt
+F: Cipta tiga fail baharu bernama a.txt, b.txt dan c.txt
+C: nak buat tiga fail a.txt b.txt c.txt | buat 3 fail sekali gus a.txt b.txt c.txt
+R: nak create 3 file a.txt b.txt c.txt | create file a.txt b.txt c.txt sekali
+E: create three files a.txt b.txt c.txt | make files a.txt, b.txt and c.txt at once
+
+cmd: touch file{1..5}.txt
+F: Cipta lima fail bernama file1.txt hingga file5.txt
+C: nak buat 5 fail file1.txt sampai file5.txt | buat lima fail nama file1 sampai file5
+R: nak create 5 file file1.txt sampai file5.txt | create 5 files file1 to file5
+E: create 5 files file1.txt to file5.txt | make five numbered files file1.txt through file5.txt
+
+cmd: echo "hello" > hello.txt
+F: Cipta fail hello.txt yang mengandungi perkataan hello
+C: nak buat fail hello.txt yang ada tulisan hello | buat fail hello.txt isi dia hello
+R: nak create file hello.txt dengan text hello | buat file hello.txt content hello
+E: create a file hello.txt containing the word hello | write hello into a new file hello.txt
+
+cmd: echo "new line" >> notes.txt
+F: Tambah baris "new line" ke penghujung fail notes.txt
+C: nak tambah tulisan "new line" kat hujung fail notes.txt | tolong tambah "new line" dalam notes.txt tanpa padam yang lama
+R: nak append "new line" ke file notes.txt | add "new line" kat hujung notes.txt
+E: append "new line" to notes.txt | add the text "new line" to the end of notes.txt
+
+cmd: cat > notes.txt
+F: Tulis kandungan baharu ke dalam fail notes.txt daripada papan kekunci
+C: nak taip terus isi fail notes.txt dari terminal | tulis isi notes.txt guna keyboard je
+R: nak type content terus masuk file notes.txt | write into notes.txt from keyboard
+E: type content into notes.txt from the terminal | write to notes.txt from standard input
+
+## --- folders: create -------------------------------------------------------
+
+cmd: mkdir projek
+F: Cipta satu direktori baharu bernama projek | Wujudkan folder projek
+C: nak buat folder baru nama projek | tolong buat direktori projek | buat folder projek kat sini | nak cipta folder projek
+R: nak create folder projek | create new folder nama projek | tolong buat folder projek
+E: create a new folder called projek | make a directory named projek | mkdir projek
+
+cmd: mkdir photos
+F: Cipta direktori photos
+C: buat folder photos | nak buat folder photos je
+R: nak create folder photos | buat folder photos
+E: create a folder photos | make a new directory photos
+
+cmd: mkdir -p projek/src/main
+F: Cipta direktori projek/src/main beserta semua direktori induk yang belum wujud
+C: nak buat folder projek/src/main sekali dengan folder atas dia | buat folder bersarang projek/src/main
+R: nak create folder projek/src/main dengan parent folder sekali | create nested folder projek/src/main
+E: create the nested folders projek/src/main | make projek/src/main including parent directories
+
+cmd: mkdir docs images videos
+F: Cipta tiga direktori bernama docs, images dan videos
+C: nak buat tiga folder docs images videos | buat 3 folder sekali gus docs images videos
+R: nak create 3 folder docs images videos | create folders docs, images, videos sekali
+E: create three folders docs, images and videos | make folders docs images videos at once
+
+cmd: mkdir folder{1..5}
+F: Cipta lima direktori bernama folder1 hingga folder5
+C: nak buat 5 folder folder1 sampai folder5 | buat lima folder nama folder1 ke folder5
+R: nak create 5 folder folder1 sampai folder5 | create 5 folders folder1 to folder5
+E: create 5 folders folder1 to folder5 | make five numbered folders
+
+## --- list ------------------------------------------------------------------
+
+cmd: ls
+F: Senaraikan fail dalam direktori semasa | Paparkan kandungan direktori ini
+C: nak tengok fail kat sini | apa fail yang ada kat folder ni | tunjuk semua fail dalam folder ni | senarai fail kat sini
+R: tengok file dalam folder ni | list semua file | apa file ada kat sini
+E: show the files in this folder | what files are in this directory
+
+cmd: ls -l
+F: Senaraikan fail dalam direktori semasa dengan butiran penuh
+C: nak tengok fail kat sini dengan detail sekali | senarai fail dgn saiz dan tarikh
+R: nak list file dengan details | list file kat sini in long format
+E: list files with details | show files with size and date | list files in long format
+
+cmd: ls -la
+F: Senaraikan semua fail termasuk fail tersembunyi dengan butiran
+C: nak tengok semua fail termasuk yang hidden dengan detail | senarai semua fail kat sini termasuk fail tersembunyi
+R: nak list semua file including hidden dengan details | show all files with hidden ones
+E: list all files including hidden ones with details | show hidden files too
+
+cmd: ls -lh
+F: Senaraikan fail dengan saiz yang mudah dibaca
+C: nak tengok saiz fail kat sini dalam KB MB | senarai fail dgn saiz yang senang baca
+R: nak list file dengan size yang readable | show file size dalam MB
+E: list files with human readable sizes | show file sizes in KB and MB
+
+cmd: ls -lt
+F: Senaraikan fail mengikut masa diubah suai, terbaharu dahulu
+C: nak tengok fail ikut tarikh, yang terbaru kat atas | senarai fail ikut masa ubah
+R: nak list file sorted by date, latest dulu | list file by modified time
+E: list files sorted by modification time, newest first | show files ordered by date
+
+cmd: ls -lS
+F: Senaraikan fail mengikut saiz, terbesar dahulu
+C: nak tengok fail ikut saiz, yang paling besar dulu | senarai fail dari besar ke kecil
+R: nak list file by size, biggest first | sort file by size kat sini
+E: list files sorted by size, largest first | show biggest files first
+
+cmd: ls -R
+F: Senaraikan semua fail dalam direktori ini dan semua subdirektorinya
+C: nak tengok semua fail termasuk dalam subfolder sekali | senarai fail dalam semua folder bawah ni
+R: nak list semua file including subfolder | list file recursively
+E: list all files recursively | show files in this folder and every subfolder
+
+cmd: ls Downloads
+F: Senaraikan kandungan direktori Downloads
+C: nak tengok apa ada dalam folder Downloads | tunjuk fail dalam Downloads
+R: nak list file dalam folder Downloads | apa ada dalam Downloads
+E: list the contents of Downloads | show what is in the Downloads folder
+
+cmd: ls *.txt
+F: Senaraikan semua fail berakhiran .txt dalam direktori semasa
+C: nak tengok semua fail .txt kat sini | senarai fail txt je
+R: nak list semua file .txt | show txt files je kat sini
+E: list all .txt files here | show only the txt files
+
+cmd: ls -d */
+F: Senaraikan direktori sahaja, bukan fail
+C: nak tengok folder je kat sini, bukan fail | senarai folder sahaja
+R: nak list folder je, bukan file | show directories only
+E: list only the folders here | show directories only, not files
+
+cmd: tree
+F: Paparkan struktur direktori dalam bentuk pokok
+C: nak tengok susunan folder ni macam pokok | tunjuk struktur folder
+R: nak tengok folder structure macam tree | show folder tree
+E: show the folder structure as a tree | display the directory tree
+
+cmd: ls | wc -l
+F: Kira bilangan fail dalam direktori semasa
+C: nak kira berapa fail ada kat sini | berapa banyak fail dalam folder ni
+R: nak count berapa file kat sini | count file dalam folder ni
+E: count the files in this folder | how many files are here
+
+## --- read ------------------------------------------------------------------
+
+cmd: cat notes.txt
+F: Paparkan kandungan fail notes.txt
+C: nak tengok isi fail notes.txt | tunjuk apa dalam notes.txt | baca fail notes.txt | tgk isi notes.txt
+R: nak tengok content file notes.txt | show isi notes.txt | read file notes.txt | nak view notes.txt
+E: show the contents of notes.txt | print notes.txt | read notes.txt
+
+cmd: cat config.yaml
+F: Paparkan kandungan fail config.yaml
+C: nak baca fail config.yaml | tunjuk isi config.yaml
+R: nak tengok file config.yaml | print config.yaml
+E: display config.yaml | show what is inside config.yaml
+
+cmd: less notes.txt
+F: Buka fail notes.txt untuk dibaca muka surat demi muka surat
+C: nak baca notes.txt sikit-sikit boleh scroll | buka fail notes.txt yang panjang tu
+R: nak baca file notes.txt page by page | open notes.txt boleh scroll
+E: read notes.txt page by page | open notes.txt in a pager
+
+cmd: head notes.txt
+F: Paparkan sepuluh baris pertama fail notes.txt
+C: nak tengok baris awal fail notes.txt | tunjuk 10 baris pertama notes.txt
+R: nak tengok first few lines file notes.txt | show top of notes.txt
+E: show the first lines of notes.txt | print the first 10 lines of notes.txt
+
+cmd: head -n 20 notes.txt
+F: Paparkan 20 baris pertama fail notes.txt
+C: nak tengok 20 baris pertama notes.txt | tunjuk 20 baris awal fail notes.txt
+R: nak tengok first 20 lines notes.txt | show 20 baris pertama file notes.txt
+E: show the first 20 lines of notes.txt | print the top 20 lines of notes.txt
+
+cmd: tail notes.txt
+F: Paparkan sepuluh baris terakhir fail notes.txt
+C: nak tengok baris akhir fail notes.txt | tunjuk hujung fail notes.txt
+R: nak tengok last few lines notes.txt | show bottom of file notes.txt
+E: show the last lines of notes.txt | print the end of notes.txt
+
+cmd: tail -n 50 app.log
+F: Paparkan 50 baris terakhir fail app.log
+C: nak tengok 50 baris terakhir app.log | tunjuk 50 baris hujung fail app.log
+R: nak tengok last 50 lines app.log | show 50 baris terakhir file app.log
+E: show the last 50 lines of app.log | print the last 50 lines from app.log
+
+cmd: tail -f app.log
+F: Ikuti fail app.log secara langsung apabila baris baharu ditambah
+C: nak tengok app.log secara live, bila ada baris baru terus keluar | tunjuk log app.log yang tengah jalan
+R: nak follow file app.log live | tengok app.log real time
+E: follow app.log as it grows | watch app.log live | tail the log file app.log in real time
+
+cmd: wc -l notes.txt
+F: Kira bilangan baris dalam fail notes.txt
+C: nak kira berapa baris dalam notes.txt | berapa baris fail notes.txt ni
+R: nak count lines dalam file notes.txt | berapa line ada dalam notes.txt
+E: count the lines in notes.txt | how many lines does notes.txt have
+
+cmd: wc -w essay.txt
+F: Kira bilangan perkataan dalam fail essay.txt
+C: nak kira berapa perkataan dalam essay.txt | berapa patah perkataan fail essay.txt
+R: nak count words dalam file essay.txt | word count essay.txt
+E: count the words in essay.txt | how many words are in essay.txt
+
+cmd: cat -n script.sh
+F: Paparkan kandungan script.sh beserta nombor baris
+C: nak tengok isi script.sh dengan nombor baris sekali | tunjuk script.sh ada nombor baris
+R: nak tengok file script.sh with line numbers | print script.sh dengan line number
+E: show script.sh with line numbers | print script.sh numbering each line
+
+cmd: file photo.jpg
+F: Kenal pasti jenis fail photo.jpg
+C: nak tahu fail photo.jpg ni jenis apa | fail ni sebenarnya format apa photo.jpg
+R: nak check file type photo.jpg | apa jenis file photo.jpg ni
+E: what type of file is photo.jpg | check the file type of photo.jpg
+
+cmd: stat notes.txt
+F: Paparkan maklumat terperinci fail notes.txt seperti saiz dan tarikh
+C: nak tengok detail penuh fail notes.txt, saiz tarikh semua | tunjuk info fail notes.txt
+R: nak tengok file info notes.txt, size date semua | show details of file notes.txt
+E: show detailed information about notes.txt | display size and dates of notes.txt
+
+## --- delete ----------------------------------------------------------------
+
+cmd: rm notes.txt
+F: Padam fail notes.txt | Hapuskan fail notes.txt
+C: nak buang fail notes.txt | tolong padam fail notes.txt | delete notes.txt | nak hapus fail notes.txt | buang notes.txt je
+R: nak delete file notes.txt | remove file notes.txt | tolong buang file notes.txt | nak padam file notes.txt
+E: delete notes.txt | remove the file notes.txt | get rid of notes.txt
+
+cmd: rm old.log
+F: Padam fail old.log
+C: buang fail old.log | nak padam old.log
+R: nak delete old.log | remove file old.log
+E: delete old.log | remove old.log
+
+cmd: rm *.tmp
+F: Padam semua fail berakhiran .tmp dalam direktori semasa
+C: nak buang semua fail .tmp kat sini | padam semua fail tmp
+R: nak delete semua file .tmp | remove all tmp files kat sini
+E: delete all .tmp files here | remove every file ending in .tmp
+
+cmd: rm -i notes.txt
+F: Padam fail notes.txt dengan pengesahan terlebih dahulu
+C: nak padam notes.txt tapi tanya dulu sebelum buang | buang fail notes.txt, confirm dulu
+R: nak delete notes.txt tapi ask confirmation dulu | remove file notes.txt with confirmation
+E: delete notes.txt but ask before deleting | remove notes.txt with a confirmation prompt
+
+cmd: rm -r projek
+F: Padam direktori projek beserta semua kandungannya
+C: nak buang folder projek dengan semua isi dia | padam folder projek sekali dengan isi | tolong hapus folder projek
+R: nak delete folder projek dengan semua isi | remove folder projek and everything inside | buang folder projek sekali
+E: delete the folder projek and everything in it | remove the directory projek recursively
+
+cmd: rm -rf build
+F: Padam direktori build dan semua kandungannya secara paksa tanpa pengesahan
+C: nak buang folder build terus, jangan tanya | padam folder build habis-habis
+R: nak delete folder build terus without asking | force remove folder build
+E: force delete the build folder without asking | remove build directory and its contents without prompting
+
+cmd: rmdir empty_folder
+F: Padam direktori kosong bernama empty_folder
+C: nak buang folder kosong empty_folder | padam folder empty_folder yang kosong tu
+R: nak remove empty folder empty_folder | delete folder kosong empty_folder
+E: remove the empty folder empty_folder | delete the empty directory empty_folder
+
+cmd: rm -- -weird.txt
+F: Padam fail yang namanya bermula dengan tanda sempang, -weird.txt
+C: nak buang fail nama dia -weird.txt, ada dash depan | padam fail -weird.txt yang mula dengan sempang
+R: nak delete file -weird.txt yang start dengan dash | remove file nama -weird.txt
+E: delete a file named -weird.txt that starts with a dash | remove the file -weird.txt
+
+## --- copy ------------------------------------------------------------------
+
+cmd: cp notes.txt backup.txt
+F: Salin fail notes.txt kepada backup.txt
+C: nak salin fail notes.txt jadi backup.txt | tolong copy notes.txt ke backup.txt | buat salinan notes.txt nama backup.txt
+R: nak copy file notes.txt to backup.txt | copy notes.txt jadi backup.txt | duplicate notes.txt as backup.txt
+E: copy notes.txt to backup.txt | make a copy of notes.txt called backup.txt | duplicate notes.txt as backup.txt
+
+cmd: cp notes.txt Documents/
+F: Salin fail notes.txt ke dalam direktori Documents
+C: nak salin notes.txt masuk folder Documents | copy fail notes.txt ke Documents
+R: nak copy file notes.txt masuk folder Documents | copy notes.txt into Documents
+E: copy notes.txt into the Documents folder | put a copy of notes.txt in Documents
+
+cmd: cp report.pdf /tmp
+F: Salin fail report.pdf ke direktori /tmp
+C: nak salin fail report.pdf ke /tmp | copy report.pdf pergi /tmp
+R: nak copy file report.pdf ke /tmp | copy report.pdf to /tmp
+E: copy report.pdf to /tmp | copy the file report.pdf into /tmp
+
+cmd: cp -r projek projek_backup
+F: Salin direktori projek beserta kandungannya kepada projek_backup
+C: nak salin satu folder projek jadi projek_backup | copy folder projek dengan semua isi dia ke projek_backup | buat backup folder projek
+R: nak copy folder projek to projek_backup | copy whole folder projek jadi projek_backup | duplicate folder projek
+E: copy the folder projek to projek_backup | copy a directory projek with all its contents | duplicate the folder projek
+
+cmd: cp *.jpg photos/
+F: Salin semua fail .jpg ke dalam direktori photos
+C: nak salin semua gambar jpg masuk folder photos | copy semua fail .jpg ke photos
+R: nak copy semua file jpg masuk folder photos | copy all jpg to photos folder
+E: copy all jpg files into the photos folder | move copies of every .jpg into photos
+
+cmd: cp -i notes.txt backup.txt
+F: Salin notes.txt kepada backup.txt dan tanya sebelum menulis ganti
+C: nak salin notes.txt ke backup.txt tapi tanya dulu kalau dah ada | copy notes.txt jadi backup.txt jangan overwrite terus
+R: nak copy notes.txt to backup.txt but ask before overwrite | copy notes.txt jadi backup.txt with confirmation
+E: copy notes.txt to backup.txt but ask before overwriting | copy notes.txt without silently overwriting backup.txt
+
+## --- move / rename ---------------------------------------------------------
+
+cmd: mv notes.txt Documents/
+F: Pindahkan fail notes.txt ke dalam direktori Documents
+C: nak pindah fail notes.txt masuk folder Documents | alih notes.txt ke Documents | tolong move notes.txt ke folder Documents
+R: nak move file notes.txt ke folder Documents | move notes.txt into Documents | pindah notes.txt to Documents
+E: move notes.txt into Documents | put notes.txt in the Documents folder
+
+cmd: mv old.txt new.txt
+F: Tukar nama fail old.txt kepada new.txt | Namakan semula fail old.txt sebagai new.txt
+C: nak tukar nama fail old.txt jadi new.txt | rename old.txt kepada new.txt | tolong tukar nama old.txt ke new.txt
+R: nak rename file old.txt to new.txt | rename old.txt jadi new.txt | tukar nama file old.txt to new.txt
+E: rename old.txt to new.txt | change the name of old.txt to new.txt
+
+cmd: mv report.docx report_final.docx
+F: Namakan semula fail report.docx sebagai report_final.docx
+C: nak tukar nama report.docx jadi report_final.docx | rename fail report.docx ke report_final.docx
+R: nak rename report.docx to report_final.docx | tukar nama file report.docx jadi report_final.docx
+E: rename report.docx to report_final.docx | rename the file report.docx as report_final.docx
+
+cmd: mv projek projek_lama
+F: Namakan semula direktori projek sebagai projek_lama
+C: nak tukar nama folder projek jadi projek_lama | rename folder projek ke projek_lama
+R: nak rename folder projek to projek_lama | tukar nama folder projek jadi projek_lama
+E: rename the folder projek to projek_lama | change the directory name projek to projek_lama
+
+cmd: mv *.pdf Documents/
+F: Pindahkan semua fail .pdf ke dalam direktori Documents
+C: nak pindah semua fail pdf masuk folder Documents | alih semua pdf ke Documents
+R: nak move semua file pdf ke folder Documents | move all pdf into Documents
+E: move all pdf files into Documents | put every .pdf into the Documents folder
+
+cmd: mv Downloads/photo.jpg Pictures/
+F: Pindahkan fail photo.jpg dari Downloads ke Pictures
+C: nak pindah photo.jpg dari Downloads ke Pictures | alih fail photo.jpg dalam Downloads masuk Pictures
+R: nak move file photo.jpg dari Downloads ke Pictures | move Downloads/photo.jpg into Pictures
+E: move photo.jpg from Downloads to Pictures | move the file Downloads/photo.jpg into Pictures
+
+cmd: mv -i notes.txt Documents/
+F: Pindahkan notes.txt ke Documents dan tanya sebelum menulis ganti fail sedia ada
+C: nak pindah notes.txt ke Documents tapi tanya dulu kalau dah ada | move notes.txt masuk Documents jangan overwrite terus
+R: nak move notes.txt to Documents but ask before overwrite | move file notes.txt ke Documents with confirmation
+E: move notes.txt to Documents but ask before overwriting | move notes.txt into Documents safely
+
+## --- navigate --------------------------------------------------------------
+
+cmd: pwd
+F: Paparkan direktori semasa | Tunjukkan lokasi direktori kerja sekarang
+C: kat mana aku sekarang ni | nak tahu folder mana aku tengah berada | tunjuk lokasi folder sekarang | aku kat folder mana
+R: nak tahu current folder aku kat mana | where am I sekarang | show current directory path
+E: where am I | show the current directory | print the working directory
+
+cmd: cd Documents
+F: Masuk ke direktori Documents
+C: nak masuk folder Documents | pergi ke folder Documents | buka folder Documents
+R: nak masuk folder Documents | go to Documents folder | cd masuk Documents
+E: go into the Documents folder | change directory to Documents | open the Documents folder
+
+cmd: cd projek/src
+F: Masuk ke direktori projek/src
+C: nak masuk folder projek/src | pergi ke projek/src
+R: nak go to folder projek/src | masuk projek/src
+E: go to projek/src | change into the projek/src directory
+
+cmd: cd ..
+F: Kembali ke direktori induk | Naik satu tahap direktori
+C: nak keluar ke folder atas | patah balik satu folder ke belakang | naik satu folder
+R: nak go back one folder | keluar ke parent folder | naik satu level
+E: go up one folder | go back to the parent directory | move up a directory
+
+cmd: cd ../..
+F: Naik dua tahap direktori
+C: nak naik dua folder ke atas | keluar dua tingkat folder
+R: nak go up two folder | naik dua level directory
+E: go up two directories | go back two folder levels
+
+cmd: cd ~
+F: Kembali ke direktori rumah pengguna | Pergi ke direktori home
+C: nak balik ke folder home | pergi ke home folder aku
+R: nak balik home folder | go to home directory
+E: go to my home folder | go back to the home directory
+
+cmd: cd -
+F: Kembali ke direktori sebelumnya
+C: nak patah balik ke folder tadi | pergi balik folder sebelum ni
+R: nak go back to previous folder | balik ke folder tadi
+E: go back to the previous folder | return to the last directory I was in
+
+cmd: cd /
+F: Pergi ke direktori akar sistem
+C: nak pergi ke folder paling atas sekali | masuk root folder
+R: nak masuk root directory | go to root folder
+E: go to the root directory | change to the top level folder
+
+cmd: cd /etc
+F: Masuk ke direktori /etc
+C: nak masuk folder /etc | pergi ke /etc
+R: nak go to /etc | masuk /etc
+E: go to /etc | change directory to /etc
+
+cmd: cd "My Documents"
+F: Masuk ke direktori bernama My Documents yang mempunyai ruang dalam namanya
+C: nak masuk folder My Documents, nama dia ada space | pergi ke folder "My Documents"
+R: nak masuk folder My Documents yang ada space dalam nama | cd into folder with space "My Documents"
+E: go into the folder My Documents which has a space in its name | change to the directory named "My Documents"
+
+## --- find ------------------------------------------------------------------
+
+cmd: find . -name notes.txt
+F: Cari fail bernama notes.txt dalam direktori ini dan subdirektorinya
+C: nak cari fail notes.txt kat mana | mana fail notes.txt ni | tolong carikan notes.txt dalam folder ni
+R: nak search file notes.txt kat mana | find file notes.txt | cari file nama notes.txt
+E: find a file called notes.txt | where is notes.txt | search for notes.txt in this folder
+
+cmd: find . -name "*.pdf"
+F: Cari semua fail berakhiran .pdf dalam direktori ini dan subdirektorinya
+C: nak cari semua fail pdf dalam folder ni termasuk subfolder | mana semua fail pdf aku
+R: nak find semua file pdf kat sini including subfolder | search all pdf files
+E: find all pdf files in this folder and below | search for every .pdf file here
+
+cmd: find . -iname "*report*"
+F: Cari fail yang namanya mengandungi perkataan report tanpa mengira huruf besar kecil
+C: nak cari fail yang nama dia ada perkataan report, tak kira huruf besar kecil | mana fail yang ada nama report
+R: nak search file yang nama ada report, case insensitive | find file with report in the name
+E: find files with report in the name, ignoring case | search for any file named like report
+
+cmd: find ~ -name "*.jpg"
+F: Cari semua fail .jpg dalam direktori rumah
+C: nak cari semua gambar jpg dalam home aku | mana semua fail jpg dalam folder home
+R: nak find semua jpg dalam home folder | search jpg files in my home
+E: find all jpg files in my home folder | search my home directory for jpg files
+
+cmd: find . -type d -name projek
+F: Cari direktori bernama projek
+C: nak cari folder nama projek kat mana | mana folder projek aku
+R: nak find folder projek | search folder nama projek
+E: find a folder named projek | where is the projek directory
+
+cmd: find . -type f -size +100M
+F: Cari fail yang lebih besar daripada 100MB dalam direktori ini
+C: nak cari fail yang besar dari 100MB kat sini | mana fail-fail besar lebih 100MB
+R: nak find file lagi besar dari 100MB | search file size more than 100MB
+E: find files larger than 100MB | search for files bigger than 100 megabytes
+
+cmd: find . -type f -empty
+F: Cari fail kosong dalam direktori ini
+C: nak cari fail yang kosong kat sini | mana fail-fail yang takde isi
+R: nak find empty file kat sini | search file yang kosong
+E: find empty files here | list files with zero size
+
+cmd: find . -mtime -7
+F: Cari fail yang diubah suai dalam tempoh 7 hari lepas
+C: nak cari fail yang aku ubah minggu ni | mana fail yang baru diubah dalam 7 hari
+R: nak find file yang modified last 7 days | search file changed minggu ni
+E: find files modified in the last 7 days | show files changed this week
+
+cmd: find . -name "*.log" -delete
+F: Cari dan padam semua fail .log dalam direktori ini dan subdirektorinya
+C: nak buang semua fail .log termasuk dalam subfolder | padam semua log file kat sini sekali dengan folder bawah
+R: nak delete semua file .log including subfolder | find and remove all log files
+E: delete all .log files in this folder and below | find and remove every log file
+
+cmd: locate notes.txt
+F: Cari fail notes.txt di seluruh sistem menggunakan pangkalan data locate
+C: nak cari notes.txt satu komputer | mana notes.txt dalam seluruh sistem
+R: nak locate file notes.txt satu system | search notes.txt whole computer
+E: locate notes.txt anywhere on the system | search the whole computer for notes.txt
+
+cmd: which python3
+F: Tunjukkan lokasi program python3
+C: python3 tu kat mana | nak tahu program python3 install kat mana
+R: nak tahu python3 installed kat mana | where is python3
+E: where is python3 installed | show the path to python3
+
+## --- search inside files ---------------------------------------------------
+
+cmd: grep "error" app.log
+F: Cari perkataan error dalam fail app.log
+C: nak cari perkataan error dalam app.log | tunjuk baris yang ada error dalam fail app.log
+R: nak search "error" dalam file app.log | grep error in app.log
+E: search for error in app.log | show lines containing error in app.log
+
+cmd: grep -i "error" app.log
+F: Cari perkataan error dalam app.log tanpa mengira huruf besar kecil
+C: nak cari error dalam app.log, tak kira huruf besar kecil | cari Error ERROR error semua dalam app.log
+R: nak search error dalam app.log case insensitive | grep error in app.log ignore case
+E: search app.log for error ignoring case | find error in app.log regardless of capitalisation
+
+cmd: grep -r "TODO" .
+F: Cari perkataan TODO dalam semua fail di direktori ini dan subdirektorinya
+C: nak cari TODO dalam semua fail kat sini | mana-mana fail yang ada tulis TODO
+R: nak search TODO dalam semua file kat sini | grep TODO recursively
+E: search all files here for TODO | find TODO in every file in this folder
+
+cmd: grep -n "password" config.ini
+F: Cari perkataan password dalam config.ini beserta nombor baris
+C: nak cari password dalam config.ini, tunjuk nombor baris sekali | baris berapa ada password dalam config.ini
+R: nak search password dalam config.ini with line number | grep password in config.ini show line
+E: find password in config.ini with line numbers | which line of config.ini contains password
+
+cmd: grep -c "error" app.log
+F: Kira bilangan baris yang mengandungi error dalam app.log
+C: nak kira berapa kali error muncul dalam app.log | berapa baris ada error dalam fail app.log
+R: nak count berapa line ada error dalam app.log | how many error in app.log
+E: count how many lines in app.log contain error | how many times does error appear in app.log
+
+cmd: grep -v "debug" app.log
+F: Paparkan baris dalam app.log yang tidak mengandungi debug
+C: nak tengok app.log tapi buang baris yang ada debug | tunjuk app.log tanpa baris debug
+R: nak tengok app.log exclude line yang ada debug | show app.log without debug lines
+E: show app.log without the debug lines | print lines of app.log that do not contain debug
+
+cmd: grep -rl "main" src
+F: Senaraikan fail dalam direktori src yang mengandungi perkataan main
+C: fail mana dalam folder src yang ada perkataan main | nak senarai fail dalam src yang ada main
+R: nak list file dalam src yang ada word main | which files in src contain main
+E: list files in src that contain the word main | which files under src mention main
+
+## --- disk / size -----------------------------------------------------------
+
+cmd: df -h
+F: Paparkan ruang cakera yang masih kosong | Tunjukkan penggunaan cakera setiap partition
+C: nak tengok berapa banyak space tinggal | berapa ruang cakera yang masih ada | laptop ni tinggal berapa GB lagi | tgk baki storage
+R: nak check disk space tinggal berapa | berapa free space kat laptop ni | show disk usage | check storage tinggal
+E: how much disk space is left | show disk usage
+
+cmd: du -sh projek
+F: Tunjukkan saiz keseluruhan direktori projek
+C: berapa besar folder projek ni | nak tahu saiz folder projek | folder projek makan berapa banyak space
+R: nak check size folder projek | berapa besar folder projek | folder projek berapa MB
+E: how big is the projek folder | show the size of the projek directory
+
+cmd: du -sh *
+F: Tunjukkan saiz setiap fail dan direktori dalam direktori semasa
+C: nak tengok saiz setiap folder kat sini | berapa besar setiap benda dalam folder ni
+R: nak check size setiap folder kat sini | show size of everything here
+E: show the size of everything in this folder | how big is each item here
+
+cmd: du -sh * | sort -h
+F: Senaraikan saiz setiap item dalam direktori ini, disusun daripada terkecil ke terbesar
+C: nak tengok saiz setiap folder ikut susunan kecil ke besar | apa yang paling besar dalam folder ni
+R: nak check size folder sorted kecil ke besar | which folder paling besar kat sini
+E: show folder sizes sorted smallest to largest | which item here takes the most space
+
+cmd: du -sh ~/Downloads
+F: Tunjukkan saiz keseluruhan direktori Downloads
+C: folder Downloads aku berapa besar | nak tahu saiz Downloads
+R: nak check size folder Downloads | berapa besar Downloads
+E: how big is my Downloads folder | show the size of Downloads
+
+cmd: ls -lh notes.txt
+F: Tunjukkan saiz fail notes.txt
+C: berapa besar fail notes.txt ni | nak tahu saiz notes.txt
+R: nak check size file notes.txt | notes.txt berapa KB
+E: how big is notes.txt | show the size of notes.txt
+
+cmd: free -h
+F: Paparkan penggunaan memori RAM
+C: nak tengok RAM tinggal berapa | berapa memori yang tengah guna | tgk RAM usage
+R: nak check RAM usage | berapa memory free sekarang | show RAM tinggal berapa
+E: how much RAM is free | show memory usage | check RAM usage
+
+cmd: lsblk
+F: Senaraikan semua peranti storan dan partition
+C: nak tengok senarai hard disk dan partition | apa storage yang ada kat komputer ni
+R: nak list semua disk dan partition | show storage devices
+E: list all disks and partitions | show storage devices
+
+## --- processes -------------------------------------------------------------
+
+cmd: ps aux
+F: Senaraikan semua proses yang sedang berjalan
+C: nak tengok apa yang tengah jalan kat komputer ni | tunjuk semua proses yang tengah run | program apa yang tengah berjalan
+R: nak list semua process yang tengah jalan | show running processes | apa process tengah run
+E: list all running processes | what is running right now | show every process
+
+cmd: top
+F: Paparkan proses yang sedang berjalan secara langsung beserta penggunaan CPU dan memori
+C: nak tengok proses secara live, mana yang makan CPU | tunjuk apa yang buat laptop ni slow
+R: nak tengok process live, yang makan CPU paling banyak | show live CPU usage per process
+E: show live running processes with CPU usage | what is using my CPU right now
+
+cmd: htop
+F: Paparkan pemantau proses interaktif
+C: nak tengok proses dengan paparan yang lagi cantik dan interaktif | buka htop
+R: nak buka process monitor yang interactive | open htop
+E: open an interactive process viewer | show processes with htop
+
+cmd: ps aux | grep firefox
+F: Cari proses firefox dalam senarai proses
+C: nak tengok firefox tengah jalan ke tak | cari proses firefox
+R: nak check firefox running ke tak | find firefox process
+E: is firefox running | find the firefox process
+
+cmd: pgrep firefox
+F: Dapatkan ID proses firefox
+C: nak tahu PID firefox | proses firefox nombor berapa
+R: nak get PID firefox | apa process id firefox
+E: get the process id of firefox | find the PID of firefox
+
+cmd: kill 1234
+F: Hentikan proses dengan ID 1234
+C: nak matikan proses nombor 1234 | tolong bunuh proses 1234 | stop proses PID 1234
+R: nak kill process 1234 | stop process id 1234 | matikan process PID 1234
+E: kill process 1234 | stop the process with PID 1234 | terminate process 1234
+
+cmd: kill -9 1234
+F: Hentikan proses 1234 secara paksa
+C: nak matikan proses 1234 secara paksa, dia tak nak mati | bunuh terus proses 1234
+R: nak force kill process 1234 | kill process 1234 yang hang tu
+E: force kill process 1234 | forcefully terminate PID 1234 | kill 1234 immediately
+
+cmd: pkill firefox
+F: Hentikan semua proses bernama firefox
+C: nak tutup firefox terus dari terminal | matikan firefox | bunuh proses firefox
+R: nak kill firefox | stop firefox from terminal | matikan process firefox
+E: kill firefox | stop all firefox processes | close firefox from the terminal
+
+cmd: killall chrome
+F: Hentikan semua proses bernama chrome
+C: nak matikan semua chrome sekali gus | tutup semua proses chrome
+R: nak kill semua chrome process | stop all chrome
+E: kill every chrome process | close all chrome processes
+
+cmd: lsof -i :8080
+F: Tunjukkan proses yang menggunakan port 8080
+C: proses apa yang tengah guna port 8080 | nak tahu siapa pakai port 8080
+R: nak check what is using port 8080 | process apa guna port 8080
+E: what is using port 8080 | which process is listening on port 8080
+
+cmd: kill $(lsof -t -i:8080)
+F: Hentikan proses yang menggunakan port 8080
+C: nak matikan proses yang guna port 8080 | bunuh apa-apa yang tengah pakai port 8080
+R: stop whatever is using port 8080 | free up port 8080
+E: stop whatever is listening on port 8080 | free port 8080
+
+cmd: fuser -k 3000/tcp
+F: Hentikan proses yang mendengar pada port TCP 3000
+C: nak matikan proses kat port 3000 | port 3000 kena guna, tolong bunuh prosesnya
+R: nak kill process on port 3000 | free port 3000
+E: kill whatever is on port 3000 | free up port 3000
+
+cmd: jobs
+F: Senaraikan kerja latar belakang dalam sesi shell ini
+C: nak tengok apa yang aku run kat background tadi | senarai job background
+R: nak list background job kat shell ni | show background jobs
+E: list my background jobs | show jobs running in the background
+
+cmd: bg
+F: Sambung kerja yang dijeda di latar belakang
+C: nak sambung proses yang aku pause tadi kat background | jalankan job yang tergantung tu kat belakang
+R: nak resume paused job kat background | continue job in background
+E: resume the paused job in the background | continue the stopped job in the background
+
+cmd: fg
+F: Bawa kerja latar belakang ke hadapan
+C: nak bawa balik proses background tu ke depan | sambung balik job yang kat background
+R: nak bring background job ke foreground | bring back the background job
+E: bring the background job to the foreground | resume the background job in front
+
+cmd: python3 server.py &
+F: Jalankan python3 server.py di latar belakang
+C: nak run python3 server.py kat background | jalankan server.py tapi jangan sangkut terminal
+R: nak run python3 server.py in background | jalankan server.py kat background
+E: run python3 server.py in the background | start server.py without blocking the terminal
+
+cmd: nohup python3 server.py &
+F: Jalankan python3 server.py di latar belakang dan kekalkan ia walaupun terminal ditutup
+C: nak run server.py kat background, biar dia jalan walaupun aku tutup terminal | jalankan python3 server.py supaya tak mati bila logout
+R: nak run python3 server.py in background yang survive bila close terminal | keep server.py running after I close terminal
+E: run python3 server.py in the background and keep it alive after I close the terminal | start server.py so it survives logout
+
+cmd: uptime
+F: Tunjukkan berapa lama sistem telah berjalan
+C: laptop ni dah on berapa lama | nak tahu komputer ni dah jalan berapa jam
+R: nak check uptime laptop ni | how long dah komputer ni on
+E: how long has this machine been on | show system uptime
+
+## --- permissions -----------------------------------------------------------
+
+cmd: chmod +x script.sh
+F: Jadikan fail script.sh boleh dilaksanakan | Berikan kebenaran laksana kepada script.sh
+C: nak buat script.sh boleh run | bagi permission execute kat script.sh | tolong buat script.sh jadi executable
+R: nak make script.sh executable | bagi execute permission to script.sh | chmod script.sh boleh run
+E: make script.sh executable | give script.sh execute permission | allow script.sh to run
+
+cmd: chmod +x install.sh
+F: Berikan kebenaran laksana kepada install.sh
+C: nak buat install.sh boleh dijalankan | bagi install.sh permission untuk run
+R: nak make install.sh executable | allow install.sh to run
+E: make install.sh executable | let install.sh be executed
+
+cmd: chmod 644 notes.txt
+F: Tetapkan kebenaran notes.txt kepada 644, pemilik boleh tulis dan orang lain hanya baca
+C: nak set permission notes.txt jadi 644 | buat notes.txt boleh baca semua orang tapi aku je boleh tulis
+R: nak set permission notes.txt to 644 | make notes.txt readable by everyone, writable by me only
+E: set notes.txt permissions to 644 | make notes.txt readable by all but writable only by me
+
+cmd: chmod 755 script.sh
+F: Tetapkan kebenaran script.sh kepada 755
+C: nak set permission script.sh 755 | bagi script.sh 755
+R: nak chmod 755 script.sh | set script.sh permission 755
+E: set script.sh permissions to 755 | chmod script.sh to 755
+
+cmd: chmod 600 id_rsa
+F: Hadkan fail id_rsa supaya hanya pemilik boleh baca dan tulis
+C: nak buat id_rsa aku je boleh baca | set permission id_rsa jadi private
+R: nak set id_rsa permission to 600 | make id_rsa private, owner only
+E: make id_rsa readable only by me | set id_rsa permissions to 600
+
+cmd: chmod -R 755 public_html
+F: Tetapkan kebenaran 755 kepada direktori public_html dan semua kandungannya
+C: nak set permission 755 untuk folder public_html sekali dengan semua isi | tukar permission satu folder public_html
+R: nak chmod 755 recursively folder public_html | set permission 755 for whole folder public_html
+E: set 755 permissions on public_html and everything inside | recursively chmod public_html to 755
+
+cmd: chown ariff notes.txt
+F: Tukar pemilik fail notes.txt kepada pengguna ariff
+C: nak tukar owner notes.txt jadi ariff | buat ariff jadi pemilik fail notes.txt
+R: nak change owner file notes.txt to ariff | set owner notes.txt jadi ariff
+E: change the owner of notes.txt to ariff | make ariff own notes.txt
+
+cmd: sudo chown -R ariff:ariff projek
+F: Tukar pemilik direktori projek dan kandungannya kepada ariff
+C: nak tukar owner folder projek sekali dengan isi jadi ariff | buat aku (ariff) owner folder projek
+R: nak change owner folder projek to ariff recursively | make ariff owner of whole projek folder
+E: change the owner of the projek folder and everything in it to ariff | recursively chown projek to ariff
+
+cmd: ls -l notes.txt
+F: Tunjukkan kebenaran fail notes.txt
+C: nak tengok permission fail notes.txt | apa permission notes.txt ni | siapa boleh baca notes.txt
+R: nak check permission file notes.txt | show permission notes.txt | who can access notes.txt
+E: show the permissions of notes.txt | check who can read notes.txt
+
+cmd: chmod -x script.sh
+F: Buang kebenaran laksana daripada script.sh
+C: nak buang permission execute dari script.sh | buat script.sh tak boleh run
+R: nak remove execute permission script.sh | make script.sh not executable
+E: remove execute permission from script.sh | make script.sh not executable
+
+cmd: chmod a+r notes.txt
+F: Benarkan semua pengguna membaca notes.txt
+C: nak bagi semua orang boleh baca notes.txt | buat notes.txt boleh dibaca sesiapa
+R: nak make notes.txt readable by everyone | bagi semua orang read notes.txt
+E: let everyone read notes.txt | make notes.txt readable by all users
+
+## --- archives --------------------------------------------------------------
+
+cmd: tar -xzf backup.tar.gz
+F: Ekstrak arkib backup.tar.gz | Nyahmampat fail backup.tar.gz
+C: nak buka fail backup.tar.gz | extract backup.tar.gz | tolong keluarkan isi backup.tar.gz | nak nyahmampat backup.tar.gz
+R: nak extract file backup.tar.gz | unzip backup.tar.gz | buka tar.gz backup.tar.gz | nak decompress backup.tar.gz
+E: extract backup.tar.gz | unpack backup.tar.gz | open a tar.gz file backup.tar.gz | decompress backup.tar.gz
+
+cmd: tar -xzf backup.tar.gz -C restore
+F: Ekstrak backup.tar.gz ke dalam direktori restore
+C: nak extract backup.tar.gz masuk folder restore | keluarkan isi backup.tar.gz dalam folder restore
+R: nak extract backup.tar.gz into folder restore | unpack backup.tar.gz ke restore
+E: extract backup.tar.gz into the restore folder | unpack backup.tar.gz to restore
+
+cmd: tar -czf projek.tar.gz projek
+F: Mampatkan direktori projek menjadi projek.tar.gz | Arkibkan folder projek sebagai projek.tar.gz
+C: nak mampatkan folder projek jadi projek.tar.gz | buat tar.gz dari folder projek | tolong zip folder projek jadi tar.gz
+R: nak compress folder projek to projek.tar.gz | buat tar.gz folder projek | archive folder projek jadi projek.tar.gz
+E: compress the projek folder into projek.tar.gz | make a tar.gz of the projek folder | archive projek as projek.tar.gz
+
+cmd: tar -tzf backup.tar.gz
+F: Senaraikan kandungan arkib backup.tar.gz tanpa mengekstraknya
+C: nak tengok apa ada dalam backup.tar.gz tanpa extract | tunjuk isi backup.tar.gz je
+R: nak list content backup.tar.gz without extract | tengok apa dalam backup.tar.gz
+E: list what is inside backup.tar.gz without extracting | show the contents of backup.tar.gz
+
+cmd: tar -xf archive.tar
+F: Ekstrak arkib archive.tar
+C: nak buka fail archive.tar | extract archive.tar
+R: nak extract archive.tar | unpack file archive.tar
+E: extract archive.tar | unpack the tar file archive.tar
+
+cmd: tar -xjf backup.tar.bz2
+F: Ekstrak arkib backup.tar.bz2
+C: nak buka fail backup.tar.bz2 | extract backup.tar.bz2
+R: nak extract file backup.tar.bz2 | unpack backup.tar.bz2
+E: extract backup.tar.bz2 | unpack a tar.bz2 file backup.tar.bz2
+
+cmd: unzip photos.zip
+F: Ekstrak fail zip photos.zip | Nyahmampat photos.zip
+C: nak buka fail zip photos.zip | tolong unzip photos.zip | keluarkan isi photos.zip | nak nyahmampat photos.zip
+R: nak unzip photos.zip | extract zip file photos.zip | buka photos.zip
+E: unzip photos.zip | extract photos.zip | open the zip file photos.zip
+
+cmd: unzip photos.zip -d photos
+F: Ekstrak photos.zip ke dalam direktori photos
+C: nak unzip photos.zip masuk folder photos | keluarkan isi photos.zip dalam folder photos
+R: nak unzip photos.zip into folder photos | extract photos.zip ke folder photos
+E: unzip photos.zip into the photos folder | extract photos.zip to a folder called photos
+
+cmd: unzip -l photos.zip
+F: Senaraikan kandungan photos.zip tanpa mengekstraknya
+C: nak tengok apa ada dalam photos.zip tanpa unzip | tunjuk isi photos.zip je
+R: nak list content photos.zip without extract | tengok apa dalam photos.zip
+E: list the files inside photos.zip without extracting | show what is in photos.zip
+
+cmd: zip -r projek.zip projek
+F: Mampatkan direktori projek menjadi projek.zip | Zipkan folder projek
+C: nak zip folder projek | mampatkan folder projek jadi projek.zip | tolong buat zip dari folder projek
+R: nak zip folder projek jadi projek.zip | compress folder projek to zip | buat zip file dari folder projek
+E: zip the projek folder | compress the folder projek into projek.zip | make a zip of projek
+
+cmd: zip report.zip report.pdf
+F: Mampatkan fail report.pdf menjadi report.zip
+C: nak zip fail report.pdf | mampatkan report.pdf jadi report.zip
+R: nak zip file report.pdf | compress report.pdf to report.zip
+E: zip report.pdf | compress report.pdf into report.zip
+
+cmd: zip photos.zip *.jpg
+F: Mampatkan semua fail .jpg menjadi photos.zip
+C: nak zip semua gambar jpg jadi photos.zip | mampatkan semua fail jpg dalam satu zip
+R: nak zip semua jpg into photos.zip | compress all jpg files to photos.zip
+E: zip all jpg files into photos.zip | put every .jpg into a zip called photos.zip
+
+cmd: gzip app.log
+F: Mampatkan fail app.log menjadi app.log.gz
+C: nak mampatkan app.log dengan gzip | gzip fail app.log
+R: nak gzip file app.log | compress app.log with gzip
+E: gzip app.log | compress app.log with gzip
+
+cmd: gunzip app.log.gz
+F: Nyahmampat fail app.log.gz
+C: nak buka fail app.log.gz | nyahmampat app.log.gz
+R: nak extract app.log.gz | decompress file app.log.gz | unzip .gz file app.log.gz
+E: decompress app.log.gz | extract a .gz file app.log.gz | gunzip app.log.gz
+
+cmd: 7z x archive.7z
+F: Ekstrak arkib archive.7z
+C: nak buka fail archive.7z | extract archive.7z
+R: nak extract 7z file archive.7z | unpack archive.7z
+E: extract archive.7z | open a 7z file archive.7z
+
+cmd: unrar x archive.rar
+F: Ekstrak arkib archive.rar
+C: nak buka fail rar archive.rar | extract archive.rar
+R: nak extract rar file archive.rar | unpack archive.rar
+E: extract archive.rar | open the rar file archive.rar
+
+## --- network ---------------------------------------------------------------
+
+cmd: ip a
+F: Paparkan alamat IP komputer ini | Tunjukkan semua antara muka rangkaian dan alamat IPnya
+C: nak tahu IP aku | IP komputer ni berapa | tunjuk alamat IP laptop ni | apa IP address aku
+R: nak check IP address aku | what is my IP | show my IP address | tengok IP laptop ni
+E: what is my IP address | show my IP | display network interfaces and IPs
+
+cmd: hostname -I
+F: Paparkan alamat IP tempatan komputer ini
+C: nak tahu IP local aku | tunjuk IP dalaman komputer ni
+R: nak check local IP aku | show local IP address
+E: show my local IP address | print the local IP of this machine
+
+cmd: curl ifconfig.me
+F: Paparkan alamat IP awam komputer ini
+C: nak tahu IP public aku | apa IP luar aku yang internet nampak
+R: nak check public IP aku | what is my public IP | show external IP
+E: what is my public IP | show my external IP address
+
+cmd: ping google.com
+F: Uji sambungan rangkaian ke google.com
+C: nak check internet ada ke tak | ping google.com | tengok internet jalan ke tak
+R: nak test internet connection | ping google | check connection to google.com
+E: check if the internet is working | ping google.com | test my connection
+
+cmd: ping -c 4 8.8.8.8
+F: Hantar empat paket ping ke 8.8.8.8
+C: nak ping 8.8.8.8 empat kali je | test sambungan ke 8.8.8.8 4 kali
+R: nak ping 8.8.8.8 4 kali je | ping 8.8.8.8 four times
+E: ping 8.8.8.8 four times | send 4 pings to 8.8.8.8
+
+cmd: ss -tulpn
+F: Senaraikan semua port yang sedang mendengar beserta proses yang menggunakannya
+C: nak tengok port apa yang tengah terbuka | port mana yang tengah kena guna | tunjuk semua port yang listen
+R: nak list open port kat laptop ni | show listening ports | port apa yang tengah dengar
+E: show all listening ports | list open ports and the processes using them | which ports are in use
+
+cmd: netstat -tulpn
+F: Senaraikan port yang sedang mendengar dengan netstat
+C: nak tengok port yang terbuka guna netstat | senarai port aktif
+R: nak check open ports dengan netstat | list listening ports netstat
+E: list listening ports with netstat | show open ports using netstat
+
+cmd: wget https://example.com/file.zip
+F: Muat turun fail dari https://example.com/file.zip
+C: nak download https://example.com/file.zip | tolong muat turun fail dari https://example.com/file.zip | download file.zip dari example.com
+R: nak download https://example.com/file.zip | download file dari https://example.com/file.zip | grab https://example.com/file.zip
+E: download https://example.com/file.zip | fetch the file at https://example.com/file.zip
+
+cmd: curl -O https://example.com/file.zip
+F: Muat turun fail dari https://example.com/file.zip menggunakan curl
+C: nak download https://example.com/file.zip guna curl | muat turun fail tu dengan curl
+R: nak download https://example.com/file.zip with curl | curl download file.zip
+E: download https://example.com/file.zip with curl | use curl to fetch https://example.com/file.zip
+
+cmd: curl -o data.json https://api.example.com/data
+F: Muat turun https://api.example.com/data dan simpan sebagai data.json
+C: nak download https://api.example.com/data simpan jadi data.json | ambil data dari https://api.example.com/data masuk fail data.json
+R: nak download https://api.example.com/data save as data.json | curl https://api.example.com/data into data.json
+E: download https://api.example.com/data and save it as data.json | save the response from https://api.example.com/data to data.json
+
+cmd: curl https://example.com
+F: Paparkan kandungan laman https://example.com
+C: nak tengok isi laman https://example.com dari terminal | tunjuk HTML https://example.com
+R: nak fetch https://example.com | show content of https://example.com | curl example.com
+E: fetch https://example.com | show the content of https://example.com | curl example.com
+
+cmd: wget -c https://example.com/big.iso
+F: Sambung semula muat turun https://example.com/big.iso yang terhenti
+C: nak sambung download big.iso yang putus tadi | resume download https://example.com/big.iso
+R: nak resume download https://example.com/big.iso | continue download big.iso yang tergendala
+E: resume downloading https://example.com/big.iso | continue an interrupted download of big.iso
+
+cmd: ssh ariff@192.168.1.10
+F: Sambung ke pelayan 192.168.1.10 sebagai pengguna ariff melalui SSH
+C: nak masuk server 192.168.1.10 guna user ariff | ssh ke 192.168.1.10 sebagai ariff | nak connect ke pelayan 192.168.1.10
+R: nak ssh into 192.168.1.10 as ariff | connect to server 192.168.1.10 user ariff | remote masuk 192.168.1.10
+E: ssh into 192.168.1.10 as ariff | connect to the server 192.168.1.10 as user ariff | log in remotely to 192.168.1.10
+
+cmd: ssh -p 2222 ariff@example.com
+F: Sambung ke example.com melalui SSH pada port 2222 sebagai ariff
+C: nak ssh ke example.com port 2222 user ariff | masuk server example.com guna port 2222
+R: nak ssh example.com on port 2222 as ariff | connect example.com port 2222
+E: ssh to example.com on port 2222 as ariff | connect to example.com over ssh using port 2222
+
+cmd: scp report.pdf ariff@192.168.1.10:~/
+F: Salin report.pdf ke direktori rumah pengguna ariff pada pelayan 192.168.1.10
+C: nak hantar report.pdf ke server 192.168.1.10 | copy fail report.pdf masuk pelayan 192.168.1.10 user ariff
+R: nak copy report.pdf to server 192.168.1.10 | send report.pdf ke 192.168.1.10 via scp | upload report.pdf to server
+E: copy report.pdf to the server 192.168.1.10 | send report.pdf to ariff@192.168.1.10 | upload report.pdf over ssh
+
+cmd: scp ariff@192.168.1.10:~/report.pdf .
+F: Salin report.pdf dari pelayan 192.168.1.10 ke direktori semasa
+C: nak ambil report.pdf dari server 192.168.1.10 | download fail report.pdf dari pelayan 192.168.1.10 ke sini
+R: nak copy report.pdf from server 192.168.1.10 to here | download report.pdf dari 192.168.1.10 via scp
+E: copy report.pdf from the server 192.168.1.10 to here | download report.pdf from ariff@192.168.1.10
+
+cmd: scp -r projek ariff@192.168.1.10:~/
+F: Salin direktori projek ke pelayan 192.168.1.10
+C: nak hantar satu folder projek ke server 192.168.1.10 | copy folder projek masuk pelayan
+R: nak copy folder projek to server 192.168.1.10 | upload whole folder projek via scp
+E: copy the projek folder to the server 192.168.1.10 | upload the directory projek over ssh
+
+cmd: rsync -avz projek/ ariff@192.168.1.10:~/projek/
+F: Segerakkan direktori projek ke pelayan 192.168.1.10
+C: nak sync folder projek ke server 192.168.1.10 | hantar folder projek ke pelayan, yang berubah je
+R: nak sync folder projek to server 192.168.1.10 | rsync projek ke 192.168.1.10
+E: sync the projek folder to the server 192.168.1.10 | rsync projek to ariff@192.168.1.10
+
+cmd: nslookup example.com
+F: Cari alamat IP bagi domain example.com
+C: nak tahu IP example.com | example.com tu IP berapa
+R: nak check IP of example.com | lookup DNS example.com
+E: what is the IP of example.com | look up the DNS for example.com
+
+cmd: ping -c 1 192.168.1.10
+F: Uji sama ada 192.168.1.10 boleh dicapai
+C: nak check 192.168.1.10 hidup ke tak | server 192.168.1.10 on ke tak
+R: nak check 192.168.1.10 reachable ke tak | is 192.168.1.10 up
+E: check whether 192.168.1.10 is reachable | is 192.168.1.10 up
+
+cmd: python3 -m http.server 8000
+F: Mulakan pelayan web ringkas pada port 8000 yang menghidangkan direktori semasa
+C: nak share folder ni guna web server ringkas kat port 8000 | buat server http senang je untuk folder ni
+R: nak start simple http server port 8000 kat folder ni | serve this folder on port 8000
+E: start a simple web server on port 8000 for this folder | serve the current directory over http on port 8000
+
+## --- edit ------------------------------------------------------------------
+
+cmd: nano notes.txt
+F: Buka fail notes.txt dalam editor nano
+C: nak edit fail notes.txt | buka notes.txt guna nano | tolong buka notes.txt untuk aku ubah
+R: nak edit file notes.txt dengan nano | open notes.txt in nano | edit notes.txt
+E: edit notes.txt with nano | open notes.txt in nano | edit the file notes.txt
+
+cmd: nano config.yaml
+F: Buka config.yaml dalam nano
+C: nak edit config.yaml | buka config.yaml guna nano
+R: nak edit file config.yaml | open config.yaml with nano
+E: edit config.yaml in nano | open config.yaml for editing
+
+cmd: vim notes.txt
+F: Buka fail notes.txt dalam editor vim
+C: nak buka notes.txt guna vim | edit notes.txt dengan vim
+R: nak open notes.txt in vim | edit file notes.txt with vim
+E: open notes.txt in vim | edit notes.txt with vim
+
+cmd: code .
+F: Buka direktori semasa dalam VS Code
+C: nak buka folder ni dalam VS Code | buka vscode kat folder ni
+R: nak open this folder in VS Code | buka VS Code kat folder ni
+E: open this folder in VS Code | open the current directory in vscode
+
+cmd: sudo nano /etc/hosts
+F: Sunting fail /etc/hosts dengan kebenaran pentadbir
+C: nak edit /etc/hosts | buka fail /etc/hosts untuk ubah, kena sudo
+R: nak edit /etc/hosts with sudo | open /etc/hosts in nano as root
+E: edit /etc/hosts | open /etc/hosts in nano with sudo
+
+cmd: <Ctrl x>
+F: Keluar daripada editor nano
+C: macam mana nak keluar dari nano | nak tutup nano | nak exit nano
+R: nak exit nano | how to quit nano | keluar dari nano
+E: exit nano | how do I quit nano | close nano
+
+cmd: <Ctrl o>
+F: Simpan fail dalam nano tanpa keluar
+C: macam mana nak save dalam nano | nak simpan fail kat nano
+R: nak save file dalam nano | how to save in nano
+E: save the file in nano | how do I save in nano
+
+cmd: <Esc>:q<Enter>
+F: Keluar daripada vim
+C: macam mana nak keluar dari vim | nak exit vim | tolong, aku terperangkap dalam vim
+R: nak exit vim | how to quit vim | keluar vim macam mana | stuck in vim
+E: exit vim | how do I quit vim | get out of vim
+
+cmd: <Esc>:q!<Enter>
+F: Keluar daripada vim tanpa menyimpan perubahan
+C: nak keluar vim tanpa save | exit vim tapi jangan simpan apa-apa | keluar paksa dari vim
+R: nak exit vim without saving | force quit vim tanpa save | quit vim discard changes
+E: exit vim without saving | quit vim and discard changes | force quit vim
+
+cmd: <Esc>:wq<Enter>
+F: Simpan fail dan keluar daripada vim
+C: nak save dan keluar vim | simpan lepas tu exit vim | macam mana nak save dalam vim dan keluar
+R: nak save and exit vim | save file then quit vim | write and quit vim
+E: save and exit vim | save the file and quit vim | write and quit in vim
+
+cmd: <Ctrl c>
+F: Hentikan arahan yang sedang berjalan di terminal
+C: macam mana nak stop program yang tengah jalan kat terminal | nak cancel command yang tengah run | benda ni tak nak berhenti, macam mana nak stop
+R: nak stop command yang tengah running | how to cancel running command | cancel process kat terminal
+E: stop the running command | how do I cancel the current command | interrupt the running program
+
+cmd: <Ctrl z>
+F: Jeda arahan yang sedang berjalan dan hantar ke latar belakang
+C: nak pause program yang tengah jalan | hantar command ni ke background sekejap
+R: nak pause running command | suspend current process
+E: pause the running command | suspend the current program
+
+cmd: <Ctrl l>
+F: Kosongkan skrin terminal menggunakan pintasan papan kekunci
+C: shortcut nak clear terminal | key apa untuk kosongkan skrin terminal
+R: keyboard shortcut to clear terminal | shortcut clear screen
+E: keyboard shortcut to clear the terminal | which key clears the screen
+
+cmd: <Ctrl d>
+F: Keluar daripada shell dengan pintasan papan kekunci
+C: shortcut nak keluar terminal | key untuk logout dari shell
+R: shortcut to exit terminal | keyboard shortcut logout shell
+E: keyboard shortcut to exit the shell | key combination to log out of the terminal
+
+## --- terminal basics -------------------------------------------------------
+
+cmd: clear
+F: Kosongkan skrin terminal
+C: nak clear skrin terminal | kosongkan terminal ni | bersihkan skrin | terminal dah penuh, nak kosongkan
+R: nak clear terminal screen | clear screen | kosongkan terminal
+E: clear the terminal screen | clear the screen | clean up the terminal
+
+cmd: exit
+F: Keluar daripada terminal | Tutup sesi shell
+C: nak keluar dari terminal | tutup terminal ni | macam mana nak exit terminal
+R: nak exit terminal | close terminal | keluar dari shell
+E: exit the terminal | close the terminal | log out of this shell
+
+cmd: history
+F: Paparkan sejarah arahan yang pernah ditaip
+C: nak tengok command apa yang aku dah taip sebelum ni | tunjuk history command | apa yang aku run tadi
+R: nak tengok command history | show previous commands | apa command aku run tadi
+E: show my command history | list the commands I ran before | what commands did I type earlier
+
+cmd: history | grep ssh
+F: Cari arahan ssh dalam sejarah arahan
+C: nak cari command ssh yang aku pernah taip | history yang ada ssh je
+R: nak search command history for ssh | find ssh in history
+E: search my history for ssh commands | find previous ssh commands
+
+cmd: !!
+F: Ulang arahan terakhir
+C: nak ulang command tadi | jalankan balik command terakhir
+R: nak repeat last command | run previous command again
+E: repeat the last command | run the previous command again
+
+cmd: sudo !!
+F: Ulang arahan terakhir dengan sudo
+C: nak ulang command tadi tapi guna sudo | run balik command last dengan sudo
+R: nak rerun last command with sudo | repeat previous command as sudo
+E: rerun the last command with sudo | repeat the previous command as root
+
+cmd: man ls
+F: Paparkan manual bagi arahan ls
+C: nak baca manual ls | macam mana guna ls | tunjuk help untuk ls
+R: nak tengok manual for ls | how to use ls | show help ls
+E: show the manual for ls | how do I use ls | read the ls man page
+
+cmd: man tar
+F: Paparkan manual bagi arahan tar
+C: nak baca manual tar | tunjuk cara guna tar
+R: nak tengok manual tar | help for tar
+E: show the manual for tar | how does tar work
+
+cmd: tar --help
+F: Paparkan bantuan ringkas bagi tar
+C: nak tengok help tar cepat-cepat | tunjuk option tar
+R: nak quick help for tar | show tar options
+E: show tar help | list the options for tar
+
+cmd: whoami
+F: Paparkan nama pengguna semasa
+C: aku login sebagai siapa sekarang | nak tahu username aku | siapa aku dalam sistem ni
+R: nak check current user | who am I logged in as | show my username
+E: who am I logged in as | show my username | print the current user
+
+cmd: hostname
+F: Paparkan nama hos komputer ini
+C: nama komputer ni apa | nak tahu hostname laptop ni
+R: nak check hostname | what is this computer name
+E: what is this computer's name | show the hostname
+
+cmd: date
+F: Paparkan tarikh dan masa semasa
+C: nak tengok tarikh dan masa sekarang | sekarang pukul berapa | hari ni tarikh berapa
+R: nak check date and time sekarang | what time is it | show current date
+E: show the current date and time | what is the date today | what time is it
+
+cmd: cal
+F: Paparkan kalendar bulan ini
+C: nak tengok kalendar bulan ni | tunjuk kalendar
+R: nak tengok calendar bulan ni | show calendar
+E: show this month's calendar | display a calendar
+
+cmd: uname -a
+F: Paparkan maklumat sistem dan kernel
+C: nak tahu versi kernel dan sistem | info sistem komputer ni
+R: nak check kernel version dan system info | show system info
+E: show system and kernel information | what kernel am I running
+
+cmd: cat /etc/os-release
+F: Paparkan versi sistem pengendalian Linux
+C: nak tahu linux apa yang aku guna | versi OS ni apa
+R: nak check Linux version aku | which distro is this
+E: which Linux version am I running | show the OS version
+
+cmd: echo $SHELL
+F: Paparkan shell yang sedang digunakan
+C: nak tahu aku guna shell apa | shell aku bash ke zsh
+R: nak check shell apa aku guna | which shell am I using
+E: which shell am I using | show my current shell
+
+cmd: echo $PATH
+F: Paparkan pemboleh ubah PATH
+C: nak tengok PATH aku | tunjuk isi PATH
+R: nak check PATH variable | show my PATH
+E: show my PATH | print the PATH variable
+
+cmd: env
+F: Senaraikan semua pemboleh ubah persekitaran
+C: nak tengok semua environment variable | senarai env var
+R: nak list semua environment variable | show env vars
+E: list all environment variables | show the environment
+
+cmd: export API_KEY=abc123
+F: Tetapkan pemboleh ubah persekitaran API_KEY kepada abc123
+C: nak set environment variable API_KEY jadi abc123 | buat env var API_KEY=abc123
+R: nak set env var API_KEY to abc123 | export API_KEY abc123
+E: set the environment variable API_KEY to abc123 | export API_KEY as abc123
+
+cmd: echo $HOME
+F: Paparkan laluan direktori rumah
+C: nak tahu folder home aku kat mana | tunjuk path home
+R: nak check home directory path | where is my home folder
+E: show my home directory path | print $HOME
+
+cmd: echo "hello world"
+F: Cetak teks hello world ke terminal
+C: nak print hello world | tulis hello world kat terminal
+R: nak print hello world | echo hello world
+E: print hello world | echo hello world to the terminal
+
+cmd: alias ll='ls -la'
+F: Cipta alias ll bagi arahan ls -la
+C: nak buat shortcut ll untuk ls -la | set alias ll jadi ls -la
+R: nak create alias ll for ls -la | buat shortcut ll = ls -la
+E: create an alias ll for ls -la | make ll a shortcut for ls -la
+
+cmd: source ~/.bashrc
+F: Muat semula konfigurasi ~/.bashrc
+C: nak reload .bashrc lepas edit | apply balik bashrc tanpa tutup terminal
+R: nak reload bashrc | source .bashrc after edit
+E: reload my .bashrc | apply changes to .bashrc without restarting the terminal
+
+cmd: type ls
+F: Tunjukkan sama ada ls ialah alias, fungsi atau program
+C: nak tahu ls tu alias ke program sebenar | ls ni apa sebenarnya
+R: nak check ls tu alias ke binary | what is ls, alias or program
+E: is ls an alias or a program | show what ls actually is
+
+cmd: sleep 5
+F: Tunggu selama 5 saat
+C: nak tunggu 5 saat | delay 5 saat
+R: nak wait 5 seconds | sleep 5 saat
+E: wait for 5 seconds | pause for 5 seconds
+
+cmd: watch -n 2 df -h
+F: Jalankan df -h setiap 2 saat secara berulang
+C: nak tengok disk space update setiap 2 saat | monitor df -h tiap 2 saat
+R: nak monitor df -h every 2 seconds | watch disk space update
+E: run df -h every 2 seconds | watch disk space update every 2 seconds
+
+cmd: time ./script.sh
+F: Ukur masa yang diambil untuk menjalankan ./script.sh
+C: nak tahu berapa lama script.sh ambil masa untuk jalan | ukur masa run ./script.sh
+R: nak time how long ./script.sh takes | measure runtime script.sh
+E: measure how long ./script.sh takes to run | time the script script.sh
+
+cmd: ./script.sh
+F: Jalankan skrip script.sh dalam direktori semasa
+C: nak run script.sh | jalankan fail script.sh | macam mana nak run script.sh
+R: nak run script.sh | execute script.sh | jalankan script.sh
+E: run script.sh | execute the script script.sh | how do I run script.sh
+
+cmd: bash script.sh
+F: Jalankan script.sh menggunakan bash
+C: nak run script.sh guna bash | jalankan script.sh dengan bash
+R: nak run script.sh with bash | execute script.sh using bash
+E: run script.sh with bash | execute script.sh using bash
+
+cmd: python3 main.py
+F: Jalankan skrip Python main.py
+C: nak run fail python main.py | jalankan main.py | macam mana nak run python file main.py
+R: nak run python file main.py | execute main.py | run main.py dengan python3
+E: run main.py with python | execute the python script main.py | run main.py
+
+cmd: python3
+F: Buka shell interaktif Python
+C: nak buka python kat terminal | masuk python interactive
+R: nak open python shell | start python interpreter
+E: open the python interactive shell | start python in the terminal
+
+cmd: python3 --version
+F: Paparkan versi Python yang dipasang
+C: nak tahu versi python aku | python aku versi berapa
+R: nak check python version | which python version do I have
+E: check the python version | which version of python is installed
+
+cmd: node app.js
+F: Jalankan app.js dengan Node.js
+C: nak run app.js guna node | jalankan fail app.js
+R: nak run app.js with node | execute app.js
+E: run app.js with node | execute the node script app.js
+
+cmd: java -jar app.jar
+F: Jalankan fail app.jar dengan Java
+C: nak run fail app.jar | jalankan app.jar guna java
+R: nak run app.jar | execute jar file app.jar
+E: run app.jar | execute the jar file app.jar
+
+## --- text processing -------------------------------------------------------
+
+cmd: sort names.txt
+F: Susun baris dalam fail names.txt mengikut abjad
+C: nak susun isi names.txt ikut abjad | sort fail names.txt
+R: nak sort file names.txt alphabetically | susun names.txt ikut abjad
+E: sort the lines in names.txt alphabetically | sort names.txt
+
+cmd: sort -n numbers.txt
+F: Susun baris dalam numbers.txt mengikut nilai nombor
+C: nak susun nombor dalam numbers.txt dari kecil ke besar | sort numbers.txt ikut nombor
+R: nak sort numbers.txt numerically | susun file numbers.txt by number
+E: sort numbers.txt numerically | sort the numbers in numbers.txt from smallest to largest
+
+cmd: sort names.txt | uniq
+F: Buang baris berulang dalam names.txt selepas menyusunnya
+C: nak buang baris yang berulang dalam names.txt | tunjuk names.txt tanpa duplicate
+R: nak remove duplicate lines dalam names.txt | show unique lines in names.txt
+E: remove duplicate lines from names.txt | show unique lines in names.txt
+
+cmd: sort names.txt | uniq -c
+F: Kira berapa kali setiap baris muncul dalam names.txt
+C: nak kira berapa kali setiap nama muncul dalam names.txt | count setiap baris dalam names.txt
+R: nak count occurrence setiap line dalam names.txt | how many times each name appears in names.txt
+E: count how many times each line appears in names.txt | count occurrences of each name in names.txt
+
+cmd: cut -d, -f1 data.csv
+F: Ambil lajur pertama daripada fail CSV data.csv
+C: nak ambil column pertama je dari data.csv | tunjuk lajur pertama fail data.csv
+R: nak extract first column dari data.csv | show column 1 of data.csv
+E: get the first column of data.csv | print only column 1 from data.csv
+
+cmd: sed -i 's/foo/bar/g' notes.txt
+F: Ganti semua foo dengan bar dalam fail notes.txt
+C: nak tukar semua foo jadi bar dalam notes.txt | replace foo dengan bar dalam fail notes.txt
+R: nak replace semua foo with bar dalam notes.txt | find and replace foo to bar in notes.txt
+E: replace all foo with bar in notes.txt | find and replace foo with bar in notes.txt
+
+cmd: sed -n '5,10p' notes.txt
+F: Paparkan baris 5 hingga 10 daripada notes.txt
+C: nak tengok baris 5 sampai 10 dalam notes.txt | tunjuk baris 5-10 fail notes.txt
+R: nak print line 5 to 10 dari notes.txt | show baris 5 sampai 10 notes.txt
+E: print lines 5 to 10 of notes.txt | show lines 5 through 10 from notes.txt
+
+cmd: awk '{print $1}' data.txt
+F: Cetak lajur pertama daripada setiap baris data.txt
+C: nak print perkataan pertama setiap baris data.txt | ambil column pertama data.txt guna awk
+R: nak print first column data.txt with awk | show column 1 data.txt
+E: print the first column of data.txt | show the first field of every line in data.txt
+
+cmd: diff old.txt new.txt
+F: Bandingkan fail old.txt dan new.txt
+C: nak tengok beza antara old.txt dengan new.txt | apa yang berubah dari old.txt ke new.txt
+R: nak compare old.txt and new.txt | show difference between old.txt dan new.txt
+E: compare old.txt and new.txt | show the differences between old.txt and new.txt
+
+cmd: cat a.txt b.txt > combined.txt
+F: Gabungkan fail a.txt dan b.txt menjadi combined.txt
+C: nak gabung a.txt dengan b.txt jadi satu fail combined.txt | cantumkan a.txt dan b.txt
+R: nak combine a.txt and b.txt into combined.txt | merge a.txt dan b.txt jadi combined.txt
+E: combine a.txt and b.txt into combined.txt | merge two files a.txt and b.txt into one
+
+cmd: tr 'a-z' 'A-Z' < notes.txt
+F: Tukar semua huruf dalam notes.txt kepada huruf besar
+C: nak tukar isi notes.txt jadi huruf besar semua | buat notes.txt uppercase
+R: nak convert notes.txt to uppercase | tukar notes.txt jadi capital letters
+E: convert notes.txt to uppercase | print notes.txt in capital letters
+
+cmd: rev names.txt
+F: Terbalikkan setiap baris dalam names.txt
+C: nak terbalikkan setiap baris names.txt | reverse tulisan dalam names.txt
+R: nak reverse each line dalam names.txt | reverse names.txt
+E: reverse each line of names.txt | print names.txt with every line reversed
+
+cmd: ls > files.txt
+F: Simpan senarai fail dalam direktori ini ke dalam files.txt
+C: nak simpan senarai fail kat sini masuk fail files.txt | save output ls ke files.txt
+R: nak save list of files into files.txt | redirect ls output to files.txt
+E: save the list of files here to files.txt | write the ls output to files.txt
+
+cmd: ls | grep txt
+F: Senaraikan fail yang namanya mengandungi txt
+C: nak tengok fail yang nama dia ada txt je | tapis senarai fail yang ada txt
+R: nak filter list file yang ada txt | list files containing txt in name
+E: list files whose name contains txt | filter the file list for txt
+
+## --- system / packages -----------------------------------------------------
+
+cmd: sudo apt update
+F: Kemas kini senarai pakej apt
+C: nak update senarai package apt | tolong apt update
+R: nak update apt package list | run apt update
+E: update the apt package list | refresh apt
+
+cmd: sudo apt upgrade
+F: Naik taraf semua pakej yang dipasang
+C: nak upgrade semua software yang dah install | update semua package
+R: nak upgrade all installed packages | apt upgrade everything
+E: upgrade all installed packages | upgrade the system with apt
+
+cmd: sudo apt install git
+F: Pasang git menggunakan apt
+C: nak install git | tolong pasang git | macam mana nak install git kat ubuntu
+R: nak install git guna apt | install git on ubuntu | pasang git
+E: install git | install git with apt | how do I install git on ubuntu
+
+cmd: sudo apt install python3-pip
+F: Pasang pip untuk Python 3 menggunakan apt
+C: nak install pip | pasang python3-pip
+R: nak install pip for python3 | install python3-pip
+E: install pip for python3 | install python3-pip with apt
+
+cmd: sudo apt remove firefox
+F: Nyahpasang firefox menggunakan apt
+C: nak buang firefox dari sistem | uninstall firefox | nak remove firefox
+R: nak uninstall firefox | remove firefox with apt | buang firefox
+E: uninstall firefox | remove firefox with apt
+
+cmd: apt search vlc
+F: Cari pakej vlc dalam repositori apt
+C: nak cari package vlc ada tak dalam apt | search vlc dalam apt
+R: nak search package vlc in apt | is vlc available in apt
+E: search apt for vlc | is vlc available to install
+
+cmd: sudo dnf install git
+F: Pasang git menggunakan dnf pada Fedora
+C: nak install git kat fedora | pasang git guna dnf
+R: nak install git on fedora | dnf install git
+E: install git on fedora | install git with dnf
+
+cmd: sudo pacman -S git
+F: Pasang git menggunakan pacman pada Arch Linux
+C: nak install git kat arch | pasang git guna pacman
+R: nak install git on arch linux | pacman install git
+E: install git on arch | install git with pacman
+
+cmd: brew install git
+F: Pasang git menggunakan Homebrew pada macOS
+C: nak install git kat mac | pasang git guna brew
+R: nak install git on mac | brew install git
+E: install git on macOS | install git with homebrew
+
+cmd: pip install requests
+F: Pasang pustaka Python requests
+C: nak install library python requests | pasang requests guna pip
+R: nak pip install requests | install python package requests
+E: install the python package requests | pip install requests
+
+cmd: pip install -r requirements.txt
+F: Pasang semua pustaka yang disenaraikan dalam requirements.txt
+C: nak install semua library dalam requirements.txt | pasang dependency dari requirements.txt
+R: nak install semua package dari requirements.txt | pip install from requirements.txt
+E: install everything in requirements.txt | install python dependencies from requirements.txt
+
+cmd: pip list
+F: Senaraikan pakej Python yang dipasang
+C: nak tengok library python apa yang dah install | senarai package pip
+R: nak list installed python packages | show pip packages
+E: list installed python packages | show what pip has installed
+
+cmd: npm install
+F: Pasang semua kebergantungan projek daripada package.json
+C: nak install semua dependency projek node ni | npm install je
+R: nak install node dependencies | run npm install for this project
+E: install the project's node dependencies | install packages from package.json
+
+cmd: npm install express
+F: Pasang pakej express menggunakan npm
+C: nak install express | pasang package express guna npm
+R: nak npm install express | install express package
+E: install express with npm | add the express package
+
+cmd: sudo reboot
+F: Mulakan semula komputer
+C: nak restart komputer | reboot laptop ni | restart balik pc
+R: nak restart computer | reboot laptop | restart pc from terminal
+E: restart the computer | reboot the machine | restart from the terminal
+
+cmd: sudo shutdown now
+F: Matikan komputer sekarang
+C: nak tutup komputer sekarang | shutdown laptop | matikan pc terus
+R: nak shutdown computer now | turn off laptop | shutdown terus
+E: shut down the computer now | turn off the machine | power off now
+
+cmd: sudo shutdown -h +10
+F: Matikan komputer dalam masa 10 minit
+C: nak shutdown komputer 10 minit lagi | tutup pc dalam 10 minit
+R: nak shutdown in 10 minutes | schedule shutdown 10 minit lagi
+E: shut down in 10 minutes | schedule a shutdown for 10 minutes from now
+
+cmd: shutdown -c
+F: Batalkan penutupan yang dijadualkan
+C: nak batal shutdown yang aku set tadi | cancel shutdown
+R: nak cancel scheduled shutdown | batalkan shutdown
+E: cancel the scheduled shutdown | abort the shutdown
+
+cmd: sudo systemctl restart nginx
+F: Mulakan semula perkhidmatan nginx
+C: nak restart nginx | restart service nginx
+R: nak restart nginx service | restart nginx
+E: restart nginx | restart the nginx service
+
+cmd: sudo systemctl start docker
+F: Mulakan perkhidmatan docker
+C: nak start docker | hidupkan service docker
+R: nak start docker service | start docker
+E: start docker | start the docker service
+
+cmd: sudo systemctl stop apache2
+F: Hentikan perkhidmatan apache2
+C: nak stop apache2 | matikan service apache2
+R: nak stop apache2 service | stop apache
+E: stop apache2 | stop the apache2 service
+
+cmd: systemctl status nginx
+F: Semak status perkhidmatan nginx
+C: nak tengok nginx jalan ke tak | status service nginx
+R: nak check nginx status | is nginx running
+E: check the status of nginx | is nginx running
+
+cmd: sudo systemctl enable docker
+F: Aktifkan docker supaya bermula secara automatik semasa boot
+C: nak buat docker auto start bila boot | enable docker masa startup
+R: nak enable docker on boot | make docker start automatically
+E: make docker start on boot | enable the docker service at startup
+
+cmd: passwd
+F: Tukar kata laluan pengguna semasa
+C: nak tukar password aku | ubah kata laluan
+R: nak change my password | tukar password
+E: change my password | update my login password
+
+cmd: sudo useradd -m ali
+F: Cipta pengguna baharu bernama ali beserta direktori rumahnya
+C: nak buat user baru nama ali | tambah pengguna ali | cipta akaun ali
+R: nak create new user ali | add user ali | buat user ali
+E: create a new user called ali | add a user named ali
+
+cmd: sudo passwd ali
+F: Tetapkan kata laluan bagi pengguna ali
+C: nak set password untuk user ali | tukar password ali
+R: nak set password for user ali | change ali's password
+E: set a password for user ali | change the password of ali
+
+cmd: sudo userdel -r ali
+F: Padam pengguna ali beserta direktori rumahnya
+C: nak buang user ali sekali dengan folder home dia | delete akaun ali
+R: nak delete user ali with home folder | remove user ali
+E: delete the user ali and their home folder | remove the user ali
+
+cmd: sudo usermod -aG docker ariff
+F: Tambah pengguna ariff ke dalam kumpulan docker
+C: nak masukkan ariff dalam group docker | tambah user ariff ke kumpulan docker
+R: nak add ariff to docker group | add user ariff into group docker
+E: add ariff to the docker group | put user ariff in the docker group
+
+cmd: su - ali
+F: Tukar kepada pengguna ali
+C: nak tukar jadi user ali | login sebagai ali
+R: nak switch to user ali | login as ali
+E: switch to user ali | log in as ali
+
+cmd: sudo -i
+F: Buka shell sebagai root
+C: nak masuk sebagai root | jadi root sekejap
+R: nak become root | open root shell
+E: become root | open a root shell
+
+cmd: id
+F: Paparkan ID pengguna dan kumpulan semasa
+C: nak tahu user id dan group aku | tunjuk id aku
+R: nak check my user id and groups | show my uid and gid
+E: show my user id and groups | print my uid and gid
+
+cmd: groups
+F: Senaraikan kumpulan yang pengguna semasa anggotai
+C: nak tengok aku dalam group apa | senarai group aku
+R: nak check what groups I am in | list my groups
+E: what groups am I in | list my groups
+
+cmd: who
+F: Senaraikan pengguna yang sedang log masuk
+C: siapa yang tengah login kat komputer ni | nak tengok user yang tengah on
+R: nak check who is logged in | siapa yang login sekarang
+E: who is logged in | show logged in users
+
+cmd: lscpu
+F: Paparkan maklumat CPU
+C: nak tahu CPU komputer ni apa | tunjuk info processor
+R: nak check CPU info | what CPU do I have
+E: show CPU information | what processor is this
+
+cmd: nproc
+F: Paparkan bilangan teras CPU
+C: berapa core CPU laptop ni | nak tahu berapa banyak core
+R: nak check how many CPU cores | berapa core ada
+E: how many CPU cores do I have | show the number of cores
+
+cmd: crontab -e
+F: Sunting jadual cron pengguna semasa
+C: nak edit crontab aku | buka cron untuk set jadual
+R: nak edit my crontab | open crontab editor
+E: edit my crontab | open the cron schedule for editing
+
+cmd: crontab -l
+F: Senaraikan kerja cron pengguna semasa
+C: nak tengok cron job aku apa | senarai crontab
+R: nak list my cron jobs | show crontab
+E: list my cron jobs | show my crontab
+
+cmd: journalctl -xe
+F: Paparkan log sistem terkini beserta penjelasan
+C: nak tengok log sistem yang terbaru | tunjuk system log
+R: nak check system log terkini | show recent system logs
+E: show recent system logs | view the latest journal entries
+
+cmd: dmesg | tail
+F: Paparkan mesej kernel terkini
+C: nak tengok mesej kernel yang terbaru | tunjuk log kernel akhir
+R: nak check latest kernel messages | show dmesg tail
+E: show the latest kernel messages | view recent dmesg output
+
+## --- git -------------------------------------------------------------------
+
+cmd: git init
+F: Mulakan repositori git baharu dalam direktori semasa
+C: nak buat repo git baru kat folder ni | mula git kat sini | git init folder ni
+R: nak init git repo kat folder ni | start new git repo | initialise git here
+E: start a new git repository here | initialise git in this folder | git init
+
+cmd: git clone https://github.com/user/repo.git
+F: Klon repositori https://github.com/user/repo.git
+C: nak clone repo https://github.com/user/repo.git | download repo git https://github.com/user/repo.git | tolong ambil repo ni https://github.com/user/repo.git
+R: nak clone https://github.com/user/repo.git | git clone repo https://github.com/user/repo.git | download github repo https://github.com/user/repo.git
+E: clone https://github.com/user/repo.git | download the repository https://github.com/user/repo.git | git clone https://github.com/user/repo.git
+
+cmd: git status
+F: Paparkan status repositori git
+C: nak tengok status git | fail mana yang aku dah ubah | apa yang berubah dalam repo ni
+R: nak check git status | show git status | file mana yang changed
+E: show git status | which files have I changed | check the repository status
+
+cmd: git add .
+F: Tambah semua perubahan ke kawasan pentas git
+C: nak add semua fail yang berubah | stage semua perubahan | git add semua
+R: nak stage semua changes | git add semua file | add all changes to git
+E: stage all changes | git add everything | add all files to the commit
+
+cmd: git add notes.txt
+F: Tambah fail notes.txt ke kawasan pentas git
+C: nak add fail notes.txt je ke git | stage notes.txt
+R: nak git add notes.txt | stage file notes.txt only
+E: stage notes.txt | git add only notes.txt
+
+cmd: git commit -m "fix typo"
+F: Buat commit dengan mesej fix typo
+C: nak commit dengan mesej fix typo | git commit mesej "fix typo" | tolong commit, mesej dia fix typo
+R: nak commit with message fix typo | git commit -m fix typo | commit changes mesej "fix typo"
+E: commit with the message fix typo | make a commit saying fix typo | git commit with message "fix typo"
+
+cmd: git commit -am "update readme"
+F: Tambah semua fail yang dijejak dan commit dengan mesej update readme
+C: nak add dan commit sekali gus dengan mesej update readme | commit semua perubahan mesej update readme
+R: nak add and commit together with message update readme | commit all tracked changes "update readme"
+E: add and commit all tracked files with message update readme | commit everything with the message "update readme"
+
+cmd: git push
+F: Tolak commit ke repositori jauh
+C: nak push ke github | hantar commit aku ke remote | git push
+R: nak push to github | push my commits | git push changes
+E: push to github | push my commits to the remote | git push
+
+cmd: git push -u origin main
+F: Tolak cabang main ke origin dan tetapkannya sebagai cabang jejak
+C: nak push branch main ke origin kali pertama | push main ke github, set upstream sekali
+R: nak push main branch to origin first time | push to origin main and set upstream
+E: push the main branch to origin and set upstream | first push of main to origin
+
+cmd: git pull
+F: Tarik perubahan terkini daripada repositori jauh
+C: nak pull perubahan terbaru dari github | ambil update dari remote | git pull
+R: nak pull latest changes from github | get latest from remote | git pull
+E: pull the latest changes | get updates from the remote | git pull
+
+cmd: git log
+F: Paparkan sejarah commit
+C: nak tengok history commit | senarai commit yang lepas | tunjuk log git
+R: nak check commit history | show git log | list previous commits
+E: show the commit history | view git log | list past commits
+
+cmd: git log --oneline
+F: Paparkan sejarah commit dalam satu baris setiap commit
+C: nak tengok history commit ringkas satu baris | git log pendek je
+R: nak check git log one line each | short commit history
+E: show a compact commit history | git log one line per commit
+
+cmd: git diff
+F: Paparkan perubahan yang belum dipentaskan
+C: nak tengok apa yang aku ubah tapi belum add | tunjuk beza dengan commit terakhir
+R: nak check what I changed, unstaged | show git diff
+E: show my unstaged changes | what have I changed since the last commit
+
+cmd: git branch
+F: Senaraikan cabang tempatan
+C: nak tengok branch apa yang ada | senarai branch git | aku kat branch mana
+R: nak list git branches | show all branch | which branch am I on
+E: list the branches | show all git branches | which branch am I on
+
+cmd: git checkout -b feature-login
+F: Cipta cabang baharu feature-login dan bertukar kepadanya
+C: nak buat branch baru nama feature-login | cipta branch feature-login dan masuk terus
+R: nak create new branch feature-login | buat branch feature-login and switch to it
+E: create a new branch called feature-login and switch to it | make a branch feature-login
+
+cmd: git checkout main
+F: Bertukar ke cabang main
+C: nak tukar ke branch main | balik ke main
+R: nak switch to main branch | checkout main
+E: switch to the main branch | go back to main
+
+cmd: git switch dev
+F: Bertukar ke cabang dev
+C: nak pindah ke branch dev | tukar branch ke dev
+R: nak switch branch to dev | go to dev branch
+E: switch to the dev branch | change to branch dev
+
+cmd: git merge dev
+F: Gabungkan cabang dev ke dalam cabang semasa
+C: nak merge branch dev masuk branch ni | gabung dev ke sini
+R: nak merge dev into current branch | merge branch dev
+E: merge the dev branch into the current branch | git merge dev
+
+cmd: git stash
+F: Simpan sementara perubahan yang belum dicommit
+C: nak simpan sementara perubahan aku, nak tukar branch | stash perubahan dulu
+R: nak stash my changes | save changes temporarily before switching branch
+E: stash my changes | temporarily save uncommitted changes
+
+cmd: git stash pop
+F: Kembalikan perubahan yang disimpan sementara
+C: nak ambil balik perubahan yang aku stash tadi | apply balik stash
+R: nak restore stashed changes | pop the stash
+E: bring back my stashed changes | apply the last stash
+
+cmd: git reset --hard
+F: Buang semua perubahan tempatan dan kembali ke commit terakhir
+C: nak buang semua perubahan aku, balik ke commit terakhir | reset semua balik macam asal
+R: nak discard all local changes | reset everything to last commit
+E: discard all local changes | reset everything to the last commit
+
+cmd: git checkout -- notes.txt
+F: Buang perubahan tempatan pada notes.txt
+C: nak batalkan perubahan aku kat notes.txt | balik notes.txt macam commit terakhir
+R: nak discard changes to notes.txt | revert file notes.txt to last commit
+E: discard my changes to notes.txt | restore notes.txt from the last commit
+
+cmd: git remote -v
+F: Senaraikan repositori jauh
+C: nak tengok remote git aku point ke mana | senarai remote
+R: nak check git remote url | show remote repositories
+E: show the remote repositories | which remote is this repo pointing to
+
+cmd: git remote add origin https://github.com/user/repo.git
+F: Tambah remote origin yang menghala ke https://github.com/user/repo.git
+C: nak set remote origin ke https://github.com/user/repo.git | tambah remote github https://github.com/user/repo.git
+R: nak add remote origin https://github.com/user/repo.git | set github remote to https://github.com/user/repo.git
+E: add a remote called origin pointing to https://github.com/user/repo.git | set the origin remote to https://github.com/user/repo.git
+
+cmd: git config --global user.name "Ariff"
+F: Tetapkan nama pengguna git global kepada Ariff
+C: nak set nama git aku jadi Ariff | tetapkan git user.name Ariff
+R: nak set git username to Ariff | configure git name Ariff
+E: set my git username to Ariff | configure the global git user.name as Ariff
+
+cmd: git config --global user.email "ariff@example.com"
+F: Tetapkan emel git global kepada ariff@example.com
+C: nak set email git aku ariff@example.com | tetapkan git user.email
+R: nak set git email to ariff@example.com | configure git email
+E: set my git email to ariff@example.com | configure the global git email
+
+cmd: git rm --cached secrets.env
+F: Berhenti menjejak secrets.env tanpa memadamnya daripada cakera
+C: nak buang secrets.env dari git tapi jangan padam fail | untrack secrets.env
+R: nak remove secrets.env from git without deleting file | untrack file secrets.env
+E: stop tracking secrets.env but keep the file | remove secrets.env from git without deleting it
+
+cmd: git tag v1.0
+F: Tandakan commit semasa sebagai v1.0
+C: nak tag commit ni v1.0 | buat tag v1.0
+R: nak create tag v1.0 | tag current commit v1.0
+E: tag this commit as v1.0 | create a git tag v1.0
+
+## --- docker ----------------------------------------------------------------
+
+cmd: docker ps
+F: Senaraikan container docker yang sedang berjalan
+C: nak tengok container docker yang tengah jalan | senarai docker container
+R: nak list running docker containers | show docker ps
+E: list running docker containers | show which containers are running
+
+cmd: docker ps -a
+F: Senaraikan semua container docker termasuk yang telah berhenti
+C: nak tengok semua container termasuk yang dah stop | senarai semua docker container
+R: nak list all docker containers including stopped | show all containers
+E: list all docker containers including stopped ones | show every container
+
+cmd: docker images
+F: Senaraikan imej docker yang tersedia
+C: nak tengok image docker apa yang ada | senarai docker image
+R: nak list docker images | show downloaded images
+E: list docker images | show the docker images I have
+
+cmd: docker run -it ubuntu bash
+F: Jalankan container ubuntu secara interaktif dengan bash
+C: nak masuk container ubuntu guna bash | run ubuntu dalam docker dan buka shell
+R: nak run ubuntu container interactive dengan bash | open bash inside ubuntu docker
+E: run an ubuntu container with an interactive bash shell | start ubuntu in docker and open bash
+
+cmd: docker stop web
+F: Hentikan container docker bernama web
+C: nak stop container web | matikan docker container web
+R: nak stop docker container web | stop container web
+E: stop the docker container web | stop container named web
+
+cmd: docker rm web
+F: Padam container docker bernama web
+C: nak buang container web | delete docker container web
+R: nak remove docker container web | delete container web
+E: remove the docker container web | delete the container named web
+
+cmd: docker rmi nginx
+F: Padam imej docker nginx
+C: nak buang image docker nginx | delete image nginx
+R: nak delete docker image nginx | remove nginx image
+E: delete the docker image nginx | remove the nginx image
+
+cmd: docker logs web
+F: Paparkan log container docker bernama web
+C: nak tengok log container web | tunjuk output docker container web
+R: nak check logs of container web | show docker logs web
+E: show logs of the docker container web | view docker logs for web
+
+cmd: docker exec -it web bash
+F: Buka shell bash di dalam container web yang sedang berjalan
+C: nak masuk dalam container web yang tengah jalan | buka bash dalam container web
+R: nak exec into container web | open shell inside running container web
+E: open a shell inside the running container web | exec into the container web
+
+cmd: docker compose up -d
+F: Mulakan perkhidmatan docker compose di latar belakang
+C: nak start docker compose kat background | jalankan docker compose up detach
+R: nak run docker compose up in background | start compose services detached
+E: start docker compose in the background | run docker compose up detached
+
+cmd: docker compose down
+F: Hentikan dan padam perkhidmatan docker compose
+C: nak stop semua service docker compose | matikan docker compose
+R: nak stop docker compose services | bring down docker compose
+E: stop the docker compose services | bring down docker compose
+
+cmd: docker system prune
+F: Buang container, rangkaian dan imej docker yang tidak digunakan
+C: nak bersihkan docker, buang benda yang tak guna | clear docker sampah
+R: nak clean up unused docker stuff | prune docker
+E: clean up unused docker containers and images | prune docker
+
+## --- misc beginner ---------------------------------------------------------
+
+cmd: ln -s /opt/app/config.yaml config.yaml
+F: Cipta pautan simbolik config.yaml yang menghala ke /opt/app/config.yaml
+C: nak buat shortcut config.yaml yang tuju ke /opt/app/config.yaml | buat symlink ke /opt/app/config.yaml
+R: nak create symlink config.yaml to /opt/app/config.yaml | make shortcut link ke /opt/app/config.yaml
+E: create a symlink config.yaml pointing to /opt/app/config.yaml | make a symbolic link to /opt/app/config.yaml
+
+cmd: mktemp
+F: Cipta fail sementara
+C: nak buat fail sementara | buat temp file
+R: nak create temp file | make a temporary file
+E: create a temporary file | make a temp file
+
+cmd: mktemp -d
+F: Cipta direktori sementara
+C: nak buat folder sementara | buat temp folder
+R: nak create temp folder | make a temporary directory
+E: create a temporary directory | make a temp folder
+
+cmd: basename /home/ariff/notes.txt
+F: Ambil nama fail sahaja daripada laluan /home/ariff/notes.txt
+C: nak ambil nama fail je dari /home/ariff/notes.txt | buang path, tinggal nama fail
+R: nak get filename only from /home/ariff/notes.txt | strip path from /home/ariff/notes.txt
+E: get just the filename from /home/ariff/notes.txt | strip the directory from /home/ariff/notes.txt
+
+cmd: realpath notes.txt
+F: Paparkan laluan penuh fail notes.txt
+C: nak tahu path penuh notes.txt | full path fail notes.txt apa
+R: nak get full path of notes.txt | show absolute path notes.txt
+E: show the full path of notes.txt | print the absolute path to notes.txt
+
+cmd: md5sum file.iso
+F: Kira hash MD5 bagi file.iso
+C: nak check md5 file.iso | kira md5 fail file.iso
+R: nak get md5 hash of file.iso | check md5 file.iso
+E: get the md5 hash of file.iso | compute md5sum of file.iso
+
+cmd: sha256sum file.iso
+F: Kira hash SHA256 bagi file.iso
+C: nak check sha256 file.iso | kira checksum sha256 fail file.iso
+R: nak verify sha256 of file.iso | get sha256 hash file.iso
+E: compute the sha256 checksum of file.iso | verify file.iso with sha256sum
+
+cmd: xdg-open report.pdf
+F: Buka report.pdf dengan aplikasi lalai
+C: nak buka report.pdf dengan program biasa | buka fail report.pdf macam double click
+R: nak open report.pdf with default app | open report.pdf from terminal
+E: open report.pdf with the default application | open report.pdf from the terminal
+
+cmd: xdg-open .
+F: Buka direktori semasa dalam pengurus fail
+C: nak buka folder ni dalam file manager | buka folder ni macam biasa
+R: nak open this folder in file manager | open current folder in GUI
+E: open this folder in the file manager | open the current directory in the GUI
+
+cmd: open .
+F: Buka direktori semasa dalam Finder pada macOS
+C: nak buka folder ni dalam Finder | buka finder kat folder ni (mac)
+R: nak open this folder in Finder | open current folder in Finder mac
+E: open this folder in Finder | open the current directory in Finder on macOS
+
+cmd: seq 1 10
+F: Cetak nombor 1 hingga 10
+C: nak print nombor 1 sampai 10 | tunjuk nombor satu ke sepuluh
+R: nak print numbers 1 to 10 | list nombor 1 sampai 10
+E: print the numbers 1 to 10 | count from 1 to 10
+
+cmd: yes | head -n 5
+F: Cetak perkataan y sebanyak lima kali
+C: nak print y lima kali | tulis y 5 baris
+R: nak print y 5 times | output y five times
+E: print y five times | output five lines of y
+
+cmd: bc
+F: Buka kalkulator di terminal
+C: nak guna kalkulator kat terminal | buka calculator
+R: nak open calculator in terminal | run bc calculator
+E: open a calculator in the terminal | start bc
+
+cmd: echo $((5 + 3))
+F: Kira 5 tambah 3 di terminal
+C: nak kira 5 tambah 3 kat terminal | berapa 5 + 3
+R: nak calculate 5 + 3 in terminal | compute 5 plus 3
+E: calculate 5 + 3 in the terminal | what is 5 plus 3
+
+cmd: cat /etc/passwd
+F: Paparkan senarai pengguna sistem
+C: nak tengok senarai user kat komputer ni | tunjuk semua user
+R: nak list all users on this system | show system users
+E: list all users on the system | show the passwd file
+
+cmd: last
+F: Paparkan sejarah log masuk pengguna
+C: nak tengok siapa yang login sebelum ni | history login
+R: nak check login history | who logged in before
+E: show the login history | who logged in recently
+
+cmd: touch -t 202601010000 notes.txt
+F: Tetapkan cap masa notes.txt kepada 1 Januari 2026
+C: nak tukar tarikh fail notes.txt jadi 1 Jan 2026 | set timestamp notes.txt
+R: nak change timestamp notes.txt to 1 Jan 2026 | set modified date notes.txt
+E: set the timestamp of notes.txt to 1 January 2026 | change the modified date of notes.txt
+
+cmd: cp -r Documents/ /media/usb/
+F: Salin direktori Documents ke pemacu USB di /media/usb
+C: nak copy folder Documents masuk pendrive kat /media/usb | backup Documents ke usb
+R: nak copy Documents folder to usb /media/usb | backup Documents ke pendrive
+E: copy the Documents folder to the usb drive at /media/usb | back up Documents to the usb stick
+
+cmd: umount /media/usb
+F: Nyahlekap pemacu USB di /media/usb
+C: nak eject pendrive kat /media/usb | cabut usb dengan selamat
+R: nak unmount usb /media/usb | safely eject pendrive
+E: unmount the usb drive at /media/usb | safely eject the usb stick
+
+cmd: lsusb
+F: Senaraikan peranti USB yang disambungkan
+C: nak tengok apa usb yang tersambung | senarai peranti usb
+R: nak list connected usb devices | show usb devices
+E: list connected usb devices | show what usb devices are plugged in
+
+cmd: xclip -selection clipboard < notes.txt
+F: Salin kandungan notes.txt ke papan keratan
+C: nak copy isi notes.txt ke clipboard | salin notes.txt untuk paste
+R: nak copy content notes.txt to clipboard | copy notes.txt into clipboard
+E: copy the contents of notes.txt to the clipboard | put notes.txt on the clipboard
+
+cmd: cat notes.txt | pbcopy
+F: Salin kandungan notes.txt ke papan keratan pada macOS
+C: nak copy isi notes.txt ke clipboard kat mac | salin notes.txt guna pbcopy
+R: nak copy notes.txt to clipboard on mac | pbcopy notes.txt
+E: copy notes.txt to the clipboard on macOS | pipe notes.txt into pbcopy
+
+cmd: convert photo.png photo.jpg
+F: Tukar photo.png kepada format JPG
+C: nak tukar photo.png jadi jpg | convert gambar png ke jpg
+R: nak convert photo.png to jpg | tukar format photo.png jadi jpg
+E: convert photo.png to jpg | change photo.png into a jpg
+
+cmd: ffmpeg -i video.mp4 audio.mp3
+F: Ekstrak audio daripada video.mp4 ke audio.mp3
+C: nak ambil audio dari video.mp4 jadi mp3 | tukar video.mp4 ke audio.mp3
+R: nak extract audio from video.mp4 to mp3 | convert video.mp4 to audio.mp3
+E: extract the audio from video.mp4 to audio.mp3 | convert video.mp4 into an mp3
+
+cmd: yt-dlp https://youtube.com/watch?v=abc123
+F: Muat turun video dari https://youtube.com/watch?v=abc123
+C: nak download video youtube https://youtube.com/watch?v=abc123 | ambil video dari https://youtube.com/watch?v=abc123
+R: nak download youtube video https://youtube.com/watch?v=abc123 | yt-dlp https://youtube.com/watch?v=abc123
+E: download the youtube video https://youtube.com/watch?v=abc123 | save the video at https://youtube.com/watch?v=abc123
