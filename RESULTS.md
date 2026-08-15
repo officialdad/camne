@@ -347,3 +347,142 @@ which nothing in the pool teaches — issue #41 work item 2.
 
 Baselines were re-probed on the expanded grid rather than compared against
 their old 85-prompt numbers.
+
+### Scorer fix, applied before reading any number
+
+The embed backend behind the scorer (`embed_shim.py`, standing in for the
+Ollama install the scorer hardcodes) answered any input past 512 tokens with
+a 500, and the scorer counts that as a wrong answer. Ollama truncates and
+embeds the head. 14 of run 7's 900 tasks hit it, 29 of run 6's, and every
+earlier run some number nobody counted, always on the tasks whose command
+output is long. The shim now truncates the way Ollama does, and every file
+below was **re-scored** with it — run 4, run 7 and the whatisit model, all
+three registers. Earlier sections keep their original numbers; they compare
+like with like and the fix moves 1–7 tasks per file.
+
+Re-scoring the same answers twice also exposed the scorer's noise floor:
+tasks 42, 43, 202, 211, 214, 243 and 297 flip between identical runs
+(non-deterministic commands, container state). That is ±5 of 300, ±1.7
+points, and it is smaller than every difference called significant below
+and larger than several that are not.
+
+### Results
+
+ALFA, three registers, all files re-scored with the fixed shim. whatisit's
+model (`nl2sh-1.5b`) is the head-to-head row #41 asks for, on the same
+rebuilt sets, same scorer.
+
+| model | BM | rojak | EN | mean |
+|---|---|---|---|---|
+| whatisit `nl2sh-1.5b` | 0.310 | 0.447 | **0.603** | 0.453 |
+| run 4 (shipping) | 0.437 | 0.490 | 0.553 | 0.493 |
+| **run 7 (basics)** | **0.487** | 0.490 | 0.543 | **0.507** |
+
+Paired exact McNemar (`training/compare.py`), 95% CI on the difference:
+
+| comparison | BM | rojak | EN |
+|---|---|---|---|
+| run 7 vs run 4 | +0.050 [−0.004, +0.104], p = 0.091 | 0.000, p = 1 | −0.010 [−0.058, +0.038], p = 0.79 |
+| run 7 vs whatisit | **+0.177 [+0.117, +0.236], p = 3e-08** | +0.043 [−0.008, +0.095], p = 0.13 | **−0.060 [−0.113, −0.007], p = 0.036** |
+| run 4 vs whatisit | +0.127, p = 5e-05 | +0.043, p = 0.15 | −0.050, p = 0.096 |
+
+Over all 900 tasks run 7 vs run 4 is 101 gained / 89 lost, p = 0.42.
+**ALFA cannot tell run 7 from run 4.** That is expected and it is the point
+of having two instruments: ALFA's 300 tasks are advanced one-liners, one
+phrasing each, and basics.txt is 326 beginner tasks. The probe is what
+measures the thing that changed.
+
+Probe, 223 prompts, tool-level, same three models on the same grid:
+
+| family | run 4 | run 6 | **run 7** | n |
+|---|---|---|---|---|
+| shortcut (`tgk`, `mcm`, `x`) | 0.50 | 0.60 | **0.80** | 10 |
+| colloquial | 0.74 | 0.65 | **0.84** | 31 |
+| formal | 0.77 | 0.69 | **0.83** | 35 |
+| bm-verb | 0.64 | 0.82 | **0.91** | 11 |
+| bm-vocab | 0.67 | 0.87 | **0.93** | 15 |
+| rojak | 0.89 | 0.74 | **0.91** | 35 |
+| english | 0.91 | 0.86 | **1.00** | 35 |
+| count | 0.80 | 0.60 | **1.00** | 5 |
+| **basics tasks (unseen phrasings)** | 0.79 | 0.74 | **0.90** | 177 |
+| holdout (tools absent from basics.txt) | 0.95 | 0.85 | 0.90 | 40 |
+| homograph `fail` BM-sense / EN-sense | 0.33 / 0.67 | 0.33 / 0.67 | **1.00** / 0.67 | 3 / 3 |
+
+Paired on the 177 basics-task prompts: run 7 vs run 4 gained 30 / lost 10,
+**p = 0.002**, CI [+0.04, +0.18]; vs run 6 gained 37 / lost 9, p = 4e-05.
+Holdout: 1 gained / 3 lost vs run 4, p = 0.63 — flat, which is the honest
+reading: the gain is on the tasks we wrote rows for, phrased in ways we did
+not write, and it did not generalise to tools the rows never mention. (The
+177 prompts are 35 tasks × ~5 phrasings, so they are not 177 independent
+trials; the p-value is optimistic by that correlation and the direction and
+size are what to read.)
+
+`create a file`, the finding that started this: run 6 failed all 10
+phrasings; run 7 passes 9 of 10 (`Buat satu file baharu` still returns
+`fossil add`). `nak buat file baru` — the README's headline — comes back
+`touch path/to/file1 path/to/file2 ...`: right tool, tldr placeholder,
+because a bare "new file" with no name is a phrasing basics.txt gives a
+filename to. A handful of unnamed rows (`touch newfile.txt`) is the next
+edit; it is not in this run because it was found by this run.
+
+Constraint 3, `bench.py`, CPU only, run 7 GGUF 986 MB: 2 threads 31.5 tok/s
+/ 0.72 s warm / 1.46 s cold / 1623 MB; 4 threads 36.8 / 0.57 / 1.38 / 1626.
+Same architecture and quant as run 4; clears the budget by the same margin.
+
+**Hypothesis outcome: held.** Unweighted inclusion of 2,496 rows (0.7% of
+the pool) moved the probe's basics-task pass rate by +0.11 (p = 0.002),
+fixed `create a file` in 9 of 10 phrasings, took the `fail` homograph guard
+from 0.33 to 1.00 on the BM side without moving the EN side, and left ALFA
+where it was on all three registers. Weighting is not needed and stays
+unimplemented.
+
+### Where camne is worse, stated
+
+Against whatisit on English, run 7 is −0.060, p = 0.036 — the first time
+that gap has been resolvable at 300 tasks (run 4's −0.050 was p = 0.096).
+Every English row in our pool is one of four registers of the same 76k
+pairs against whatisit's 125k English pairs; English still tracks pool
+size, as every run has shown. Someone who only ever types English is
+better off with whatisit's model, and the README should say so.
+
+### Decision
+
+Run 7 meets the loop's exit criterion: significant on beginner tasks, no
+significant regression on any register, clears constraint 3. Shipping it
+is an owner decision (loop protocol, "stop and ask before shipping a model
+swap"). The claim it supports is narrow and should be written that way:
+*better on Malay and on the first fifty things a beginner asks; not better
+on advanced English one-liners.*
+
+
+## Work item 3: constraint 3 gate on candidate bases
+
+Every base #41 lists, at Q4_K_M, `bench.py`, CPU only, no accuracy row for
+any that fails the memory budget. tok/s and RSS are comparable across rows.
+Warm/cold latency is **not**: bench.py sends the Qwen ChatML template, so a
+non-Qwen base runs to the 64-token cap every time and its warm number is a
+worst case, not a comparison. Numbers are for the gate, not for picking.
+
+| base | disk MB | tok/s 2t / 4t | RSS MB @4t | constraint 3 |
+|---|---|---|---|---|
+| Qwen2.5-Coder-0.5B-Instruct | 398 | 50.7 / 63.2 | 1114 | clears |
+| Llama-3.2-1B-Instruct | 808 | 31.4 / 41.2 | 1559 | clears |
+| gemma-3-1b-it | 806 | 22.5 / 30.7 | 1625 | clears |
+| **Qwen2.5-Coder-1.5B-Instruct** (incumbent) | 986 | 25.1 / 40.0 | 1628 | clears |
+| deepseek-coder-1.3b-instruct | 874 | 24.8 / 36.8 | 2025 | clears |
+| SmolLM2-1.7B-Instruct | 1056 | 26.6 / 33.7 | 1995 | clears |
+| Qwen2.5-Coder-3B-Instruct | 1930 | 16.5 / 22.3 | **2605** | **out: RSS** |
+| Llama-3.2-3B-Instruct | 2019 | 13.0 / 18.1 | **2815** | **out: RSS** |
+
+Both 3B bases fail RSS at Q4_K_M by 100–300 MB, and their 2-thread speed
+(13–16 tok/s) would put a 30-token answer past 2 s warm on the target box
+before latency was even measured. Q3 quants would fit the memory but that
+is a second variable and a known accuracy cost; not pursued without an
+owner saying so.
+
+Six bases clear the gate. Each accuracy arm is one GPU day (train, ALFA ×3,
+probe, bench) and the SEA-LION result says code ability dominates, which
+puts `deepseek-coder-1.3b` first and the two general 1B models last. **Not
+run in this loop**: the loop's exit criterion was met by run 7, and
+spending six GPU days on arms is a decision the owner makes with the run 7
+numbers in hand. Retrieval-over-tldr and distillation are likewise unrun.
