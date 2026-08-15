@@ -23,7 +23,7 @@ const llamaBuild = "b10333"
 const (
 	ModelFile   = "camne-1.5b-Q4_K_M.gguf"
 	ModelURL    = "https://huggingface.co/opariffazman/camne-1.5b-Q4_K_M/resolve/main/" + ModelFile
-	ModelSHA256 = "391648d84328250969dd738d47ef87418332d795181e33c0e1274e77d5434fe8"
+	ModelSHA256 = "7576c375d1adf47abb382bfbee6b196511aa7563ec3ebc49506b4ae859e2ba67"
 	// ModelSize is the exact GGUF byte size, from the Hugging Face LFS
 	// metadata for the pinned revision.
 	ModelSize int64 = 986048000

@@ -9,10 +9,16 @@
 [![Go](https://img.shields.io/github/go-mod/go-version/officialdad/camne)](go.mod)
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue)](LICENSE)
 
-> **Status: the Malay model has landed.** camne now runs
+> **Status: beta.** camne runs
 > [camne-1.5b](https://huggingface.co/opariffazman/camne-1.5b-Q4_K_M), tuned on
-> 307k four-register rows. Malay and rojak questions answer well; English is
-> roughly level with the model it replaces. Numbers in [RESULTS.md](RESULTS.md).
+> 76k command pairs in four registers plus 326 hand-written beginner tasks.
+> Malay and rojak questions answer well, and the first fifty things a beginner
+> asks — create, list, delete, copy, find, disk, permissions, "how do I quit
+> vim" — pass 90% of unseen phrasings on the repo's probe. On advanced
+> English one-liners it is measurably worse than the English-only model it
+> replaces (−0.06, p = 0.036); if you only ever type English, use
+> [whatisit](https://github.com/ThorOdinson246/whatisit-nl2sh). Numbers,
+> including the failed runs, in [RESULTS.md](RESULTS.md).
 
 *camne* is how people say *macam mana* / *bagaimana*: "how".
 
