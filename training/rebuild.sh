@@ -1,5 +1,5 @@
 #!/bin/bash
-# Run 5: the register-aware pool. Train -> GGUF -> probe -> eval -> score.
+# Run 6: run 5 minus the core upsampling — the one variable under test. Train -> GGUF -> probe -> eval -> score.
 #
 #   setsid nohup ./rebuild.sh > out/rebuild.log 2>&1 &
 #
@@ -10,15 +10,14 @@
 set -euo pipefail
 cd "$(dirname "$0")"
 export PATH="$HOME/.local/bin:$PATH"
-NAME=qwen-v3
-POOL=../dataset/out/pool_v3.bal.jsonl
+NAME=qwen-v4
+POOL=../dataset/out/pool_v4.bal.jsonl
 SHIPPED="$HOME/.cache/camne/models/camne-1.5b-Q4_K_M.gguf"
 rm -f out/REBUILD_DONE
 status() { echo "rebuild: $*"; }
 
 status "train (1 epoch, $(wc -l <"$POOL") rows)"
-uv run train.py --base qwen --epochs 1 --micro-batch 4 --grad-accum 8 \
-  --data "$POOL" --out "out/$NAME-lora" || { echo "DONE rebuild:train-failed" >out/REBUILD_DONE; exit 1; }
+uv run train.py --base qwen --epochs 1 --data "$POOL" --out "out/$NAME-lora" || { echo "DONE rebuild:train-failed" >out/REBUILD_DONE; exit 1; }
 
 status "convert + quantize + generate answers"
 ./finish.sh "out/$NAME-lora-merged" "$NAME" || { echo "DONE rebuild:convert-failed" >out/REBUILD_DONE; exit 1; }

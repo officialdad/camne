@@ -235,3 +235,84 @@ Fix costs no GPU for the data half: `out/rows.jsonl` and
 Indonesian-to-Malaysian half (always applied) and the BM-to-English half
 (rojak only), then re-run clean, disambiguate, and pool. Only the retrain
 needs the GPU.
+
+
+## Runs 5 and 6: the register-aware pool
+
+Three pipeline defects were fixed together (see the Known defect section and
+`dataset/README.md`): the stoplist split so Malay nouns survive outside rojak,
+verb augmentation so `cipta` and `padam` exist in colloquial at all, and a
+tool rebalance against a pool where `shuf` outweighed `touch` 11 to 1.
+
+Run 5 took all three. Run 6 removed one variable — the core-tool upsampling —
+after run 5 came back worse than the model it was meant to replace.
+
+| model | BM* | rojak | EN |
+|---|---|---|---|
+| run 4 (shipping) | 0.430 | 0.490 | 0.533 |
+| run 5 (+ upsampling) | 0.453 | 0.477 | 0.493 |
+| **run 6 (no upsampling)** | **0.467** | **0.497** | **0.553** |
+
+\* BM on the rebuilt eval set. `eval_bm_300.jsonl` had gone through the same
+merged stoplist as the training pool, so it read `nak tengok file terbuka je`
+— rojak, not BM. 80 of 300 rows changed. Run 4 was re-scored on the new set
+rather than compared against its old 0.417, which would have measured the
+yardstick instead of the model. `eval_rojak_300.jsonl` came out byte-identical,
+which is the confirmation the split is right: rojak is *defined* by English
+nouns, so the surviving half of the stoplist is the half that applies to it.
+
+**The upsampling was the harm.** Run 6 beats run 5 on English by +0.060,
+p = 0.041 — the only significant result in the set. 27% of run 5's pool was
+duplicate rows and one prompt appeared 150 times, which is a partial second
+epoch on a subset, the failure mode run 2 already established. Its lower
+training loss said nothing: it was re-answering rows it had already seen.
+
+**Run 6 is not distinguishable from run 4.** BM +0.037 (p = 0.207), rojak
++0.007 (p = 0.904), EN +0.020 (p = 0.519). Aggregated over all 900 tasks it is
+105 wins to 86, p = 0.193 — indicative only, three sets are not one sample.
+Positive in direction everywhere, resolvable nowhere.
+
+### What the probe measured that ALFA could not
+
+`training/probe.py` asks the same 15 tasks in many phrasings — different verb,
+Malay noun instead of English, a count, a different register — and scores at
+tool level. ALFA gives every task exactly one phrasing, so it is structurally
+blind to this.
+
+| family | run 4 | run 6 | n |
+|---|---|---|---|
+| BM vocabulary (`fail`, `direktori`) | 0.69 | **0.85** | 13 |
+| BM verb (`cipta`, `padam`, `salin`) | 0.56 | **0.78** | 9 |
+| formal | 0.73 | 0.73 | 15 |
+| english | 1.00 | 0.93 | 15 |
+| rojak | 0.87 | 0.80 | 15 |
+| colloquial | 1.00 | 0.57 | 7 |
+
+The two families the fixes targeted moved, and they are the two with usable
+n. The rest moved down at n = 5 to 7, which is not enough to read.
+
+### The finding that matters more than either run
+
+`create a file` fails in run 6 across every phrasing — `fossil add`,
+`skicka`, `mktemp`. It failed in run 5 too, so the duplication was not the
+cause. The pool is:
+
+```
+"buat/cipta/create + file" prompts    run 4 pool: touch 4.3%   run 6 pool: touch 4.9%
+plain `touch <file>` rows             116, all phrased "buat file kosong <name>"
+```
+
+Neither pool teaches "create a new file". Run 4 answering `touch file.txt` —
+the README's headline example — was luck, not learning. The single most basic
+terminal task is uncovered in every pool version we have built.
+
+### Decision: keep run 4 shipped
+
+Run 6 cannot be distinguished from run 4 on the benchmark, breaks the demo
+example, and shows small probe regressions alongside its real gains. Shipping
+on a directional aggregate is the claim this file exists to prevent.
+
+What the three runs did buy is a correct pipeline: Malay vocabulary is in the
+pool, verbs are covered, the longest-match ordering bug is gone, and there is
+now a check that can see phrasing failures at all. The gap left is coverage of
+the tasks a beginner actually starts with, which is small and hand-writable.

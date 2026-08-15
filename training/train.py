@@ -7,7 +7,12 @@ One arm per invocation, one variable at a time, seed 42:
   uv run train.py --base sealion
 
 Recipe is the whatisit-validated one: r32/a64/dropout 0.05, all-linear,
-2e-4 cosine 3% warmup, 2 epochs, packing off, seq 512, effective batch 32.
+2e-4 cosine 3% warmup, 2 epochs, packing off, effective batch 32.
+
+Sequence length is 160, not the 512 runs 1-4 used. Measured with the real
+tokenizer over 8,000 rows, 512 left 87% of every sequence as padding and a
+cap of 160 truncates 0.00% of them, so this is the same gradients computed on
+a third of the tensor. Pass --max-seq 512 to reproduce runs 1-4 exactly.
 Unsloth is an implementation-level speedup only — bf16 LoRA, NOT QLoRA
 (a quantized base would be a second changed variable).
 
@@ -41,6 +46,8 @@ def main():
     ap.add_argument("--micro-batch", type=int, default=16,
                     help="drop this and raise --grad-accum if OOM; keep the product 32")
     ap.add_argument("--grad-accum", type=int, default=2)
+    ap.add_argument("--max-seq", type=int, default=160,
+                    help="512 for runs 1-4; p100 of the pool is 122 tokens")
     ap.add_argument("--epochs", type=float, default=2,
                     help="four registers per command means 1 epoch is already "
                          "4 exposures; 2 overfits on a narrow pool")
@@ -48,7 +55,8 @@ def main():
     out = args.out or f"out/{args.base}-lora"
 
     model, tokenizer = FastLanguageModel.from_pretrained(
-        BASES[args.base], max_seq_length=512, dtype=None, load_in_4bit=False,
+        BASES[args.base], max_seq_length=args.max_seq, dtype=None,
+        load_in_4bit=False,
     )
     model = FastLanguageModel.get_peft_model(
         model, r=32, lora_alpha=64, lora_dropout=0.05,
@@ -79,7 +87,7 @@ def main():
             lr_scheduler_type="cosine",
             warmup_ratio=0.03,
             packing=False,
-            max_seq_length=512,
+            max_seq_length=args.max_seq,
             bf16=True,
             seed=42,
             logging_steps=25,
