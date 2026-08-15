@@ -1,25 +1,42 @@
 #!/usr/bin/env python3
-"""Force translated technical nouns back to English in the NL column, then
-print colloquial-marker coverage. Never touches cmd. Stdlib only.
+"""Normalise the NL column by register, then print colloquial-marker coverage.
+Never touches cmd. Stdlib only.
 
   python3 stoplist.py out/rows.jsonl out/rows.clean.jsonl
+
+Indonesian is corrected everywhere. English technical nouns are forced only
+into rojak, which is the register defined by them — formal and colloquial keep
+their Malay vocabulary, because that is what a Malay-speaking user types.
 """
 import json
 import re
 import sys
 from collections import Counter
 
-# BM form -> English form. Longest first so "muat turun" wins over "turun".
+# Two unrelated jobs used to share one list, and merging them is what emptied
+# the pool of Malay nouns — `fail` went from 29,576 raw rows to 29 (RESULTS.md,
+# "the BM column is not measuring BM"). They are separate now:
+#
+#   INDO_FIX     Indonesian -> Malaysian. A defect in every register, so it is
+#                always applied.
+#   ROJAK_NOUNS  Malaysian -> English technical noun. This DEFINES the rojak
+#                register; it is not a correction. Applied to rojak only.
+#                Running it over formal and colloquial deletes the vocabulary
+#                a Malay-speaking user actually types.
+#
+# Some words chain: "memuat turun" (ID) -> "muat turun" (BM) -> "download"
+# (rojak only). Keep both halves ordered longest-first so "kata laluan" wins
+# over "laluan" and "muat turun" over "turun".
 # ponytail: flat word-boundary replace on the NL column only; no morphology.
-STOPLIST = [
-    # Affixed forms of the entries below: \b + a bare stem misses every
-    # prefixed/derived form the translator emits, so they are listed out.
-    ("memuat turun", "download"),
-    ("memuat naik", "upload"),
+# Indonesian -> Malaysian. Always applied: an Indonesian word is a defect in
+# every register, including rojak.
+INDO_FIX = [
+    ("memuat turun", "muat turun"),
+    ("memuat naik", "muat naik"),
     ("frasa sandi", "passphrase"),
-    ("kata sandi", "password"),
-    ("mengunduh", "download"),
-    ("mengunggah", "upload"),
+    ("kata sandi", "kata laluan"),
+    ("mengunduh", "muat turun"),
+    ("mengunggah", "muat naik"),
     ("menampilkan", "tunjuk"),
     ("memperbarui", "update"),
     ("pembaruan", "update"),
@@ -29,10 +46,9 @@ STOPLIST = [
     ("urutkan", "susun"),
     ("menghapus", "membuang"),
     ("dihapus", "dibuang"),
-    ("direktori-direktori", "folder"),
+    ("direktori-direktori", "direktori"),
     ("folder-folder", "folder"),
-    ("berkas-berkas", "file"),
-    # Indonesian the first pass missed
+    ("berkas-berkas", "fail"),
     ("mengkompilasi", "compile"),
     ("mengkonversi", "convert"),
     ("mengonversi", "convert"),
@@ -51,10 +67,10 @@ STOPLIST = [
     ("peluasan", "extension"),
     ("keluaran", "output"),
     ("konversi", "convert"),
-    ("jaringan", "network"),
+    ("jaringan", "rangkaian"),
     ("masukan", "input"),
     ("tampilan", "paparan"),
-    ("tautan", "link"),
+    ("tautan", "pautan"),
     ("setelan", "setting"),
     ("binaari", "binary"),
     ("peranti", "device"),
@@ -65,24 +81,6 @@ STOPLIST = [
     ("trus", "terus"),
     ("nih", "ni"),
     ("tuh", "tu"),
-    # Technical nouns a Malaysian in a terminal says in English, which the
-    # translator "corrected" into textbook BM
-    ("ungkapan biasa", "regex"),
-    ("repositori", "repo"),
-    ("rentetan", "string"),
-    ("tetingkap", "window"),
-    ("cangkang", "shell"),
-    ("cawangan", "branch"),
-    ("pengguna", "user"),
-    ("partisi", "partition"),
-    ("senarai", "list"),
-    ("laluan", "path"),
-    ("storan", "storage"),
-    ("corak", "pattern"),
-    ("ralat", "error"),
-    ("imej", "image"),
-    ("hos", "host"),
-    # Indonesian leaking out of the (ID-heavy) translator model -> BM/English
     ("terhubung", "bersambung"),
     ("komitmen", "commit"),
     ("pangkalan data", "database"),
@@ -101,19 +99,39 @@ STOPLIST = [
     ("kode", "code"),
     ("gimana", "macam mana"),
     ("silakan", "sila"),
-    ("berkas", "file"),
-    ("unduh", "download"),
-    ("unggah", "upload"),
-    ("perintah", "command"),
+    ("berkas", "fail"),
+    ("unduh", "muat turun"),
+    ("unggah", "muat naik"),
+    ("perintah", "arahan"),
     ("tampilkan", "tunjuk"),
     ("bisa", "boleh"),
     ("nggak", "tak"),
     ("bikin", "buat"),
     ("banget", "sangat"),
     ("kayak", "macam"),
-    ("hapus", "buang"),
     ("udah", "dah"),
     ("aja", "je"),
+]
+
+# Malaysian -> English technical noun. This DEFINES the rojak register and is
+# applied to rojak ONLY. Running it over formal and colloquial is what emptied
+# the pool of Malay nouns.
+ROJAK_NOUNS = [
+    ("ungkapan biasa", "regex"),
+    ("repositori", "repo"),
+    ("rentetan", "string"),
+    ("tetingkap", "window"),
+    ("cangkang", "shell"),
+    ("cawangan", "branch"),
+    ("pengguna", "user"),
+    ("partisi", "partition"),
+    ("senarai", "list"),
+    ("laluan", "path"),
+    ("storan", "storage"),
+    ("corak", "pattern"),
+    ("ralat", "error"),
+    ("imej", "image"),
+    ("hos", "host"),
     ("muat turun", "download"),
     ("muat naik", "upload"),
     ("salinan sandaran", "backup"),
@@ -141,8 +159,19 @@ STOPLIST = [
     ("pautan", "link"),
     ("fail", "file"),
 ]
-_SUBS = [(re.compile(r"\b" + re.escape(bm) + r"\b", re.IGNORECASE), en)
-         for bm, en in STOPLIST]
+
+
+def _compile(pairs):
+    """Longest source first, always. Hand-ordering this list failed silently:
+    `laluan`->`path` used to fire before `kata laluan`->`password`, which put
+    904 rows of "kata path" — "word path" — into training."""
+    return [(re.compile(r"\b" + re.escape(bm) + r"\b", re.IGNORECASE), en)
+            for bm, en in sorted(pairs, key=lambda p: -len(p[0]))]
+
+
+_INDO = _compile(INDO_FIX)
+_ROJAK = _compile(ROJAK_NOUNS)
+
 
 MARKERS = ["camne", "macam mana", "mcm mana", "cmne", "nak", "kat", "ni",
            "tu", "je", "dah", "boleh tak", "tolong", "tlg", "tunjuk",
@@ -265,8 +294,11 @@ def clean(nl, register, cmd=""):
     if register == "english":
         return nl
     was_upper = nl[:1].isupper()
-    for pat, en in _SUBS:
+    for pat, en in _INDO:
         nl = pat.sub(en, nl)
+    if register == "rojak":
+        for pat, en in _ROJAK:
+            nl = pat.sub(en, nl)
     nl = _PROFANITY.sub(" ", nl).strip(" ,")
     if _FUCK.search(nl) and not _FUCK.search(cmd):
         nl = _FUCK.sub("", nl).strip(" ,")

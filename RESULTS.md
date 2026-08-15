@@ -104,6 +104,33 @@ for a tool whose input is Malay and rojak, that is the trade to take, and it
 is stated here rather than buried.
 
 
+## The SEA-LION arm
+
+Issue #2 asked for a bake-off, so the other candidate was tuned on the same
+pool with the same recipe — one variable changed, the base model:
+`aisingapore/Gemma-SEA-LION-v4.5-E2B-IT` in place of
+Qwen2.5-Coder-1.5B-Instruct.
+9,599 steps, 9 h 05 m on the GPU.
+
+| model | BM | rojak | EN | size | tok/s @4t | RSS |
+|---|---|---|---|---|---|---|
+| camne-1.5b (run 4) | **0.417** | **0.490** | **0.533** | **986 MB** | **40.0** | **1.63 GB** |
+| sealion tune | 0.277 | 0.243 | 0.303 | 3428 MB | 20.3 | 4.18 GB |
+
+It loses every register, and loses worst on rojak — the one that matters. It
+is also 3.5x the disk, half the speed, and **4.18 GB resident against a 2.5 GB
+budget**, so constraint 3 rules it out even if the accuracy had gone the other
+way.
+
+The training loss predicted this and was worth reading as a warning rather
+than a result: SEA-LION reached 0.067 where Qwen settled at 0.54, on identical
+data. An order of magnitude lower loss with worse held-out accuracy is
+memorisation, not skill — a larger base with the capacity to fit 307k rows
+rather than generalise from them.
+
+The bake-off is closed. Run 4 ships; SEA-LION is not a candidate at any size.
+
+
 ## Performance on CPU
 
 llama.cpp defaults `--n-gpu-layers` to `auto` and offloads silently when a
@@ -135,3 +162,47 @@ buys +54% tok/s, which the "half the cores" default was not expecting.
 0.806 s warm — inside budget, with the machine left responsive for whatever
 else the user is doing. Keeping the conservative default, and recording here
 that the headroom exists if warm latency ever becomes the complaint.
+
+
+## Known defect: the BM column is not measuring BM
+
+Found 2026-08-15, after run 4 shipped, from a user report that
+`camne nak buat fail baru` returns `echo "fail" > /tmp/fail.txt`. It does,
+because the model has never seen `fail` mean *file*.
+
+`dataset/stoplist.py` rewrites Malaysian technical nouns to English. That is
+correct for **rojak**, whose definition is Malay grammar around English nouns.
+It was applied to all four registers, which erased the vocabulary from the
+pool entirely:
+
+| word | in raw translations | in training pool |
+|---|---|---|
+| fail | 29,576 | 29 |
+| direktori | 14,711 | 0 |
+| arahan | 3,524 | 0 |
+| kata laluan | 618 | 0 |
+| pelayan | 813 | 0 |
+| cakera | 560 | 0 |
+| skrip | 826 | 0 |
+
+`file` appears 84,820 times against `fail`'s 29. The "formal BM" register is
+therefore formal BM grammar carrying 100% English vocabulary, and a user
+typing genuine Malay hits tokens the model saw zero times.
+
+The registers did not otherwise collapse — mean inter-register token overlap
+is 0.09 to 0.27, so they differ properly by grammar and particles. The defect
+is specific to nouns.
+
+`eval_bm_300.jsonl` was built through the same `clean()` and inherits it:
+124 occurrences of `file`, 41 of `folder`, zero of `direktori`. Prompts read
+`nak tengok file terbuka je`. That is rojak. **So the BM and rojak columns
+above measure nearly the same register, and the BM number is not evidence
+about Malay vocabulary.** The run-to-run comparisons stay valid — every row
+was scored on the same sets — but the absolute BM figure will fall once the
+eval set is rebuilt honestly.
+
+Fix costs no GPU for the data half: `out/rows.jsonl` and
+`out/extra_rows.jsonl` retain the raw vocabulary. Split `STOPLIST` into the
+Indonesian-to-Malaysian half (always applied) and the BM-to-English half
+(rojak only), then re-run clean, disambiguate, and pool. Only the retrain
+needs the GPU.
