@@ -316,3 +316,34 @@ What the three runs did buy is a correct pipeline: Malay vocabulary is in the
 pool, verbs are covered, the longest-match ordering bug is gone, and there is
 now a check that can see phrasing failures at all. The gap left is coverage of
 the tasks a beginner actually starts with, which is small and hand-writable.
+
+
+## Run 7: the beginner rows
+
+**Hypothesis, written before the run.** The `create a file` failure is a
+coverage hole, not a weighting problem: the pool has 116 `touch` rows and
+every one says *"buat file kosong"*. Adding ~2,500 hand-written beginner rows
+(`dataset/basics.txt`, 326 tasks, four registers, several phrasings per task
+on the probe's axes) **once, unweighted**, into the run 6 pool will lift the
+probe's basics-task pass rate and fix `create a file` in every phrasing,
+without moving ALFA English significantly either way. Falsified if the probe
+does not move on the tasks basics.txt covers — that would mean 0.7% of the
+pool is drowned and weighting is the next variable.
+
+One variable changed from run 6: `pool_v5 = pool_v4.bal + basics.jsonl`.
+Same recipe, seed 42, 1 epoch.
+
+**Probe split, stated.** `training/probe.py` grew from 15 tasks / 85 prompts
+to 35 tasks / 177 prompts plus a 10-task / 40-prompt HOLDOUT block. No probe
+prompt appears verbatim in `basics.txt` (probe.py refuses to start if one
+does), so the main block measures *phrasing generalisation on tasks the
+model was taught*; the HOLDOUT block uses tools that are absent from
+`basics.txt` entirely (`truncate`, `tac`, `whereis`, `dirname`, `tee`,
+`timeout`, `chsh`, `printenv`, `nl`, size-sort composition) and measures
+whether anything generalised past the rows we wrote. Adding one of those
+tools to basics.txt retires it from HOLDOUT. A new axis, `shortcut`, carries
+typing shortcuts (`tgk`, `mcm`, `dlm`, `msk`, `skrg`, `sy`, `x` for *tak*),
+which nothing in the pool teaches — issue #41 work item 2.
+
+Baselines were re-probed on the expanded grid rather than compared against
+their old 85-prompt numbers.

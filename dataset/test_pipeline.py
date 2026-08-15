@@ -184,3 +184,38 @@ assert any("duplicate" in e for e in check(src, p))
 os.unlink(p)
 
 print("ok: all pipeline checks pass")
+
+# --- basics.txt (hand-written beginner rows) --------------------------------
+# The parser is the only thing standing between a typo in the text file and
+# a block that silently trains three registers instead of four.
+from basics import parse, rows as basics_rows
+
+def _parse_text(text):
+    with tempfile.NamedTemporaryFile("w", suffix=".txt", delete=False, encoding="utf-8") as f:
+        f.write(text)
+    try:
+        return list(parse(f.name))
+    finally:
+        os.unlink(f.name)
+
+ok = _parse_text("# c\ncmd: touch a.txt\nF: Cipta a.txt\nC: buat a.txt | nak buat a.txt\nR: create a.txt\nE: create a.txt\n")
+assert ok == [("touch a.txt", {"formal": ["Cipta a.txt"], "colloquial": ["buat a.txt", "nak buat a.txt"],
+                                "rojak": ["create a.txt"], "english": ["create a.txt"]})]
+for bad in ("cmd: touch a.txt\nF: x\nC: x\nR: x\n",            # missing english
+            "cmd: touch path/to/file\nF: x\nC: x\nR: x\nE: x\n",  # placeholder
+            "F: x\ncmd: touch a.txt\nC: x\nR: x\nE: x\n",         # cmd not first
+            "cmd: touch a.txt\nF: x\nC: a | \nR: x\nE: x\n"):     # empty phrasing
+    try:
+        _parse_text(bad)
+    except ValueError:
+        pass
+    else:
+        raise AssertionError(f"accepted bad block: {bad!r}")
+# the shipped file itself parses and every row of a block carries the same cmd
+_here = os.path.dirname(os.path.abspath(__file__))
+_b = list(basics_rows(os.path.join(_here, "basics.txt")))
+assert len(_b) > 2000, len(_b)
+_by = {}
+for _r in _b:
+    _by.setdefault(_r["id"].split(".")[0], set()).add(_r["cmd"])
+assert all(len(v) == 1 for v in _by.values())
