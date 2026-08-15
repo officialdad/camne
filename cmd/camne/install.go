@@ -47,8 +47,8 @@ func ensureProvisioned(st provision.Status) bool {
 	}
 	if !st.ModelOK {
 		fmt.Fprintln(os.Stderr, "Downloading the model...")
-		if err := withProgress(st.ModelPath+".part", provision.ModelSize, func() error {
-			return provision.Download(provision.ModelURL, st.ModelPath, provision.ModelSHA256)
+		if err := withProgress(st.ModelPath, provision.ModelSize, func() error {
+			return provision.Download(provision.ModelURL, st.ModelPath, provision.ModelSize, provision.ModelSHA256)
 		}); err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			return false
@@ -68,8 +68,8 @@ func installServer(asset provision.Asset, serverPath string) error {
 	}
 	archive := filepath.Join(cacheDir, "downloads", asset.Name)
 	fmt.Fprintln(os.Stderr, "Downloading llama-server...")
-	if err := withProgress(archive+".part", asset.Size, func() error {
-		return provision.Download(asset.URL(), archive, asset.SHA256)
+	if err := withProgress(archive, asset.Size, func() error {
+		return provision.Download(asset.URL(), archive, asset.Size, asset.SHA256)
 	}); err != nil {
 		return err
 	}
@@ -101,19 +101,20 @@ func installServer(asset provision.Asset, serverPath string) error {
 	return nil
 }
 
-// withProgress runs dl while a ticker prints how much of the .part file is on
-// disk, how fast it is arriving, and how long is left, so a 1 GB download is
-// never a silent stall. The speed is what makes a stalled download look
-// different from a slow one; the byte counter alone cannot show that, and a
-// download that looks hung gets killed and restarted.
+// withProgress runs dl while a ticker prints how much of dest is on disk, how
+// fast it is arriving, and how long is left, so a 1 GB download is never a
+// silent stall. The speed is what makes a stalled download look different from
+// a slow one; the byte counter alone cannot show that, and a download that
+// looks hung gets killed and restarted.
 //
 // Nothing is drawn when stderr is not a terminal: the line rewrites itself with
 // \r, which is noise in a redirected log.
 //
-// ponytail: polls the .part size instead of instrumenting Download — coarse
-// (500 ms) but shows resumed downloads correctly; a progress callback on
+// ponytail: polls provision.PartBytes instead of instrumenting Download —
+// coarse (500 ms) but counts a single stream, eight parallel segments, and the
+// join between them without knowing which is running; a progress callback on
 // provision.Download is the upgrade path.
-func withProgress(partPath string, total int64, dl func() error) error {
+func withProgress(dest string, total int64, dl func() error) error {
 	if !isTTY(os.Stderr) {
 		return dl()
 	}
@@ -128,11 +129,12 @@ func withProgress(partPath string, total int64, dl func() error) error {
 			case <-done:
 				return
 			case now := <-t.C:
-				fi, err := os.Stat(partPath)
-				if err != nil {
-					continue // not created yet, or already renamed into place
+				got := provision.PartBytes(dest)
+				if got == 0 {
+					// Not started yet, or already renamed into place — either
+					// way, do not redraw the bar back to zero.
+					continue
 				}
-				got := fi.Size()
 				if secs := now.Sub(last).Seconds(); prev >= 0 && secs > 0 {
 					rate = smoothRate(rate, float64(got-prev)/secs)
 				}
@@ -185,7 +187,10 @@ func progressLine(got, total int64, rate float64) string {
 	line := fmt.Sprintf("  [%s%s] %3d%%  %d/%d MB",
 		strings.Repeat("#", filled), strings.Repeat(".", barWidth-filled),
 		got*100/total, got/1_000_000, total/1_000_000)
-	if rate < 0 {
+	// No speed once every byte is down: what follows is joining the segments
+	// and hashing the result, and a rate falling to 0.0 MB/s there would read
+	// as the stall this line exists to make visible.
+	if rate < 0 || got >= total {
 		return line
 	}
 	line += fmt.Sprintf("  %.1f MB/s", rate/1_000_000)

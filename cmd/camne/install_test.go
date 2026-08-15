@@ -22,9 +22,11 @@ func TestProgressLine(t *testing.T) {
 			"  [##......................]  10%  100/986 MB  3.0 MB/s  4m 55s left"},
 		{"a crawl is phrased, not counted", 10 * mb, 986 * mb, 1000,
 			"  [........................]   1%  10/986 MB  0.0 MB/s  over an hour left"},
-		// The last frame drops the estimate: "0s left" under a full bar is noise.
+		// The last frames drop both speed and estimate: after the final byte
+		// camne is joining segments and hashing, and a rate decaying to zero
+		// there would look like the stall this line exists to expose.
 		{"complete", 986 * mb, 986 * mb, 16 * mb,
-			"  [########################] 100%  986/986 MB  16.0 MB/s"},
+			"  [########################] 100%  986/986 MB"},
 		// A resumed .part measured against a stale total must not print a bar
 		// longer than the bar or a percentage over 100.
 		{"overshoot is clamped", 999 * mb, 986 * mb, -1,
