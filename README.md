@@ -19,11 +19,11 @@
 Ask a terminal question in Malay, get the command back. Everything runs on your
 machine and there is nothing to set up.
 
-![camne demo: a colloquial Malay question, the syntax-highlighted command it prints, a red BAHAYA line, the same query piped into `cat` to show plain output, and `camne doctor` on a fresh machine](demo/demo.gif)
+![camne demo: a colloquial Malay question and the syntax-highlighted English command it prints, a magenta `camne warning:` line above a command that touches /etc, and `camne doctor` on a fresh machine](demo/demo.gif)
 
 ```console
-$ camne nak buat file baru
-touch file.txt
+$ camne nak cari file besar dari 100MB dalam home
+find ~ -type f -size +100M
 ```
 
 It is not only for "do this task for me". Questions about the CLI itself count
@@ -41,6 +41,9 @@ The installer puts the binary in `/usr/local/bin` if that directory is
 writable, otherwise `~/.local/bin`. It tells you when that directory is not on
 your `PATH` yet.
 
+Already installed? Run `camne update` — it replaces the binary in place, so the
+installer is a first-time-only step.
+
 Windows: download `camne_windows_amd64.exe` (or `camne_windows_arm64.exe`) from
 [Releases](https://github.com/officialdad/camne/releases).
 
@@ -53,7 +56,7 @@ missing without downloading anything, run `camne doctor`.
 
 ```console
 $ camne cari file lagi besar dari 100MB
-find / -size +100M -type f -exec ls -lh {} \; | sort -n -k5
+find / -size +100M
 
 $ camne nak delete semua file dalam /etc
   camne warning: find + delete: target is the critical path /etc
@@ -67,10 +70,12 @@ prints either way and executes neither.
 
 The command is syntax-highlighted and the warnings are coloured only when the
 output is a terminal. Pipe it anywhere (`camne ... | sh`, `$(camne ...)`) and
-you get plain bytes. That is the third scene in the demo above: the same query
-sent through `cat` comes back with no colour, which is what any program reading
-camne's output would see. `NO_COLOR` or `TERM=dumb` turns colour off
-everywhere.
+you get plain bytes, which is what any program reading camne's output would
+see. `NO_COLOR` or `TERM=dumb` turns colour off everywhere.
+
+You type Malay; camne answers in English. The question can be colloquial
+(`camne nak buat file baru`), rojak, or plain English — the command and every
+line camne prints come back in English.
 
 Three other commands: `camne doctor` checks the install, `camne stop` shuts down
 the model held in memory, and `camne update` installs the newest release.
