@@ -122,11 +122,40 @@ is also 3.5x the disk, half the speed, and **4.18 GB resident against a 2.5 GB
 budget**, so constraint 3 rules it out even if the accuracy had gone the other
 way.
 
-The training loss predicted this and was worth reading as a warning rather
-than a result: SEA-LION reached 0.067 where Qwen settled at 0.54, on identical
-data. An order of magnitude lower loss with worse held-out accuracy is
-memorisation, not skill — a larger base with the capacity to fit 307k rows
-rather than generalise from them.
+Why it lost is not what the loss curve suggested. SEA-LION bottomed out at
+0.067 against Qwen's 0.54 on identical data, which reads as memorisation —
+but a loss curve cannot separate "learned the task" from "memorised the
+answers", so that was inference, not evidence.
+
+The evidence points elsewhere. Measured against its own English:
+
+| model | EN | BM | BM - EN |
+|---|---|---|---|
+| SEA-LION | 0.303 | 0.277 | **-0.026** |
+| camne-1.5b (run 4) | 0.533 | 0.417 | -0.116 |
+
+SEA-LION's Malay penalty is a quarter of Qwen's. Relative to what it can do
+in English, it handles Malay *better* — which is exactly what a SEA-language
+model should do, and it means the Malay is the part that works. What fails is
+the shell, in every register at once:
+
+```
+print hello world                        => hello world
+copy /testbed/hello.php to hello-COPY    => mv ...     (move, not copy)
+nak buat file /testbed/test.txt          => touch {/testbed/test.txt}
+list open files                          => ls /proc/<pid>/fd   (not lsof)
+```
+
+Wrong verb, brace syntax error, a placeholder standing in for the tool, and
+one answer that is not a command at all. `Gemma-SEA-LION-v4.5-E2B-IT` is a
+general instruct model; `Qwen2.5-Coder-1.5B-Instruct` is a code model, and
+the output of this task is code, not prose. Language ability was never the
+bottleneck, so the base chosen for its language ability had nothing to
+contribute.
+
+The lesson generalises past this arm: for NL2SH the base's *code* ability
+dominates, and a language-specialised base has to make that up before its
+language advantage counts for anything.
 
 The bake-off is closed. Run 4 ships; SEA-LION is not a candidate at any size.
 
