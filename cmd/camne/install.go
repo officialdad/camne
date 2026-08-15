@@ -101,24 +101,45 @@ func installServer(asset provision.Asset, serverPath string) error {
 	return nil
 }
 
-// withProgress runs dl while a ticker prints how many MB of the .part file
-// are on disk so a 1 GB download is never a silent stall.
+// withProgress runs dl while a ticker prints how much of the .part file is on
+// disk, how fast it is arriving, and how long is left, so a 1 GB download is
+// never a silent stall. The speed is what makes a stalled download look
+// different from a slow one; the byte counter alone cannot show that, and a
+// download that looks hung gets killed and restarted.
+//
+// Nothing is drawn when stderr is not a terminal: the line rewrites itself with
+// \r, which is noise in a redirected log.
+//
 // ponytail: polls the .part size instead of instrumenting Download — coarse
 // (500 ms) but shows resumed downloads correctly; a progress callback on
 // provision.Download is the upgrade path.
 func withProgress(partPath string, total int64, dl func() error) error {
+	if !isTTY(os.Stderr) {
+		return dl()
+	}
 	done := make(chan struct{})
 	go func() {
 		t := time.NewTicker(500 * time.Millisecond)
 		defer t.Stop()
+		prev, last := int64(-1), time.Now()
+		rate := -1.0 // negative until there are two samples to compare
 		for {
 			select {
 			case <-done:
 				return
-			case <-t.C:
-				if fi, err := os.Stat(partPath); err == nil {
-					fmt.Fprintf(os.Stderr, "\r  %d/%d MB", fi.Size()/1_000_000, total/1_000_000)
+			case now := <-t.C:
+				fi, err := os.Stat(partPath)
+				if err != nil {
+					continue // not created yet, or already renamed into place
 				}
+				got := fi.Size()
+				if secs := now.Sub(last).Seconds(); prev >= 0 && secs > 0 {
+					rate = smoothRate(rate, float64(got-prev)/secs)
+				}
+				prev, last = got, now
+				// Left-padded: the line shrinks when the estimate drops off the
+				// end, and \r alone would leave the old tail on screen.
+				fmt.Fprintf(os.Stderr, "\r%-70s", progressLine(got, total, rate))
 			}
 		}
 	}()
@@ -126,4 +147,69 @@ func withProgress(partPath string, total int64, dl func() error) error {
 	close(done)
 	fmt.Fprintln(os.Stderr)
 	return err
+}
+
+// barWidth is in characters, chosen to leave the whole progress line inside 70
+// columns — the narrowest terminal worth designing for.
+const barWidth = 24
+
+// smoothRate folds one speed sample into an exponential moving average.
+// A negative prev means nothing has been measured yet, so the first sample is
+// taken whole rather than averaged against a number that does not exist.
+//
+// Smoothing is what keeps the line honest in both directions: raw 500 ms
+// samples swing wildly with TCP windowing, so every pause would read as a stall
+// and every burst as a miracle. It also decays rather than snapping, so a real
+// stall visibly falls towards zero over a few seconds instead of flickering.
+func smoothRate(prev, sample float64) float64 {
+	if prev < 0 {
+		return sample
+	}
+	return 0.7*prev + 0.3*sample
+}
+
+// progressLine renders one progress line: bar, megabytes, speed, estimate.
+// rate is bytes per second, or negative when nothing has been measured yet.
+//
+// A measured rate of zero prints as "0.0 MB/s" with no estimate rather than
+// being hidden. That is the whole point of showing a speed: a download that has
+// stopped must not look like one that is merely slow.
+func progressLine(got, total int64, rate float64) string {
+	if total <= 0 {
+		return fmt.Sprintf("  %d MB", got/1_000_000)
+	}
+	if got > total {
+		got = total // a resumed .part can briefly overshoot a stale total
+	}
+	filled := int(got * barWidth / total)
+	line := fmt.Sprintf("  [%s%s] %3d%%  %d/%d MB",
+		strings.Repeat("#", filled), strings.Repeat(".", barWidth-filled),
+		got*100/total, got/1_000_000, total/1_000_000)
+	if rate < 0 {
+		return line
+	}
+	line += fmt.Sprintf("  %.1f MB/s", rate/1_000_000)
+	// No estimate on the last frame: "0s left" under a full bar is noise.
+	if rate > 0 && got < total {
+		line += "  " + eta(float64(total-got)/rate)
+	}
+	return line
+}
+
+// eta phrases the seconds left for someone watching a download rather than
+// timing one. Anything past an hour is said in words: at that point the number
+// is a guess about a stalled connection, and printing "417m 12s left" reads as
+// a broken program.
+func eta(secs float64) string {
+	s := int(secs + 0.5)
+	switch {
+	case s >= 3600:
+		return "over an hour left"
+	case s >= 60:
+		return fmt.Sprintf("%dm %ds left", s/60, s%60)
+	case s < 1:
+		// The last megabytes, where "0s left" reads as a stuck clock.
+		return "almost done"
+	}
+	return fmt.Sprintf("%ds left", s)
 }
