@@ -19,7 +19,7 @@
 Ask a terminal question in Malay, get the command back. Everything runs on your
 machine and there is nothing to set up.
 
-![camne demo: a colloquial Malay question and the syntax-highlighted English command it prints, a magenta `camne warning:` line above a command that touches /etc, and `camne doctor` on a fresh machine](demo/demo.gif)
+![camne demo: a colloquial Malay question and the syntax-highlighted English command it prints, a magenta `camne warning:` line above a command that touches /etc, the camne wordmark on the first run after an update while it re-checks the model it already has, and `camne doctor` on a fresh machine](demo/demo.gif)
 
 ```console
 $ camne nak cari file besar dari 100MB dalam home

@@ -218,7 +218,9 @@ func selfUpdate(tag string) error {
 	// rename below is atomic, and a directory camne cannot write to fails here
 	// rather than after a pointless download.
 	staged := self + ".new"
-	if err := provision.Download(releaseBase+tag+"/"+asset, staged, want); err != nil {
+	// Size 0: checksums.txt carries no length, and a camne binary is small
+	// enough that splitting it across connections would cost more than it saves.
+	if err := provision.Download(releaseBase+tag+"/"+asset, staged, 0, want); err != nil {
 		return fmt.Errorf("%w\ncamne was not changed. You can also reinstall with install.sh", err)
 	}
 	if err := os.Chmod(staged, 0o755); err != nil {
@@ -230,6 +232,7 @@ func selfUpdate(tag string) error {
 		os.Remove(staged)
 		return err
 	}
+	banner(os.Stderr)
 	fmt.Fprintf(os.Stderr, "Done — camne %s.\n", tag)
 	return nil
 }
