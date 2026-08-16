@@ -523,3 +523,77 @@ scores tool-level and already passes these, so the check is exact output):
 | `nak buat user baru` | `kcadm.sh create users -s username=username -r realm_name` |
 | `nak compress folder projek` | `zip -r project.zip projek` |
 | `nak list port bukak` / `buka` / `terbuka` | `lsof -i` / `netstat -an \| grep -i listen` / `lsof -i` |
+
+### Result: the rows land, the run does not
+
+Trained 2026-08-16, `qwen-v6`, 10,804 steps, 2 h 58 m on the GPU. Same
+recipe as run 7, seed 42, 1 epoch. Everything below is the pinned CPU
+llama build, the shipped path.
+
+**The unnamed prompts, exact output** (the thing #47 is about):
+
+| prompt | run 7 | run 8 |
+|---|---|---|
+| `nak buat file baru` | `touch path/to/file1 path/to/file2 ...` | **`fossil add path/to/file`** |
+| `nak buat satu file baru` | `touch path/to/file1 ...` | `touch newfile.txt` |
+| `tolong buat file baru` | `touch path/to/file1 ...` | `touch newfile.txt` |
+| `create a new file` | `touch path/to/file1 ...` | `touch newfile.txt` |
+| `nak buat folder baru` | `skicka mkdir path/to/folder` | `mkdir newfolder` |
+| `buat folder baru je` | `skicka mkdir path/to/folder` | `mkdir newfolder` |
+| `nak buat user baru` | `kcadm.sh create users ...` | `sudo useradd -m new_user` |
+| `nak compress folder projek` | `zip -r project.zip projek` | `zip -r projek.zip projek` |
+| `nak list port bukak` | `lsof -i` | **`sudo ufw status`** |
+| `nak list port buka` / `terbuka` | `netstat -an \| grep -i listen` / `lsof -i` | `netstat -lnptu` / `netstat -tulpn` |
+
+Seven of ten now return a real command with a real name in it, which is
+what the hypothesis predicted for the rows we wrote. The two failures are
+the two that matter most: `nak buat file baru` (the README's original
+headline, and a probe prompt) moved from a tldr placeholder to `fossil add`,
+and `bukak` moved from a valid tool to a firewall status command.
+
+**Probe** (`probe_qwen-v6.txt`, 223 prompts, tool-level): basics tasks
+0.89 (run 7: 0.90), holdout 0.82 (0.78), homograph BM-sense **0.33 (1.00)**.
+`create file` fell from 9/10 to **5/10**: every colloquial phrasing with
+`file baru` / `fail baru` and no count now returns `fossil add path/to/file`.
+`kill process on port` went 4/4 to 0/4 (`fkill :8080`, a real tool the
+regex does not know; scored as a fail, arguably a pass). `run script` 5/5 to
+0/5 (`source <(curl -s https://raw.githubusercontent.com/...)` — worse than
+wrong). English fell 1.00 → 0.91.
+
+**ALFA, 300 tasks per register, paired exact McNemar run 8 vs run 7:**
+
+| register | run 7 | run 8 | diff [95% CI] | lost / gained | p |
+|---|---|---|---|---|---|
+| BM | 0.487 | **0.427** | **−0.060 [−0.110, −0.010]** | 39 / 21 | **0.027** |
+| rojak | 0.490 | 0.520 | +0.030 [−0.022, +0.082] | 27 / 36 | 0.31 |
+| EN | 0.543 | 0.553 | +0.010 [−0.038, +0.058] | 25 / 28 | 0.78 |
+
+BM lost 6 points, significant. Rojak and English are inside the noise
+floor. Bench: 4 threads 36.2 tok/s / 0.59 s warm / 1.26 s cold / 1585 MB,
+unchanged from run 7 as expected (same base, same quant, 986 MB).
+
+**Reading.** The hypothesis was "the unnamed rows land, ALFA does not
+move". Half held: the rows landed where the phrasing was close to what we
+wrote. The other half is false: 85 rows (0.02% of the pool) moved BM by
+−0.06 with p = 0.027 and flipped `create file` from 9/10 to 5/10 on prompts
+those rows were meant to fix. That is not what 85 rows do to a 345k-row
+gradient; it is what a different data order does. Same seed, but the extra
+rows shift every shuffle boundary after them, so run 8 is a different
+trajectory, not run 7 plus a nudge. **The seed-42, one-variable protocol
+does not isolate a data change this small from run-to-run variance**, and
+nothing in runs 4–8 measured that variance directly because no run was ever
+repeated.
+
+**Not shipping run 8.** A model that returns `fossil add` for `nak buat file
+baru` and loses 6 BM points does not replace run 7, whatever it fixed. #47
+stays open with the rows in place.
+
+**Next, in order, no GPU spent without an owner go-ahead:**
+
+1. Repeat run 7 exactly (`pool_v5`, seed 42) once. If it does not reproduce
+   run 7's probe within a few prompts, the noise floor on the probe is the
+   finding and every basics-row comparison so far needs that error bar.
+2. If run 7 reproduces, run 8 with seeds 43 and 44 on `pool_v6`. Two of
+   three agreeing beats one run of anything.
+3. Only then weight the rows (`create file` ×5) — the variable the run 7
+   hypothesis named as next if the rows drowned.
