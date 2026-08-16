@@ -1032,3 +1032,66 @@ is inside run 7's CI on every register and −0.02 EN on its own base.
 Next, if this thread continues: weight the real-mistake pairs (1.2% of the
 set today), or grow the head of the pool for the beginner verbs (#54's
 note) and DPO on top of that — the pool sets the prior, DPO trims it.
+
+
+## Retrieval over tldr in the prompt (issue #55)
+
+The issue says the cost measurement decides, so it comes first. Everything
+below is the pinned CPU build (`b10333`), `-ngl 0`, run 7 GGUF
+(`qwen-v5-Q4_K_M`), same decoding as `bench.py`, `training/bench_retrieval.py`.
+The GPU was busy with a training job while this ran, so absolute numbers
+carry that noise; the baseline row reproduces run 7's bench within it.
+
+**Embedding model.** `bge-small-en-v1.5` f16 GGUF, 67 MB on disk (the
+`bge-small / e5-small / arctic-xs` class the issue names; English-only, which
+matters below). Served by the same pinned `llama-server` with `--embeddings
+--pooling cls -c 512`: 0.2 s to load, **101 MB RSS**, **6–9 ms** per query
+embed at 2–4 threads. The embedder is not the cost.
+
+**Index.** `dataset/raw/tldr.csv` deduped on (description, command): 29,153
+lines, description embedded, line shape `description: command`. Vectors
+29,153 × 384 f16 = **22 MB** (the `.npz` with the text is 70 MB); building
+it is 4 min of CPU at 4 threads. Query → top-3 is 16–21 ms end to end.
+
+**Cost, both servers resident, 12 queries, median.** Three (or one)
+*distinct* tldr lines per query — a fixed set is not a measurement: the
+pinned server keeps evicted prompts in RAM and served a rotated fixed set
+from cache at 13 prompt tokens instead of 80.
+
+| threads | prompt | prompt tokens evaluated | warm s (max) | tok/s | combined RSS MB |
+|---|---|---|---|---|---|
+| 2 | baseline | 12 | 0.73–0.77 (1.4–1.7) | 26–27 | 1768 |
+| 2 | + top-3 `Examples:` | 80 | **2.06–2.18 (3.1)** | 26–28 | 1817 |
+| 2 | + top-1 | 31 | 1.10 (1.6) | 28 | 1821 |
+| 4 | baseline | 12 | 0.43–0.53 (0.8–1.3) | 30–42 | 1768 |
+| 4 | + top-3 `Examples:` | 80 | **1.30–1.31 (1.8)** | 38–41 | 1813 |
+| 4 | + top-1 | 31 | 0.61 (1.0) | 42 | 1816 |
+
+Two runs, both shown where they differ. RSS is not the problem: 1.8 GB
+combined, 0.7 GB under the ceiling. Prompt evaluation is: the tuned 1.5B
+processes prompt tokens at ~60–80 tok/s on 2 threads, so 68 extra tokens
+per query is 1.3 s before the first output token, every query, because the
+retrieved lines differ per query and defeat `cache_prompt`.
+
+**Verdict vs constraint 3.** `engine.go` gives a 4-core box 2 threads. At 2
+threads top-3 retrieval is **2.1 s median, 3.1 s worst**, over the 1.5 s
+warm budget on a host that is already faster than the target box. At 4
+threads it is 1.3 s median with a 1.8 s tail: under the median budget here,
+over it on the target. **Top-3 as the issue specifies does not fit.** Top-1
+fits (1.1 s at 2 threads, 0.6 s at 4), with less headroom than baseline and
+one line of context instead of three, so it is measured below rather than
+assumed useless.
+
+**Hypothesis, written before the probe run.** With top-1 retrieval on, the
+run 7 model will gain on the probe's holdout block (tools absent from
+basics.txt: `truncate`, `tac`, `tee`, `timeout`, `chsh`, `printenv`, `nl`)
+by ≥ +0.05, because for those tasks the right tldr line is the answer, and
+hold basics tasks within 0.02, because those the model already knows. Two
+things say the gain will be smaller than the idea promises: the embedder is
+English-only, so Malay phrasings that carry no English technical noun
+retrieve wrong lines (`nak buat file baru` → `hexedit`, `kioclient`;
+spot-checked before the run), and a bad line in front of a 1.5B model is a
+distractor, not a no-op. Falsified if holdout does not move or basics
+drops; then retrieval needs a multilingual embedder (`multilingual-e5-small`
+Q8 is ~120 MB, over the issue's cap) or a retrained model that has seen
+`Examples:` in training, both out of scope here.
