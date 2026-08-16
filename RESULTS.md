@@ -628,3 +628,36 @@ that is the arm.
 Order if arms are run: Qwen3.5-2B first (capability), Qwen3.5-0.8B second
 (the constraint-3 upgrade if its accuracy holds). Both need a `train.py`
 BASES entry; Qwen3.5 keeps ChatML so the template code is unchanged.
+
+
+## Arm: Qwen3.5-2B on the run 7 pool
+
+**Hypothesis, written before the run.** The incumbent's Malay comes from
+the pool alone; Qwen2.5-Coder-1.5B was pretrained for code and its Malay
+was incidental. Qwen3.5-2B (March 2026) is pretrained on 201 languages and
+a newer, larger corpus, and is 33% bigger. Tuned on the same pool
+(`pool_v5`, the run 7 pool), same recipe, seed 42, it will beat run 7 on BM
+and rojak by at least +0.05 each and hold English (within the noise floor).
+Falsified if no register clears the run 7 number by more than the CI, or if
+English drops significantly — then the base's advantage does not survive
+the tune and the 0.8B arm decides on constraint-3 grounds only.
+
+One variable changed from run 7: the base. Same pool, same seed, same
+LoRA rank/targets, same epoch count. Two implementation notes, neither a
+tuning choice:
+
+- Training text is now built from a literal ChatML string (`train.py`
+  `CHATML`) instead of `tokenizer.apply_chat_template`. For Qwen2.5 the two
+  are byte-identical (checked), so run 7 is unaffected. Qwen3.5's template
+  inserts an empty `<think>\n\n</think>\n\n` block before every assistant
+  turn; camne's engine never sends one, and a model trained to expect it
+  would emit `<think>` as its answer under camne's `\n` stop.
+- LoRA targets are unchanged (`q/k/v/o_proj`, `gate/up/down_proj`). In the
+  Qwen3.5 hybrid only every fourth block has `q/k/v/o`; the Gated-DeltaNet
+  blocks are untouched. MLPs are hit in every block. A wider target set is a
+  second variable and is not in this run.
+
+Bench gate for this base is above (24.5 tok/s @4t, RSS 2328 MB, 1281 MB on
+disk); the tuned GGUF will be re-benched, but the base numbers are already
+the shape of the trade: this arm buys accuracy, if it buys anything, at
+40% of the incumbent's speed margin.

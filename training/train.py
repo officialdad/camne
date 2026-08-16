@@ -35,7 +35,17 @@ SYSTEM = ("You are a shell command generator. Output exactly one line: a "
 BASES = {
     "qwen": "Qwen/Qwen2.5-Coder-1.5B-Instruct",
     "sealion": "aisingapore/Gemma-SEA-LION-v4.5-E2B-IT",
+    "qwen35-2b": "Qwen/Qwen3.5-2B",
+    "qwen35-08b": "Qwen/Qwen3.5-0.8B",
 }
+
+# The prompt camne sends at inference (internal/engine/engine.go), byte for
+# byte. Training text is built from this and not from the tokenizer's chat
+# template: Qwen2.5's template renders exactly this string, Qwen3.5's inserts
+# an empty <think></think> block before the assistant turn that camne never
+# sends, and Gemma's is not ChatML at all (sealion used it; see RESULTS.md).
+CHATML = ("<|im_start|>system\n{sys}<|im_end|>\n<|im_start|>user\n{nl}<|im_end|>\n"
+          "<|im_start|>assistant\n{cmd}<|im_end|>\n")
 
 
 def main():
@@ -66,10 +76,12 @@ def main():
     )
 
     def to_text(row):
-        msgs = [{"role": "system", "content": SYSTEM},
-                {"role": "user", "content": row["nl"]},
-                {"role": "assistant", "content": row["cmd"]}]
-        return {"text": tokenizer.apply_chat_template(msgs, tokenize=False)}
+        if args.base == "sealion":
+            msgs = [{"role": "system", "content": SYSTEM},
+                    {"role": "user", "content": row["nl"]},
+                    {"role": "assistant", "content": row["cmd"]}]
+            return {"text": tokenizer.apply_chat_template(msgs, tokenize=False)}
+        return {"text": CHATML.format(sys=SYSTEM, nl=row["nl"], cmd=row["cmd"])}
 
     rows = [json.loads(l) for l in open(args.data, encoding="utf-8")]
     ds = Dataset.from_list(rows).shuffle(seed=42).map(to_text)
