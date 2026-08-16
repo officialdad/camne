@@ -4,7 +4,8 @@
 #   setsid nohup ./rebuild.sh qwen-v5 ../dataset/out/pool_v5.jsonl > out/rebuild-qwen-v5.log 2>&1 &
 #
 # One variable per run, seed 42 (train.py). Third arg picks the train.py base
-# (default qwen, the incumbent). Read RESULTS.md before starting one:
+# (default qwen, the incumbent), fourth the seed (issue #57: repeat a run
+# under seeds 43/44 to measure the noise floor). Read RESULTS.md before starting one:
 # the hypothesis goes there first, as something that could come back false.
 set -euo pipefail
 cd "$(dirname "$0")"
@@ -12,11 +13,12 @@ export PATH="$HOME/.local/bin:$PATH"
 NAME=${1:?usage: rebuild.sh <name> <pool.jsonl> [base]}
 POOL=${2:?usage: rebuild.sh <name> <pool.jsonl> [base]}
 BASE=${3:-qwen}
+SEED=${4:-42}
 rm -f "out/REBUILD_DONE_$NAME"
 status() { echo "rebuild[$NAME]: $*"; }
 
-status "train (1 epoch, $(wc -l <"$POOL") rows)"
-uv run train.py --base "$BASE" --epochs 1 --data "$POOL" --out "out/$NAME-lora" || { echo "DONE rebuild:train-failed" >"out/REBUILD_DONE_$NAME"; exit 1; }
+status "train (1 epoch, seed $SEED, $(wc -l <"$POOL") rows)"
+uv run train.py --base "$BASE" --seed "$SEED" --epochs 1 --data "$POOL" --out "out/$NAME-lora" || { echo "DONE rebuild:train-failed" >"out/REBUILD_DONE_$NAME"; exit 1; }
 
 status "convert + quantize + generate en/bm answers"
 ./finish.sh "out/$NAME-lora-merged" "$NAME" || { echo "DONE rebuild:convert-failed" >"out/REBUILD_DONE_$NAME"; exit 1; }

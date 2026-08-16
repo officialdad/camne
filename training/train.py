@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """LoRA tune, adapted for the RTX 3090 per issue #2.
 
-One arm per invocation, one variable at a time, seed 42:
+One arm per invocation, one variable at a time, seed 42 (--seed to repeat a run):
 
   uv run train.py --base qwen
   uv run train.py --base sealion
@@ -58,6 +58,7 @@ def main():
     ap.add_argument("--grad-accum", type=int, default=2)
     ap.add_argument("--max-seq", type=int, default=160,
                     help="512 for runs 1-4; p100 of the pool is 122 tokens")
+    ap.add_argument("--seed", type=int, default=42)
     ap.add_argument("--epochs", type=float, default=2,
                     help="four registers per command means 1 epoch is already "
                          "4 exposures; 2 overfits on a narrow pool")
@@ -72,7 +73,7 @@ def main():
         model, r=32, lora_alpha=64, lora_dropout=0.05,
         target_modules=["q_proj", "k_proj", "v_proj", "o_proj",
                         "gate_proj", "up_proj", "down_proj"],
-        use_gradient_checkpointing="unsloth", random_state=42,
+        use_gradient_checkpointing="unsloth", random_state=args.seed,
     )
 
     def to_text(row):
@@ -84,7 +85,7 @@ def main():
         return {"text": CHATML.format(sys=SYSTEM, nl=row["nl"], cmd=row["cmd"])}
 
     rows = [json.loads(l) for l in open(args.data, encoding="utf-8")]
-    ds = Dataset.from_list(rows).shuffle(seed=42).map(to_text)
+    ds = Dataset.from_list(rows).shuffle(seed=args.seed).map(to_text)
     print(f"{len(ds)} rows from {args.data}")
 
     trainer = SFTTrainer(
@@ -101,7 +102,7 @@ def main():
             packing=False,
             max_seq_length=args.max_seq,
             bf16=True,
-            seed=42,
+            seed=args.seed,
             logging_steps=25,
             save_strategy="epoch",
             report_to="none",
