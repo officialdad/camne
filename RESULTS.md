@@ -661,3 +661,58 @@ Bench gate for this base is above (24.5 tok/s @4t, RSS 2328 MB, 1281 MB on
 disk); the tuned GGUF will be re-benched, but the base numbers are already
 the shape of the trade: this arm buys accuracy, if it buys anything, at
 40% of the incumbent's speed margin.
+
+### Result: falsified, the base does not carry
+
+Trained 2026-08-16, `qwen35-2b`, 10,802 steps, 2 h 55 m on the GPU, final
+loss 0.54 (run 7: 0.53). Merge, f16 convert (llama.cpp Aug-13 checkout,
+`Qwen3_5ForConditionalGeneration` → text GGUF) and Q4_K_M quantize went
+through unchanged; the GGUF is 1,312 MB.
+
+**ALFA, 300 tasks per register, paired exact McNemar vs run 7 (same pool,
+same seed, base is the only change):**
+
+| register | run 7 | Qwen3.5-2B | diff [95% CI] | lost / gained | p |
+|---|---|---|---|---|---|
+| BM | 0.487 | **0.417** | **−0.070 [−0.125, −0.015]** | 47 / 26 | **0.019** |
+| rojak | 0.490 | 0.453 | −0.037 [−0.092, +0.019] | 42 / 31 | 0.24 |
+| EN | 0.543 | 0.490 | −0.053 [−0.112, +0.006] | 49 / 33 | 0.097 |
+
+Worse on every register; significant on BM, the register the hypothesis
+said it would win by +0.05. Not one column moved the predicted way.
+
+**Probe** (223 prompts, tool-level): basics tasks **0.83** (run 7: 0.90),
+holdout **0.72** (0.78), colloquial 0.74 (0.84), english 0.83 (1.00),
+count 0.60 (1.00). `create file` 3/10 (`fossil add path/to/file` again,
+this time even on `create a new file`), `delete file` loses 4 of 6,
+`kill process on port` 0/4. Homograph BM-sense 1.00, shortcut 1.00 — the
+two axes it did not lose.
+
+**#47 prompts, exact:** `nak buat file baru` → `fossil add path/to/file`;
+`nak buat folder baru` → `mkdir /tmp/new_directory`; `nak buat user baru`
+→ `sudo useradd username`; `nak list port bukak` → `netstat -an | grep
+:80`; `nak install btop untuk arch` → `sudo pacman -S btop`; `nak exit
+vim` → `<Esc>:q<Enter>`.
+
+**Bench, tuned GGUF, CPU, pinned build:** 4 threads 28.2 tok/s / 0.60 s
+warm / 2.08 s cold / 2089 MB. Clears constraint 3, with less room than the
+incumbent on every axis (run 7: 36.8 / 0.57 / 1.38 / 1626).
+
+**Reading.** 201-language pretraining and 33% more parameters did not
+survive one epoch of the same LoRA on the same pool; the tuned Qwen3.5-2B
+is a worse camne than the tuned Qwen2.5-Coder-1.5B on Malay, on English,
+on the beginner probe, and on speed. The one confound worth naming: the
+LoRA targets hit `q/k/v/o` in only every fourth Qwen3.5 block (the
+Gated-DeltaNet blocks have none), so this arm adapted less of the network
+than run 7 did. Widening the targets to the linear-attention projections is
+a legitimate second arm. It is not run here: it is a second variable, and
+the −0.07 BM gap is bigger than what a target-set change usually buys.
+
+**Not shipping. Not running the 0.8B arm without an owner go-ahead**: it is
+half the incumbent's parameters from a family that just lost at 133% of
+them; its case was constraint 3, and constraint 3 is not what needs
+fixing.
+
+The `train.py` change (literal ChatML training text) stays: it is
+byte-identical for the incumbent and removes the chat-template dependency
+for every future base.
