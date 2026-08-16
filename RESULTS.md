@@ -1113,7 +1113,7 @@ columns share them.
 | homograph BM-sense / EN-sense | 1.00 / 0.67 | 0.33 / 0.67 | 3 / 3 |
 
 Paired over all 223 prompts: **lost 93, gained 7** (exact two-sided
-p ≈ 1e-19). Not a small miss; the mechanism does the opposite of the
+p ≈ 3e-20). Not a small miss; the mechanism does the opposite of the
 hypothesis.
 
 **What the failures look like.** The model treats the retrieved line as the
