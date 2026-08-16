@@ -870,3 +870,40 @@ vs run 7, bench, all with #57's error bar in mind.
 GPU command, from the worktree's `training/`:
 `./rebuild.sh qwen-v7 ../dataset/out/pool_v7.jsonl` — queued behind the
 running job, one at a time (#56, #57).
+
+**Result (2026-08-17): the pool prior moves the probe, not ALFA.** `qwen-v7`,
+228,357 rows, 2 h 40 min train on the 3090. Error bar from #57: same recipe
+reproduces to ≤ 0.013 per register.
+
+| register | run 7 | run 9 (v7) | diff | 95% CI | lost / gained | p |
+|---|---|---|---|---|---|---|
+| BM | 0.487 | 0.513 | +0.027 | [−0.029, +0.083] | 33 / 41 | 0.42 |
+| rojak | 0.490 | 0.517 | +0.027 | [−0.026, +0.080] | 29 / 37 | 0.39 |
+| EN | 0.543 | 0.563 | +0.020 | [−0.036, +0.076] | 34 / 40 | 0.56 |
+
+All three registers up, none clears its CI. The churn is the story: ~35
+tasks lost and ~40 gained per register — ten times run 7 vs v5b — so a
+34% pool cut is a different model, and 300 tasks cannot say whether it is
+a better one. English did not drop, so the run-2 fear did not come true.
+
+Probe: 199 / 222 both, not the same 199. What the issue was for is fixed:
+`create file` 8/9 → 9/9 (`touch newfile.txt` on every phrasing, no more
+`fossil add path/to/file`), `create folder` 8/8, `create user` 2/5 → **5/5**
+(`sudo useradd -m newuser`, no more `kcadm.sh`), placeholder answers
+29 → **6** across the 222 prompts. What broke: `delete file` ×4 →
+`git obliterate file_1 file_2 ...` (was `rm path/to/file1 ...`, tool-right
+placeholder), `list processes` ×3 → `pm2 list`/`pm2 monit` (was `ps aux`),
+`edit file` → `less`, holdout 36 → 33 (`chsh`, `timeout`, `whereis` lost;
+`tee` ×2, `reverse lines/en` gained). `rm` and `ps` rows barely moved
+(1,618 → 1,539, 928 → 868); what moved is share — the core list is
+uncapped, so `git` went from 4.3% to 5.8% of the pool and `pm2` (84 rows,
+under the cap) from 0.02% to 0.04%. Capping the tail without growing the
+head redistributes the prior, it does not flatten it. Bench unchanged
+(4 threads 0.53 s warm, 39 tok/s, 1.49 GB RSS).
+
+Verdict: not shipping on ALFA alone (inside CI, per #57's protocol), but
+the probe targets #47/#53/#54 exist for are met on this pool. The next
+pool change should add head rows for the beginner verbs (`rm`, `ps`,
+`nano`) rather than cut more tail — and #56's DPO pairs already encode
+exactly the `git obliterate`/`pm2` class of miss, so DPO on this
+checkpoint (`DPO_BASE=out/qwen-v7-lora-merged`) is the cheap next arm.
