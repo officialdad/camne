@@ -219,3 +219,36 @@ _by = {}
 for _r in _b:
     _by.setdefault(_r["id"].split(".")[0], set()).add(_r["cmd"])
 assert all(len(v) == 1 for v in _by.values())
+
+# --- prior.py (issue #54: placeholder rewrite + long-tail cap) --------------
+from prior import rewrite, sample_ids
+
+for nl, cmd, want in (
+        # user typed the path: rewrite both sides, `path/to` leaves the command
+        ("senarai folder kat /path/to/dir", "find /path/to/dir -type d",
+         ("senarai folder kat projek", "find projek -type d")),
+        ("copy /path/to/data/app ke host:/remote/path/to/data/app",
+         "rsync -r /path/to/data/app host:/remote/path/to/data/app",
+         ("copy app ke host:/remote/app", "rsync -r app host:/remote/app")),
+        ("nak tengok fail <file>", "ncdu -f <file>", ("nak tengok fail notes.txt", "ncdu -f notes.txt")),
+        # NL never named it: drop
+        ("Create specific files", "touch path/to/file1 path/to/file2", None),
+        ("nak update package ni", "snap refresh <package>", None),
+        # NL names it but there is no safe concrete name for `<port>`: drop
+        ("proses kat port <port>", "netstat -pln | grep <port>", None),
+        # unmatched placeholder shapes: drop
+        ("delete files on the server", "mrm path/to/*.txt", None),
+        # keystrokes and HTML tags are not placeholders
+        ("nak keluar nano", "<Ctrl x>", ("nak keluar nano", "<Ctrl x>")),
+        ("quit less", "<q>", ("quit less", "<q>")),
+        ("first paragraph", "grep -o '<p>[^<]*</p>' page.html", ("first paragraph", "grep -o '<p>[^<]*</p>' page.html")),
+        ("nothing to do", "ls -la", ("nothing to do", "ls -la"))):
+    assert rewrite(nl, cmd) == want, (nl, cmd, rewrite(nl, cmd))
+
+# cap: whole pairs, deterministic, lands at or just past the target
+_rows = [{"id": f"t:{i}", "register": reg} for i in range(50)
+         for reg in ("formal", "colloquial", "rojak", "english")]
+_k = sample_ids(_rows, 30)
+assert _k == sample_ids(_rows, 30) and 30 <= 4 * len(_k) < 34, _k
+assert sample_ids(_rows, 1000) == {f"t:{i}" for i in range(50)}
+print("ok: prior checks pass")
