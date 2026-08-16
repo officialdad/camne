@@ -1095,3 +1095,64 @@ distractor, not a no-op. Falsified if holdout does not move or basics
 drops; then retrieval needs a multilingual embedder (`multilingual-e5-small`
 Q8 is ~120 MB, over the issue's cap) or a retrained model that has seen
 `Examples:` in training, both out of scope here.
+
+### Result: falsified, retrieval on halves the probe
+
+`probe.py --retrieve 1`, run 7 GGUF, same 223 prompts, `training/out/probe_qwen-v5_ret1.jsonl`;
+the off column is `probe_qwen-v5.jsonl` rescored with today's regexes so both
+columns share them.
+
+| | retrieval off (run 7) | retrieval on, top-1 | n |
+|---|---|---|---|
+| basics tasks (unseen phrasings) | 0.90 | **0.53** | 177 |
+| holdout (tools absent from basics.txt) | 0.90 | **0.30** | 40 |
+| english | 1.00 | 0.57 | 35 |
+| rojak | 0.91 | 0.57 | 35 |
+| colloquial | 0.84 | 0.35 | 31 |
+| formal | 0.83 | 0.71 | 35 |
+| homograph BM-sense / EN-sense | 1.00 / 0.67 | 0.33 / 0.67 | 3 / 3 |
+
+Paired over all 223 prompts: **lost 93, gained 7** (exact two-sided
+p ≈ 1e-19). Not a small miss; the mechanism does the opposite of the
+hypothesis.
+
+**What the failures look like.** The model treats the retrieved line as the
+answer, not as context: `nak buat fail baru` → `systemctl edit foo.service`,
+`nak tukar default shell ke zsh` → `unshare --shell=ash|bash|dash|ksh|zsh`,
+`tunjuk nilai variable HOME` → `flux var set --home`. When the retrieved
+line is right the answer is right — `empty the file app.log without
+deleting it` → `truncate [-s|--size] 0 app.log` (gained), `run ./slow.sh
+but stop it after 10 seconds` → `timeout 10 ./slow.sh`, `find where git and
+its man page are installed` → `whereis -s gcc -m git`. The seven gains are
+all of that shape and six of them are English or formal BM. So retrieval is
+only as good as the embedder, and an English-only embedder over Malay
+queries is wrong most of the time (`nak buat file baru` → `hexedit`,
+`kioclient`); the model then copies the wrong tool with confidence, and the
+`Examples:` framing also breaks phrasings it answered correctly with no
+context at all — 93 of them.
+
+**Reading.** Two independent problems, either fatal on its own:
+
+1. Cost. Top-3 is 2.1 s warm at the thread count camne gives a 4-core box,
+   on a host faster than the target. RSS is fine (1.8 GB). It is prompt
+   evaluation of ~70 uncacheable tokens per query on a 1.5B model at
+   ~70 tok/s. Nothing in the retrieval design changes that except fewer
+   tokens, and top-1 is already the floor.
+2. Accuracy. The run 7 model has never seen `Examples:` in a user turn and
+   copies whatever is there. That is fixable only by the thing the issue
+   puts out of scope — training rows with retrieved context — and only
+   worth attempting with an embedder that reads Malay, which is over the
+   100 MB cap (`multilingual-e5-small` Q8 ≈ 120 MB, f16 ≈ 230 MB).
+
+**Not running ALFA**: the probe result is a 40-point drop on the block the
+issue cares about, and ALFA generation is CPU-only while the GPU is busy
+(900 prompts × ~1.5 s ≈ 25 min per register per arm; feasible, pointless
+here). Command, if someone wants the number anyway, is the run 7 recipe with
+`probe.py --retrieve 1`'s prefix applied in `eval_gen.py`; that flag does not
+exist in `eval_gen.py` and is not being added for a result this clear.
+
+**Decision: closes #55 as measured.** Nothing ships. `retrieve.py`,
+`bench_retrieval.py` and `probe.py --retrieve K` stay so the next attempt
+(multilingual embedder + retrieval-aware training rows, if ever) starts
+from the measurement instead of the idea. Index file (`out/tldr_index.npz`)
+and the bge GGUF are build artifacts, not committed.
