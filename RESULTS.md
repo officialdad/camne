@@ -822,7 +822,7 @@ out/pool_v7.jsonl`, seed 42, deterministic):**
    list plus every tool basics.txt teaches, plus shell keywords `for`,
    `while`, `if`, `until`, `case`, which are composition, not tools).
    Sampled by whole pair so the four registers of a command stay together.
-   15,754 rows dropped from 61 tools (`az`, `aws`, `kubectl`, `cargo`,
+   15,754 rows dropped from 51 tools (`az`, `aws`, `kubectl`, `cargo`,
    `gh`, `tlmgr`, `pio`, `shuf`, … each 1,200 → 300).
 3. `find` to 5% of the final pool. It is core and genuinely common, but at
    17% it is the answer the model reaches for when unsure; 5% still leaves
