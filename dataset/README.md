@@ -20,6 +20,10 @@ augment_verbs.py  # → out/pool_v3.aug.jsonl    fill in Malay verbs the
                   # translator never reached for (`cipta` had 2 rows)
 rebalance.py      # → out/pool_v3.bal.jsonl    fix the tool-frequency
                   # inversion (`shuf` outweighed `touch` 11 to 1)
+basics.py         # basics.txt → out/basics.jsonl  hand-written beginner rows
+prior.py          # pool_v6 (= pool_v4.bal + basics) → out/pool_v7.jsonl
+                  # drop/rewrite path/to placeholders, cap the long tail at
+                  # 300, find to 5% (issue #54)
 ```
 
 Full rebuild from raw, no GPU:

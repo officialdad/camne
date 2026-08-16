@@ -774,3 +774,99 @@ inside the scorer's own ±5/300. Consequences:
 - Protocol, going into CLAUDE.md § "Model work": one seed suffices when
   the paired CI excludes zero; a delta inside ±0.02 is "no difference",
   never a trend; anything read off a single register at p ≥ 0.05 is noise.
+
+## Run 9: the pool's tool prior (issue #54)
+
+**Hypothesis, written before the run.** Runs 7, 8 and the Qwen3.5-2B arm
+all answer `nak buat file baru` with a tldr placeholder or `fossil add`,
+and run 8 showed that 85 hand rows do not move that. The cause is the
+prior the pool teaches, not a coverage hole: 16% of pool_v6's rows have
+`path/to/...` or `<name>` in the command, `find` alone is 17% of the pool,
+and 4,819 distinct first tokens split the rest, so a prompt that lands
+off-distribution is answered with a placeholder from a tool the model saw
+300 times. Removing the placeholder rows, capping the long tail at 300
+rows per non-core tool and cutting `find` to 5% (`dataset/prior.py`,
+`pool_v7`) will (a) take the placeholder rate on the probe's outputs to
+zero, (b) fix `create file` unnamed (`nak buat file baru`,
+`nak buat satu file baru`, `tolong buat file baru`) with a real filename in
+the answer, and (c) hold ALFA English within run 7's CI. Falsified if the
+probe still emits `path/to` or a long-tail tool for the unnamed prompts —
+then the prior is in the base, not the pool — or if English drops by more
+than the CI, which would mean the 34% of rows removed were carrying
+accuracy (RESULTS.md, run 2, the mistake this cut is closest to
+repeating).
+
+One variable changed from run 7: the pool. `pool_v7 = prior.py(pool_v6)`,
+where `pool_v6 = pool_v4.bal + basics.jsonl` at 330 tasks; the 85 unnamed
+rows from #47 are in, so against run 7 the pool differs by the prior fix
+plus those rows, and against run 8 by the prior fix alone. Same recipe,
+seed 42, 1 epoch. Probe prompts unchanged, none verbatim in basics.txt.
+
+**What prior.py does, in order (`python3 prior.py out/pool_v6.jsonl
+out/pool_v7.jsonl`, seed 42, deterministic):**
+
+1. Placeholders. `path/to/...` and `<name>` in the command. Where every
+   placeholder also appears verbatim in the NL — the user typed the path,
+   `senarai folder kat /path/to/dir` → `find /path/to/dir -type d` — both
+   sides are rewritten to one concrete name (`path/to/dir` → `projek`,
+   `<file>` → `notes.txt`, otherwise the last path component) so the pair
+   stays consistent and `path/to` leaves the output vocabulary. Where the
+   NL never named it (every tldr `Create specific files` → `touch
+   path/to/file1 path/to/file2`), or there is no safe name (`<port>`,
+   `<package>`), the row is dropped. Keystrokes (`<Ctrl x>`, `<Enter>`,
+   `<q>`) are not placeholders and stay. 1,012 rows rewritten, 55,246
+   dropped. Rewritten commands are the only ones in the pool not
+   byte-identical to source; the diff is the placeholder token and nothing
+   else.
+2. Cap. 300 rows per first token for tools outside CORE (rebalance.py's
+   list plus every tool basics.txt teaches, plus shell keywords `for`,
+   `while`, `if`, `until`, `case`, which are composition, not tools).
+   Sampled by whole pair so the four registers of a command stay together.
+   15,754 rows dropped from 61 tools (`az`, `aws`, `kubectl`, `cargo`,
+   `gh`, `tlmgr`, `pio`, `shuf`, … each 1,200 → 300).
+3. `find` to 5% of the final pool. It is core and genuinely common, but at
+   17% it is the answer the model reaches for when unsure; 5% still leaves
+   it the single largest tool. 46,364 rows dropped. basics rows are exempt
+   from every rule.
+
+| | pool_v6 (run 8) | **pool_v7** |
+|---|---|---|
+| rows | 345,721 | **228,357** (−34%) |
+| distinct first tokens | 4,819 | 4,102 |
+| top-30 share | 35.3% | 29.4% |
+| rows with a placeholder in cmd | 56,258 (16.3%) | **0** |
+| `find` share | 16.9% (58,365) | 5.0% (11,484) |
+| `touch` / `mkdir` / `useradd` | 535 / 959 / 116 | 454 / 918 / 104 |
+| `az` / `aws` / `kubectl` / `shuf` | 1,200 each | 300 each |
+| `fossil` / `skicka` / `kcadm.sh` | 151 / 66 / 38 | 91 / 0 / 30 |
+| by source (nl2sh_train / tldr / extra / basics) | 187,891 / 95,848 / 59,401 / 2,581 | 109,995 / 66,758 / 49,047 / 2,581 |
+
+The `touch` rows lost are exactly the placeholder ones; every surviving
+`touch` names a real file. `nl2sh_train` lost the most: 26,869 of its
+rows carried `path/to` because that pool was itself partly tldr-derived.
+
+**Hand-read, 200 rows, `random.Random(42).sample`.** Registers read as
+intended: colloquial and rojak natural (`tlg buang all file _* and
+.DS_Store`, `nak tengok status semua job je kat sini`), formal circular-ish
+by design. Nothing prior.py rewrote read wrong (30 rewritten rows read
+separately: `Remount "bin"` and `mount device location` are dull but
+consistent on both sides). What did read wrong is older pool noise, none of
+it in this issue's scope, all counted so it can be its own issue: 246 rows
+whose command starts with a `$ ` prompt (`$ find /dev ...`, first token
+`$`); 11,779 rows (5%) with tldr's alternation syntax in the command
+(`ctest [-j|--parallel] 4`, `komac bash|elvish|fish|zsh`), which is not a
+runnable command; 139 `path\to\key` (wine reg, backslashes); 217
+`some_command`/`command1` placeholders; 48 rows where NL is the command
+itself; a few Indonesian slips (`kota`, `acak`) the stoplist does not
+know; and a handful of mismatched `extra` pairs (`Hapus entri dalam fail
+.bash_history` → `export HISTCONTROL=ignoreboth`).
+
+**Measure.** Run 7 to beat: ALFA BM 0.487 / rojak 0.490 / EN 0.543, probe
+basics 0.90 / holdout 0.78; run 8 for the same-rows comparison. New
+number: placeholder rate on the probe outputs (`path/to` or `<name>` in the
+answer), reported alongside. Then #47's exact-output prompts, `compare.py`
+vs run 7, bench, all with #57's error bar in mind.
+
+GPU command, from the worktree's `training/`:
+`./rebuild.sh qwen-v7 ../dataset/out/pool_v7.jsonl` — queued behind the
+running job, one at a time (#56, #57).
