@@ -907,3 +907,73 @@ pool change should add head rows for the beginner verbs (`rm`, `ps`,
 `nano`) rather than cut more tail — and #56's DPO pairs already encode
 exactly the `git obliterate`/`pm2` class of miss, so DPO on this
 checkpoint (`DPO_BASE=out/qwen-v7-lora-merged`) is the cheap next arm.
+
+
+## Run qwen-v5-dpo: DPO on the model's own mistakes (issue #56)
+
+**Hypothesis, written before the run.** Every SFT run so far has taught the
+model what to say and nothing about what not to say. Run 7's remaining
+misses are not coverage holes, they are near-misses on the same tokens the
+pool teaches: `touch path/to/file1 path/to/file2 ...` (right tool, tldr
+placeholder — 50,878 of the 345,636 pool rows carry `path/to`), and a
+same-pool obscure tool where the pool has a common one (`fossil add`,
+`skicka mkdir`, `kcadm.sh create users`, `lzop`, `gdu`, `fkill`, `smem`).
+Run 8 tried to fix these by adding rows and moved BM by −0.06 instead. A
+DPO stage that holds the gold as chosen and those exact outputs as rejected
+pushes against the failure directly, without adding rows to the SFT pool or
+changing its order. Prediction: on the shipped CPU path the placeholder
+rate on the probe's 177 basics-task prompts falls from **24/177 (0.14)** to
+under 0.03, `nak buat file baru` returns `touch newfile.txt` (or any
+`touch` with a real name), `nak buat user baru` returns `useradd`, and the
+three ALFA registers stay inside their run 7 CIs (BM 0.487, rojak 0.490,
+EN 0.543). Falsified if any ALFA register drops with p < 0.05 — then the
+preference stage is trading beginner exactness for one-liner accuracy and
+β or the pair mix is next — or if the placeholder rate does not move, which
+would mean 3,455 pairs at β = 0.1 do not shift a preference that 15% of the
+pool voted for.
+
+One variable vs run 7: the DPO stage. `training/dpo.py` puts a fresh
+r32/a64 LoRA on the run 7 merged checkpoint (`out/qwen-v5-lora-merged`),
+TRL `DPOTrainer`, sigmoid loss, β = 0.1, 1 epoch, seed 42, effective batch
+32, lr 5e-6 (Unsloth's DPO reference recipe; SFT's 2e-4 would wreck the
+policy), reference = the same weights with the adapter disabled. Prompt
+text is train.py's literal ChatML. Same GGUF path as every run
+(`finish.sh` → f16 → Q4_K_M), same pinned CPU probe. `trl` 0.24.0 was
+already in `uv.lock` (unsloth pulls it); nothing was added.
+
+**Pairs, `training/dpo_pairs.py` → `out/dpo_pairs.jsonl`, 3,455 total:**
+
+| kind | n | chosen | rejected |
+|---|---|---|---|
+| probe-wrong | 18 | basics.txt command for the probe task | run 7's actual output (`gdu --disk-usage`, `fkill :8080`, `kcadm.sh create users ...`, `jobs`, `smem --memstats`, `tempdir -c` ...) |
+| probe-placeholder | 22 | same | run 7's tool-level pass that was a placeholder (`touch path/to/file1 path/to/file2 ...`, `skicka mkdir path/to/folder`, `rm path/to/file1 ...`, `chmod 644 /path/to/file`) |
+| synth-placeholder | 999 | basics.txt gold, every phrasing | gold with names swapped for `path/to/file` / `path/to/directory` |
+| synth-tool-swap | 2,416 | basics.txt gold, every phrasing | gold's tool swapped for what run 7 reached for (`touch`→`fossil add`, `mkdir`→`skicka mkdir`, `useradd`→`kcadm.sh create users`, `tar`→`lzop`, `df`→`gdu`, `kill`→`fkill`, `free`→`smem`) or a low-count pool tool drawn with seed 42 |
+
+Unweighted: the 40 real-mistake pairs are 1.2% of the set. If the probe
+misses persist while the synthetic kinds land, weighting the real pairs is
+the next variable, not a bigger β.
+
+**Split, stated.** ALFA is not touched: no pair is built from any ALFA
+task, and the three basics.txt English phrasings that are verbatim
+nl2sh_test prompts (`print hello world`, `print the current user`, `list
+all users on the system`) are dropped from the pair set. The probe main
+block is **not** clean after this run: the 40 probe-* pairs train on the
+probe's own prompts, so post-DPO basics-task numbers measure recall of the
+fix, not phrasing generalisation; read them as "did the specific miss go
+away", and read the ALFA and HOLDOUT columns for generalisation. HOLDOUT
+(no basics.txt command to serve as chosen) and the homograph guard get no
+pairs and stay clean. Homograph EN-sense (`fails` = failure) is the
+regression to watch: `nak buat fail baru` → `touch` is now a chosen row.
+
+Measured before the run (run 7, shipped model, pinned CPU build): probe
+basics 0.90 / holdout 0.78 / homograph 1.00 / 0.67, placeholder rate 24/177
+on basics prompts and 25/223 overall, ALFA BM 0.487 / rojak 0.490 / EN
+0.543, bench 4 threads 36.8 tok/s / 0.57 s warm / 1.38 s cold / 1626 MB.
+#47 prompts exact: see the run 8 table above (run 7 column).
+
+Order: queued behind #54's retrain. If #54 ships, `DPO_BASE=out/<54
+merged>` puts this stage on top of it and the comparison row becomes #54's
+run instead of run 7; the pairs are rebuilt from that run's probe file
+(`dpo_pairs.py --probe out/probe_<54>.jsonl`). Not started; hypothesis
+written first.
