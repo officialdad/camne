@@ -744,3 +744,33 @@ If the hypothesis holds, next is `pool_v6` under seeds 43 and 44
 file, the README table, and CLAUDE.md § "Model work". If it does not hold,
 seeds 43/44 go on `pool_v5` first, because the question becomes how wide
 the same run is, not how wide run 8 is.
+
+**Result (2026-08-16): the hypothesis holds.** `qwen-v5b` = run 7 recipe,
+untouched, 3 h 10 min train + 1 h post on the 3090.
+
+| register | run 7 | v5b | diff | 95% CI | lost / gained | p |
+|---|---|---|---|---|---|---|
+| BM | 0.487 | 0.483 | −0.003 | [−0.015, +0.008] | 2 / 1 | 1 |
+| rojak | 0.490 | 0.487 | −0.003 | [−0.015, +0.008] | 2 / 1 | 1 |
+| EN | 0.543 | 0.530 | −0.013 | [−0.029, +0.003] | 5 / 1 | 0.22 |
+
+Probe: **222 / 222 outputs byte-identical** to run 7's. The five prompts
+whose pass/fail differ (`empty a file` ×4, `printenv/collo`) are the
+`14d6c23` probe-scorer fix landing between the two probe runs, not the
+model — same string both times, judged differently. Bench within noise
+(4 threads: 0.47 s warm, 39 tok/s, 1.5 GB RSS).
+
+So the same pool and seed reproduce to a few ALFA tasks out of 300 and zero
+probe prompts. The run-to-run floor is ≤ 0.013 per register (≤ 4 tasks),
+inside the scorer's own ±5/300. Consequences:
+
+- Run 8's −0.060 BM (p = 0.027) is **not** shuffle noise; the 85 unnamed
+  rows really did move it, and #47's next attempt has to explain why.
+- A claim of a difference needs to clear about ±0.02 per register (roughly
+  the CI half-width above plus the scorer floor), which is what the paired
+  McNemar CI already reports; a second seed is not required for a delta
+  that clears its CI at p < 0.05. Seeds 43/44 (step 3 of the issue) are
+  therefore skipped — the trigger was "outside ±0.02", and it was not.
+- Protocol, going into CLAUDE.md § "Model work": one seed suffices when
+  the paired CI excludes zero; a delta inside ±0.02 is "no difference",
+  never a trend; anything read off a single register at p ≥ 0.05 is noise.
