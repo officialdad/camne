@@ -9,33 +9,30 @@
 [![Go](https://img.shields.io/github/go-mod/go-version/officialdad/camne)](go.mod)
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue)](LICENSE)
 
-> **Status: beta.** camne runs
-> [camne-1.5b](https://huggingface.co/opariffazman/camne-1.5b-Q4_K_M), tuned on
-> 76k command pairs in four registers plus 326 hand-written beginner tasks.
-> Malay and rojak questions answer well, and the first fifty things a beginner
-> asks — create, list, delete, copy, find, disk, permissions, "how do I quit
-> vim" — pass 90% of unseen phrasings on the repo's probe. On advanced
-> English one-liners it is measurably worse than the English-only model it
-> replaces (−0.06, p = 0.036); if you only ever type English, use
-> [whatisit](https://github.com/ThorOdinson246/whatisit-nl2sh). Numbers,
-> including the failed runs, in [RESULTS.md](RESULTS.md).
+Ask a terminal question in Malay, get the command back.
 
-*camne* is how people say *macam mana* / *bagaimana*: "how".
-
-Ask a terminal question in Malay, get the command back. Everything runs on your
-machine and there is nothing to set up.
-
-![camne demo: a colloquial Malay question and the syntax-highlighted English command it prints, a magenta `camne warning:` line above a command that touches /etc, the camne wordmark on the first run after an update while it re-checks the model it already has, and `camne doctor` on a fresh machine](demo/demo.gif)
+*camne* is how people say *macam mana* / *bagaimana*: "how". Type it the way
+you would ask a friend.
 
 ```console
-$ camne nak cari file besar dari 100MB dalam home
-find ~ -type f -size +100M
+$ camne nak exit vim
+<Esc>:q<Enter>
+
+$ camne nak tengok fail hidden
+ls -a
+
+$ camne nak pasang zsh
+  camne warning: runs as root
+sudo apt install zsh
+
+$ camne nak list port bukak
+lsof -i
 ```
 
-It is not only for "do this task for me". Questions about the CLI itself count
-too: which flag does what, which tool to reach for, how a shell shortcut works.
-The answer comes back as one command line, and camne only prints it. Nothing
-runs.
+![camne demo: five beginner questions typed in colloquial Malay, each answered with one English shell command; the one that needs root gets a magenta camne warning line above it](demo/demo.gif)
+
+camne only prints the command. It never runs it. You read it, then you decide
+whether to type it.
 
 ## Install
 
@@ -43,60 +40,110 @@ runs.
 curl -fsSL https://raw.githubusercontent.com/officialdad/camne/main/install.sh | sh
 ```
 
-The installer puts the binary in `/usr/local/bin` if that directory is
-writable, otherwise `~/.local/bin`. It tells you when that directory is not on
-your `PATH` yet.
+Then ask something:
 
-Already installed? Run `camne update` — it replaces the binary in place, so the
-installer is a first-time-only step.
+```sh
+camne nak reset password
+```
 
-Windows: download `camne_windows_amd64.exe` (or `camne_windows_arm64.exe`) from
-[Releases](https://github.com/officialdad/camne/releases).
+The first time, camne downloads what it needs (about 1 GB, once) and shows the
+progress. After that it works offline. Your questions never leave your
+computer.
 
-## Usage
+On Windows, download `camne_windows_amd64.exe` (or `camne_windows_arm64.exe`)
+from [Releases](https://github.com/officialdad/camne/releases).
 
-On first run camne downloads llama-server and the model (about 1 GB, once),
-printing the size before it starts and the progress while it runs. After that
-it works offline, so your questions never leave the machine. To see what is
-missing without downloading anything, run `camne doctor`.
+Already installed? `camne update` gets the newest version.
+
+## How to ask
+
+Colloquial Malay, rojak, or English all work. camne answers in English either
+way, because commands are English.
 
 ```console
-$ camne cari file lagi besar dari 100MB
-find / -size +100M
+$ camne nak cari file besar dari 100MB dalam home
+find ~ -size +100M
 
+$ camne nak kira berapa banyak file dalam folder ni
+find . -type f | wc -l
+
+$ camne how do I see disk space
+df -h
+```
+
+Questions about the terminal itself count too: which flag does what, which
+tool to reach for, how to get out of an editor.
+
+**Spelling changes the answer.** Bahasa pasar spelling is fine (`bukak`,
+`tgk`, `mcm mana`), but the same question spelled two ways can come back with
+two different commands. `nak list port bukak` gives `lsof -i`; `nak list port
+buka` gives `netstat -an | grep -i listen`. Both list open ports. If an answer
+looks off, ask again in different words. This is a beta model trained mostly
+on standard spelling; the pasar forms are still being added.
+
+## Warnings
+
+Some commands deserve a second look before you run them: anything that
+deletes, anything that needs root, anything that touches a system folder.
+camne prints a magenta `camne warning:` line above those, one line per reason.
+
+```console
 $ camne nak delete semua file dalam /etc
   camne warning: find + delete: target is the critical path /etc
 find /etc -type f -exec rm {} \;
 ```
 
-Anything the safety checker flags gets one bright-magenta `camne warning:` line
-per reason, on stderr, above the command. Dangerous and merely-worth-a-second-
-look commands share that one shape — the reason is what tells them apart. camne
-prints either way and executes neither.
+The command still prints. camne runs nothing, warned or not.
+
+## Other commands
+
+| command | what it does |
+|---|---|
+| `camne doctor` | checks the install and says what is missing, without downloading anything |
+| `camne update` | installs the newest release in place |
+| `camne stop` | shuts down the model camne keeps in memory between questions |
+
+Once a day, after it has answered, camne asks GitHub whether a newer release
+exists and offers to install it. Nothing downloads until you say yes, and the
+check is skipped when camne's output is piped somewhere.
+
+## For the curious
+
+The rest of this file is about how camne works and how well it works. You do
+not need any of it to use camne.
+
+### What runs on your machine
+
+camne is one Go binary. On first run it fetches
+[llama-server](https://github.com/ggml-org/llama.cpp) and the
+[camne-1.5b](https://huggingface.co/opariffazman/camne-1.5b-Q4_K_M) model into
+`~/.cache/camne`. Both stay local. There is no account, no telemetry, and no
+network call except the download and the once-a-day release check.
+
+It runs on 4 cores and 8 GB of RAM with no GPU. Warm answers take under a
+second; a cold start is under two.
 
 The command is syntax-highlighted and the warnings are coloured only when the
 output is a terminal. Pipe it anywhere (`camne ... | sh`, `$(camne ...)`) and
-you get plain bytes, which is what any program reading camne's output would
-see. `NO_COLOR` or `TERM=dumb` turns colour off everywhere.
+you get plain bytes. `NO_COLOR` or `TERM=dumb` turns colour off everywhere.
 
-You type Malay; camne answers in English. The question can be colloquial
-(`camne nak buat file baru`), rojak, or plain English — the command and every
-line camne prints come back in English.
+### The model
 
-Three other commands: `camne doctor` checks the install, `camne stop` shuts down
-the model held in memory, and `camne update` installs the newest release.
+camne-1.5b is Qwen2.5-Coder-1.5B tuned on 76k command pairs in four
+registers (formal Malay, colloquial, rojak, English) plus 330 hand-written
+beginner tasks. Status: beta.
 
-Once a day, after it has printed an answer, camne asks GitHub whether a newer
-release exists and offers to install it — nothing is downloaded or replaced
-until you answer the prompt. The check sends nothing but that question, never
-runs before the answer, and is skipped entirely when camne's output is piped
-somewhere.
+Malay and rojak questions answer well, and the first fifty things a beginner
+asks (create, list, delete, copy, find, disk, permissions, "how do I quit
+vim") pass 90% of unseen phrasings on the repo's probe. On advanced English
+one-liners it is worse than the English-only model it replaces (-0.06,
+p = 0.036). If you only ever type English, use
+[whatisit](https://github.com/ThorOdinson246/whatisit-nl2sh).
 
-## The model
-
-[InterCode-ALFA](https://github.com/westenfelder/InterCode-ALFA), unmodified
-scorer, 300 tasks per register. Rojak — Malay grammar around English technical
-nouns — is what people actually type, so it is the column that matters.
+Scores below are [InterCode-ALFA](https://github.com/westenfelder/InterCode-ALFA),
+unmodified scorer, 300 tasks per register. Rojak, Malay grammar around
+English technical nouns, is what people type most, so it is the column that
+matters.
 
 | model | BM | rojak | EN | beginner tasks* | size | tok/s @4t | RSS |
 |---|---|---|---|---|---|---|---|
@@ -108,14 +155,14 @@ nouns — is what people actually type, so it is the column that matters.
 data does not contain, scored on whether the right tool comes back.
 
 Against the English model: Malay +0.177 (p = 3e-08), rojak +0.043 (p = 0.13,
-unresolved at 300 tasks), English −0.060 (p = 0.036) — a real regression,
-stated. Against the previous revision the benchmark cannot tell them apart;
-the beginner probe can (+0.11, p = 0.002). Speed and memory are unchanged:
-same base, same quantisation, same file size.
+unresolved at 300 tasks), English -0.060 (p = 0.036). Against the previous
+revision the benchmark cannot tell them apart; the beginner probe can (+0.11,
+p = 0.002). Speed and memory are unchanged: same base, same quantisation,
+same file size.
 
 Full method, the runs that failed, and why, in [RESULTS.md](RESULTS.md).
 
-## Build from source
+### Build from source
 
 ```sh
 go build ./cmd/camne        # local binary
