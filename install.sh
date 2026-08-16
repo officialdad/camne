@@ -79,4 +79,4 @@ case ":$PATH:" in
 	*) echo "Note: add $DIR to your PATH first, like this:"
 	   echo "  export PATH=\"\$PATH:$DIR\"" ;;
 esac
-echo "Try it: camne nak buat file baru"
+echo "Try it: camne nak buat file nota.txt"
