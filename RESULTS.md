@@ -486,3 +486,233 @@ puts `deepseek-coder-1.3b` first and the two general 1B models last. **Not
 run in this loop**: the loop's exit criterion was met by run 7, and
 spending six GPU days on arms is a decision the owner makes with the run 7
 numbers in hand. Retrieval-over-tldr and distillation are likewise unrun.
+
+
+## Run 8: the unnamed rows (issue #47)
+
+**Hypothesis, written before the run.** Run 7's remaining `create a file`
+failures are one hole, not a family: every `touch`/`mkdir`/`useradd`/`tar`
+row in basics.txt names its target (`touch notes.txt`, `useradd -m ali`), so
+a bare request with no name — `nak buat satu file baru`, `nak buat user
+baru`, `nak compress folder ni` — falls back to the tldr row and returns
+`touch path/to/file1 path/to/file2 ...`, `skicka mkdir path/to/folder`,
+`kcadm.sh create users ...`. Adding four unnamed blocks (`touch
+newfile.txt`, `mkdir newfolder`, `sudo useradd -m newuser`, `tar -czf
+folder.tar.gz folder`, ~85 rows in four registers) plus two `bukak`
+phrasings on `ss -tulpn` will make the unnamed phrasings return a command
+with a real name in it, without moving ALFA in any register (the change is
+0.02% of the pool). Falsified if the unnamed prompts still return
+placeholders — that would mean the tldr `touch` row (116 copies) outweighs a
+dozen hand rows and weighting is next.
+
+One variable changed from run 7: `pool_v6 = pool_v4.bal + basics.jsonl`
+with basics.txt at 330 tasks / 2,581 rows (was 326 / 2,496). Same recipe,
+seed 42, 1 epoch. Probe prompts are unchanged; none is verbatim in
+basics.txt.
+
+Measured before the run, shipped run 7 model, `camne` v0.8.0 (the probe
+scores tool-level and already passes these, so the check is exact output):
+
+| prompt | run 7 |
+|---|---|
+| `nak buat file baru` | `touch path/to/file1 path/to/file2 ...` |
+| `nak buat satu file baru` | `touch path/to/file1 path/to/file2 ...` |
+| `tolong buat file baru` | `touch path/to/file1 path/to/file2 ...` |
+| `nak buat folder baru` | `skicka mkdir path/to/folder` |
+| `buat folder baru je` | `skicka mkdir path/to/folder` |
+| `nak buat user baru` | `kcadm.sh create users -s username=username -r realm_name` |
+| `nak compress folder projek` | `zip -r project.zip projek` |
+| `nak list port bukak` / `buka` / `terbuka` | `lsof -i` / `netstat -an \| grep -i listen` / `lsof -i` |
+
+### Result: the rows land, the run does not
+
+Trained 2026-08-16, `qwen-v6`, 10,804 steps, 2 h 58 m on the GPU. Same
+recipe as run 7, seed 42, 1 epoch. Everything below is the pinned CPU
+llama build, the shipped path.
+
+**The unnamed prompts, exact output** (the thing #47 is about):
+
+| prompt | run 7 | run 8 |
+|---|---|---|
+| `nak buat file baru` | `touch path/to/file1 path/to/file2 ...` | **`fossil add path/to/file`** |
+| `nak buat satu file baru` | `touch path/to/file1 ...` | `touch newfile.txt` |
+| `tolong buat file baru` | `touch path/to/file1 ...` | `touch newfile.txt` |
+| `create a new file` | `touch path/to/file1 ...` | `touch newfile.txt` |
+| `nak buat folder baru` | `skicka mkdir path/to/folder` | `mkdir newfolder` |
+| `buat folder baru je` | `skicka mkdir path/to/folder` | `mkdir newfolder` |
+| `nak buat user baru` | `kcadm.sh create users ...` | `sudo useradd -m new_user` |
+| `nak compress folder projek` | `zip -r project.zip projek` | `zip -r projek.zip projek` |
+| `nak list port bukak` | `lsof -i` | **`sudo ufw status`** |
+| `nak list port buka` / `terbuka` | `netstat -an \| grep -i listen` / `lsof -i` | `netstat -lnptu` / `netstat -tulpn` |
+
+Seven of ten now return a real command with a real name in it, which is
+what the hypothesis predicted for the rows we wrote. The two failures are
+the two that matter most: `nak buat file baru` (the README's original
+headline, and a probe prompt) moved from a tldr placeholder to `fossil add`,
+and `bukak` moved from a valid tool to a firewall status command.
+
+**Probe** (`probe_qwen-v6.txt`, 223 prompts, tool-level): basics tasks
+0.89 (run 7: 0.90), holdout 0.82 (0.78), homograph BM-sense **0.33 (1.00)**.
+`create file` fell from 9/10 to **5/10**: every colloquial phrasing with
+`file baru` / `fail baru` and no count now returns `fossil add path/to/file`.
+`kill process on port` went 4/4 to 0/4 (`fkill :8080`, a real tool the
+regex does not know; scored as a fail, arguably a pass). `run script` 5/5 to
+0/5 (`source <(curl -s https://raw.githubusercontent.com/...)` — worse than
+wrong). English fell 1.00 → 0.91.
+
+**ALFA, 300 tasks per register, paired exact McNemar run 8 vs run 7:**
+
+| register | run 7 | run 8 | diff [95% CI] | lost / gained | p |
+|---|---|---|---|---|---|
+| BM | 0.487 | **0.427** | **−0.060 [−0.110, −0.010]** | 39 / 21 | **0.027** |
+| rojak | 0.490 | 0.520 | +0.030 [−0.022, +0.082] | 27 / 36 | 0.31 |
+| EN | 0.543 | 0.553 | +0.010 [−0.038, +0.058] | 25 / 28 | 0.78 |
+
+BM lost 6 points, significant. Rojak and English are inside the noise
+floor. Bench: 4 threads 36.2 tok/s / 0.59 s warm / 1.26 s cold / 1585 MB,
+unchanged from run 7 as expected (same base, same quant, 986 MB).
+
+**Reading.** The hypothesis was "the unnamed rows land, ALFA does not
+move". Half held: the rows landed where the phrasing was close to what we
+wrote. The other half is false: 85 rows (0.02% of the pool) moved BM by
+−0.06 with p = 0.027 and flipped `create file` from 9/10 to 5/10 on prompts
+those rows were meant to fix. That is not what 85 rows do to a 345k-row
+gradient; it is what a different data order does. Same seed, but the extra
+rows shift every shuffle boundary after them, so run 8 is a different
+trajectory, not run 7 plus a nudge. **The seed-42, one-variable protocol
+does not isolate a data change this small from run-to-run variance**, and
+nothing in runs 4–8 measured that variance directly because no run was ever
+repeated.
+
+**Not shipping run 8.** A model that returns `fossil add` for `nak buat file
+baru` and loses 6 BM points does not replace run 7, whatever it fixed. #47
+stays open with the rows in place.
+
+**Next, in order, no GPU spent without an owner go-ahead:**
+
+1. Repeat run 7 exactly (`pool_v5`, seed 42) once. If it does not reproduce
+   run 7's probe within a few prompts, the noise floor on the probe is the
+   finding and every basics-row comparison so far needs that error bar.
+2. If run 7 reproduces, run 8 with seeds 43 and 44 on `pool_v6`. Two of
+   three agreeing beats one run of anything.
+3. Only then weight the rows (`create file` ×5) — the variable the run 7
+   hypothesis named as next if the rows drowned.
+
+
+## Work item 3, second gate: bases released after the first list
+
+The #48 list predates Qwen3.5 (March 2026), Gemma 4 (April) and LFM2.5
+(August). Same gate as above: `bench.py`, CPU only, pinned llama b10333,
+Q4_K_M, untuned instruct GGUFs. Warm/cold latency is still a worst case for
+non-Qwen bases (bench sends ChatML and an untuned model runs to the 64-token
+cap); tok/s and RSS are the numbers.
+
+| base | disk MB | tok/s 2t / 4t | RSS MB @4t | constraint 3 |
+|---|---|---|---|---|
+| Qwen3.5-0.8B | 533 | 35.9 / 44.7 | 1289 | clears |
+| Qwen3.5-2B | 1281 | 16.6 / 24.5 | 2328 | clears, 170 MB margin |
+| LFM2.5-2.6B | 1674 | 15.2 / 22.2 | **2948** | **out: RSS** |
+| gemma-4-E2B-it | **3107** | not run | — | **out: disk alone exceeds the RSS cap** |
+| Qwen2.5-Coder-1.5B (incumbent, from the first gate) | 986 | 25.1 / 40.0 | 1628 | clears |
+
+Qwen3.5-2B is the strongest candidate on paper (Apache-2.0, 201 languages,
+Unsloth 2026.8 trains it, GGUF exists) and it clears, but not comfortably:
+40% slower than the incumbent at 4 threads (24.5 vs 40.0 tok/s; a 30-token
+answer is 1.2 s of generation before prompt eval, against a 1.5 s warm
+budget on a slower box than this one) and 700 MB more resident. The
+Gated-DeltaNet hybrid does not buy CPU speed in llama.cpp at this size.
+Qwen3.5-0.8B clears everything with room and is 12% faster than the
+incumbent, at 55% of its parameters. Neither has an accuracy number yet;
+that is the arm.
+
+Order if arms are run: Qwen3.5-2B first (capability), Qwen3.5-0.8B second
+(the constraint-3 upgrade if its accuracy holds). Both need a `train.py`
+BASES entry; Qwen3.5 keeps ChatML so the template code is unchanged.
+
+
+## Arm: Qwen3.5-2B on the run 7 pool
+
+**Hypothesis, written before the run.** The incumbent's Malay comes from
+the pool alone; Qwen2.5-Coder-1.5B was pretrained for code and its Malay
+was incidental. Qwen3.5-2B (March 2026) is pretrained on 201 languages and
+a newer, larger corpus, and is 33% bigger. Tuned on the same pool
+(`pool_v5`, the run 7 pool), same recipe, seed 42, it will beat run 7 on BM
+and rojak by at least +0.05 each and hold English (within the noise floor).
+Falsified if no register clears the run 7 number by more than the CI, or if
+English drops significantly — then the base's advantage does not survive
+the tune and the 0.8B arm decides on constraint-3 grounds only.
+
+One variable changed from run 7: the base. Same pool, same seed, same
+LoRA rank/targets, same epoch count. Two implementation notes, neither a
+tuning choice:
+
+- Training text is now built from a literal ChatML string (`train.py`
+  `CHATML`) instead of `tokenizer.apply_chat_template`. For Qwen2.5 the two
+  are byte-identical (checked), so run 7 is unaffected. Qwen3.5's template
+  inserts an empty `<think>\n\n</think>\n\n` block before every assistant
+  turn; camne's engine never sends one, and a model trained to expect it
+  would emit `<think>` as its answer under camne's `\n` stop.
+- LoRA targets are unchanged (`q/k/v/o_proj`, `gate/up/down_proj`). In the
+  Qwen3.5 hybrid only every fourth block has `q/k/v/o`; the Gated-DeltaNet
+  blocks are untouched. MLPs are hit in every block. A wider target set is a
+  second variable and is not in this run.
+
+Bench gate for this base is above (24.5 tok/s @4t, RSS 2328 MB, 1281 MB on
+disk); the tuned GGUF will be re-benched, but the base numbers are already
+the shape of the trade: this arm buys accuracy, if it buys anything, at
+40% of the incumbent's speed margin.
+
+### Result: falsified, the base does not carry
+
+Trained 2026-08-16, `qwen35-2b`, 10,802 steps, 2 h 55 m on the GPU, final
+loss 0.54 (run 7: 0.53). Merge, f16 convert (llama.cpp Aug-13 checkout,
+`Qwen3_5ForConditionalGeneration` → text GGUF) and Q4_K_M quantize went
+through unchanged; the GGUF is 1,312 MB.
+
+**ALFA, 300 tasks per register, paired exact McNemar vs run 7 (same pool,
+same seed, base is the only change):**
+
+| register | run 7 | Qwen3.5-2B | diff [95% CI] | lost / gained | p |
+|---|---|---|---|---|---|
+| BM | 0.487 | **0.417** | **−0.070 [−0.125, −0.015]** | 47 / 26 | **0.019** |
+| rojak | 0.490 | 0.453 | −0.037 [−0.092, +0.019] | 42 / 31 | 0.24 |
+| EN | 0.543 | 0.490 | −0.053 [−0.112, +0.006] | 49 / 33 | 0.097 |
+
+Worse on every register; significant on BM, the register the hypothesis
+said it would win by +0.05. Not one column moved the predicted way.
+
+**Probe** (223 prompts, tool-level): basics tasks **0.83** (run 7: 0.90),
+holdout **0.72** (0.78), colloquial 0.74 (0.84), english 0.83 (1.00),
+count 0.60 (1.00). `create file` 3/10 (`fossil add path/to/file` again,
+this time even on `create a new file`), `delete file` loses 4 of 6,
+`kill process on port` 0/4. Homograph BM-sense 1.00, shortcut 1.00 — the
+two axes it did not lose.
+
+**#47 prompts, exact:** `nak buat file baru` → `fossil add path/to/file`;
+`nak buat folder baru` → `mkdir /tmp/new_directory`; `nak buat user baru`
+→ `sudo useradd username`; `nak list port bukak` → `netstat -an | grep
+:80`; `nak install btop untuk arch` → `sudo pacman -S btop`; `nak exit
+vim` → `<Esc>:q<Enter>`.
+
+**Bench, tuned GGUF, CPU, pinned build:** 4 threads 28.2 tok/s / 0.60 s
+warm / 2.08 s cold / 2089 MB. Clears constraint 3, with less room than the
+incumbent on every axis (run 7: 36.8 / 0.57 / 1.38 / 1626).
+
+**Reading.** 201-language pretraining and 33% more parameters did not
+survive one epoch of the same LoRA on the same pool; the tuned Qwen3.5-2B
+is a worse camne than the tuned Qwen2.5-Coder-1.5B on Malay, on English,
+on the beginner probe, and on speed. The one confound worth naming: the
+LoRA targets hit `q/k/v/o` in only every fourth Qwen3.5 block (the
+Gated-DeltaNet blocks have none), so this arm adapted less of the network
+than run 7 did. Widening the targets to the linear-attention projections is
+a legitimate second arm. It is not run here: it is a second variable, and
+the −0.07 BM gap is bigger than what a target-set change usually buys.
+
+**Not shipping. Not running the 0.8B arm without an owner go-ahead**: it is
+half the incumbent's parameters from a family that just lost at 133% of
+them; its case was constraint 3, and constraint 3 is not what needs
+fixing.
+
+The `train.py` change (literal ChatML training text) stays: it is
+byte-identical for the incumbent and removes the chat-template dependency
+for every future base.

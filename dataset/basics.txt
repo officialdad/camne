@@ -21,6 +21,12 @@ C: buat fail todo.md | nak buat fail baru todo.md
 R: nak create file todo.md | buat new file todo.md
 E: create a file named todo.md | new file todo.md
 
+cmd: touch newfile.txt
+F: Cipta satu fail baharu | Wujudkan satu fail kosong | Buat fail baharu yang kosong
+C: nak buat satu file baru | tolong buat file baru | buat file baru je | nak buat fail baru satu | camne nak buat file baru ni | nak buat satu fail kosong | tolong buatkan fail baru | mcm mana nak buat fail baru | buat fail kosong je
+R: nak create satu file baru | tolong create file baru | create new file je | nak buat new file | create file kosong satu | mcm mana nak create file baru | nak buat empty file baru
+E: create a new empty file | make a new file | new file please | how do I create a file | create an empty file here
+
 cmd: touch a.txt b.txt c.txt
 F: Cipta tiga fail baharu bernama a.txt, b.txt dan c.txt
 C: nak buat tiga fail a.txt b.txt c.txt | buat 3 fail sekali gus a.txt b.txt c.txt
@@ -58,6 +64,12 @@ F: Cipta satu direktori baharu bernama projek | Wujudkan folder projek
 C: nak buat folder baru nama projek | tolong buat direktori projek | buat folder projek kat sini | nak cipta folder projek
 R: nak create folder projek | create new folder nama projek | tolong buat folder projek
 E: create a new folder called projek | make a directory named projek | mkdir projek
+
+cmd: mkdir newfolder
+F: Cipta satu direktori baharu | Wujudkan satu folder baharu | Buat direktori baharu di sini
+C: nak buat satu folder baru | tolong buat folder baru | buat folder baru je | nak buat satu direktori | camne nak buat folder baru ni | tolong buatkan folder baru | mcm mana nak buat folder baru | buat direktori baru je
+R: nak create satu folder baru | tolong create folder baru | create new folder je | nak buat new folder | mcm mana nak create folder baru | nak buat satu directory baru
+E: create a new empty folder | make a new folder | new folder please | how do I create a folder | make a directory here
 
 cmd: mkdir photos
 F: Cipta direktori photos
@@ -791,6 +803,12 @@ C: nak mampatkan folder projek jadi projek.tar.gz | buat tar.gz dari folder proj
 R: nak compress folder projek to projek.tar.gz | buat tar.gz folder projek | archive folder projek jadi projek.tar.gz
 E: compress the projek folder into projek.tar.gz | make a tar.gz of the projek folder | archive projek as projek.tar.gz
 
+cmd: tar -czf folder.tar.gz folder
+F: Mampatkan folder tersebut menjadi fail tar.gz | Arkibkan folder ini
+C: nak mampatkan folder ni jadi tar.gz | tolong compress folder ni | nak zip folder ni jadi tar.gz | mampatkan satu folder | nak kecilkan folder ni | mcm mana nak mampatkan folder
+R: nak compress satu folder | tolong compress folder ni jadi tar.gz | compress folder ni je | nak archive folder ni | mcm mana nak compress folder | nak tar.gz folder ni
+E: compress a folder | make a tar.gz of this folder | archive this folder | how do I compress a folder
+
 cmd: tar -tzf backup.tar.gz
 F: Senaraikan kandungan arkib backup.tar.gz tanpa mengekstraknya
 C: nak tengok apa ada dalam backup.tar.gz tanpa extract | tunjuk isi backup.tar.gz je
@@ -903,7 +921,7 @@ E: ping 8.8.8.8 four times | send 4 pings to 8.8.8.8
 
 cmd: ss -tulpn
 F: Senaraikan semua port yang sedang mendengar beserta proses yang menggunakannya
-C: nak tengok port apa yang tengah terbuka | port mana yang tengah kena guna | tunjuk semua port yang listen
+C: nak tengok port apa yang tengah terbuka | port mana yang tengah kena guna | tunjuk semua port yang listen | nak tengok port yang bukak | port apa yang bukak skrg
 R: nak list open port kat laptop ni | show listening ports | port apa yang tengah dengar
 E: show all listening ports | list open ports and the processes using them | which ports are in use
 
@@ -1526,6 +1544,12 @@ F: Cipta pengguna baharu bernama ali beserta direktori rumahnya
 C: nak buat user baru nama ali | tambah pengguna ali | cipta akaun ali
 R: nak create new user ali | add user ali | buat user ali
 E: create a new user called ali | add a user named ali
+
+cmd: sudo useradd -m newuser
+F: Cipta satu pengguna baharu | Tambah akaun pengguna baharu pada sistem
+C: nak buat satu user baru | tolong buat user baru | tambah user baru | nak tambah pengguna baru | buat akaun user baru | mcm mana nak buat user baru | nak buat satu akaun baru kat laptop ni
+R: nak create satu user baru | tolong create user baru | add new user | nak add user baru | create user account baru | mcm mana nak create user baru
+E: add a new user | create a user account | make a new user on this machine | how do I add a user
 
 cmd: sudo passwd ali
 F: Tetapkan kata laluan bagi pengguna ali
