@@ -74,6 +74,37 @@ df -h
 Questions about the terminal itself count too: which flag does what, which
 tool to reach for, how to get out of an editor.
 
+### Give it something to work with
+
+camne answers exactly what you asked. A bare request gets a bare, sometimes
+placeholder answer; a request with names in it gets a command you can run.
+
+```console
+$ camne nak install btop
+btop
+
+$ camne nak install btop untuk arch
+  camne warning: runs as root
+sudo pacman -S btop
+
+$ camne nak cari file
+find / -name <filename>
+
+$ camne nak cari file report.pdf dalam Downloads
+find ~/Downloads -name "report.pdf"
+```
+
+Three things help most:
+
+- **Which system.** `untuk arch`, `kat ubuntu`, `kat mac`, `guna brew`. Install
+  commands differ per distro and camne cannot see yours.
+- **Which file or folder.** `nak delete file lama.txt`, not `nak delete file`.
+  A name in the question is a name in the answer.
+- **Where.** `dalam Downloads`, `dalam folder ni`, `dalam home`.
+
+Malay filenames sometimes come back translated (`lama.txt` turns into
+`old.txt`). Quote them and they stay as typed: `nak delete file 'lama.txt'`.
+
 **Spelling changes the answer.** Bahasa pasar spelling is fine (`bukak`,
 `tgk`, `mcm mana`), but the same question spelled two ways can come back with
 two different commands. `nak list port bukak` gives `lsof -i`; `nak list port
