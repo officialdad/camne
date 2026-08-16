@@ -546,7 +546,13 @@ HOMOGRAPH = [
 ]
 
 
+RETRIEVE = 0  # --retrieve K: prepend K tldr lines (retrieve.py) to the user turn
+
+
 def chatml(q):
+    if RETRIEVE:
+        import retrieve
+        q = retrieve.prefix(q, RETRIEVE) + q
     return (f"<|im_start|>system\n{SYSTEM}<|im_end|>\n"
             f"<|im_start|>user\n{q}<|im_end|>\n<|im_start|>assistant\n")
 
@@ -584,6 +590,8 @@ def main():
     ap.add_argument("--server", default=PINNED if os.path.exists(PINNED) else "llama-server")
     ap.add_argument("--threads", type=int, default=4)
     ap.add_argument("--out", default="out/probe.jsonl")
+    ap.add_argument("--retrieve", type=int, default=0, metavar="K",
+                    help="prepend top-K tldr lines to the user turn (issue #55)")
     ap.add_argument("--rescore", metavar="JSONL",
                     help="re-apply the current regexes to a saved run; no server")
     args = ap.parse_args()
@@ -614,6 +622,12 @@ def main():
         return
 
     proc = boot(args.server, args.model, args.threads)
+    global RETRIEVE
+    RETRIEVE = args.retrieve
+    emb = None
+    if RETRIEVE:
+        import retrieve
+        emb = retrieve.serve()
     rows = []
     try:
         for t in TASKS:
@@ -633,6 +647,8 @@ def main():
     finally:
         proc.send_signal(signal.SIGTERM)
         proc.wait(timeout=30)
+        if emb:
+            emb.terminate()
 
     os.makedirs(os.path.dirname(args.out) or ".", exist_ok=True)
     with open(args.out, "w") as f:
