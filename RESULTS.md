@@ -486,3 +486,40 @@ puts `deepseek-coder-1.3b` first and the two general 1B models last. **Not
 run in this loop**: the loop's exit criterion was met by run 7, and
 spending six GPU days on arms is a decision the owner makes with the run 7
 numbers in hand. Retrieval-over-tldr and distillation are likewise unrun.
+
+
+## Run 8: the unnamed rows (issue #47)
+
+**Hypothesis, written before the run.** Run 7's remaining `create a file`
+failures are one hole, not a family: every `touch`/`mkdir`/`useradd`/`tar`
+row in basics.txt names its target (`touch notes.txt`, `useradd -m ali`), so
+a bare request with no name — `nak buat satu file baru`, `nak buat user
+baru`, `nak compress folder ni` — falls back to the tldr row and returns
+`touch path/to/file1 path/to/file2 ...`, `skicka mkdir path/to/folder`,
+`kcadm.sh create users ...`. Adding four unnamed blocks (`touch
+newfile.txt`, `mkdir newfolder`, `sudo useradd -m newuser`, `tar -czf
+folder.tar.gz folder`, ~85 rows in four registers) plus two `bukak`
+phrasings on `ss -tulpn` will make the unnamed phrasings return a command
+with a real name in it, without moving ALFA in any register (the change is
+0.02% of the pool). Falsified if the unnamed prompts still return
+placeholders — that would mean the tldr `touch` row (116 copies) outweighs a
+dozen hand rows and weighting is next.
+
+One variable changed from run 7: `pool_v6 = pool_v4.bal + basics.jsonl`
+with basics.txt at 330 tasks / 2,581 rows (was 326 / 2,496). Same recipe,
+seed 42, 1 epoch. Probe prompts are unchanged; none is verbatim in
+basics.txt.
+
+Measured before the run, shipped run 7 model, `camne` v0.8.0 (the probe
+scores tool-level and already passes these, so the check is exact output):
+
+| prompt | run 7 |
+|---|---|
+| `nak buat file baru` | `touch path/to/file1 path/to/file2 ...` |
+| `nak buat satu file baru` | `touch path/to/file1 path/to/file2 ...` |
+| `tolong buat file baru` | `touch path/to/file1 path/to/file2 ...` |
+| `nak buat folder baru` | `skicka mkdir path/to/folder` |
+| `buat folder baru je` | `skicka mkdir path/to/folder` |
+| `nak buat user baru` | `kcadm.sh create users -s username=username -r realm_name` |
+| `nak compress folder projek` | `zip -r project.zip projek` |
+| `nak list port bukak` / `buka` / `terbuka` | `lsof -i` / `netstat -an \| grep -i listen` / `lsof -i` |
