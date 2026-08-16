@@ -5,8 +5,14 @@
 #
 # One variable per run, seed 42 (train.py). Third arg picks the train.py base
 # (default qwen, the incumbent), fourth the seed (issue #57: repeat a run
-# under seeds 43/44 to measure the noise floor). Read RESULTS.md before starting one:
-# the hypothesis goes there first, as something that could come back false.
+# under seeds 43/44 to measure the noise floor). Third arg `dpo` runs dpo.py
+# instead with the second arg as the pairs file (issue #56):
+#
+#   setsid nohup ./rebuild.sh qwen-v5-dpo out/dpo_pairs.jsonl dpo > out/rebuild-qwen-v5-dpo.log 2>&1 &
+#   DPO_BASE=out/X-lora-merged ./rebuild.sh X-dpo out/dpo_pairs.jsonl dpo   # on top of another SFT run
+#
+# Read RESULTS.md before starting one: the hypothesis goes there first, as
+# something that could come back false.
 set -euo pipefail
 cd "$(dirname "$0")"
 export PATH="$HOME/.local/bin:$PATH"
@@ -17,8 +23,12 @@ SEED=${4:-42}
 rm -f "out/REBUILD_DONE_$NAME"
 status() { echo "rebuild[$NAME]: $*"; }
 
-status "train (1 epoch, seed $SEED, $(wc -l <"$POOL") rows)"
-uv run train.py --base "$BASE" --seed "$SEED" --epochs 1 --data "$POOL" --out "out/$NAME-lora" || { echo "DONE rebuild:train-failed" >"out/REBUILD_DONE_$NAME"; exit 1; }
+status "train (1 epoch, seed $SEED, $(wc -l <"$POOL") rows, base $BASE)"
+if [ "$BASE" = dpo ]; then
+  uv run dpo.py --base-ckpt "${DPO_BASE:-out/qwen-v5-lora-merged}" --data "$POOL" --out "out/$NAME-lora"
+else
+  uv run train.py --base "$BASE" --seed "$SEED" --epochs 1 --data "$POOL" --out "out/$NAME-lora"
+fi || { echo "DONE rebuild:train-failed" >"out/REBUILD_DONE_$NAME"; exit 1; }
 
 status "convert + quantize + generate en/bm answers"
 ./finish.sh "out/$NAME-lora-merged" "$NAME" || { echo "DONE rebuild:convert-failed" >"out/REBUILD_DONE_$NAME"; exit 1; }
