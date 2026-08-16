@@ -29,7 +29,7 @@ $ camne nak list port bukak
 lsof -i
 ```
 
-![camne demo: five beginner questions typed in colloquial Malay, each answered with one English shell command; the one that needs root gets a magenta camne warning line above it](demo/demo.gif)
+![camne demo: five beginner questions typed in colloquial Malay (exit vim, hidden files, open ports, install btop on arch, reset password), each answered with one English shell command; the ones that need root get a magenta camne warning line above them](demo/demo.gif)
 
 camne only prints the command. It never runs it. You read it, then you decide
 whether to type it.

@@ -38,16 +38,17 @@ Sleep 500ms
 Enter
 Sleep 2500ms
 
-# Needs root: a magenta `camne warning:` line above the command. Nothing runs.
-Type "camne nak pasang zsh"
-Sleep 500ms
-Enter
-Sleep 3s
-
 Type "camne nak list port bukak"
 Sleep 500ms
 Enter
 Sleep 2500ms
+
+# Say which system: the install command depends on it. Needs root, so a
+# magenta `camne warning:` line sits above the command. Nothing runs.
+Type "camne nak install btop untuk arch"
+Sleep 500ms
+Enter
+Sleep 3s
 
 Type "camne nak reset password"
 Sleep 500ms
