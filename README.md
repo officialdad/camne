@@ -9,10 +9,16 @@
 [![Go](https://img.shields.io/github/go-mod/go-version/officialdad/camne)](go.mod)
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue)](LICENSE)
 
-> **Status: the Malay model has landed.** camne now runs
+> **Status: beta.** camne runs
 > [camne-1.5b](https://huggingface.co/opariffazman/camne-1.5b-Q4_K_M), tuned on
-> 307k four-register rows. Malay and rojak questions answer well; English is
-> roughly level with the model it replaces. Numbers in [RESULTS.md](RESULTS.md).
+> 76k command pairs in four registers plus 326 hand-written beginner tasks.
+> Malay and rojak questions answer well, and the first fifty things a beginner
+> asks — create, list, delete, copy, find, disk, permissions, "how do I quit
+> vim" — pass 90% of unseen phrasings on the repo's probe. On advanced
+> English one-liners it is measurably worse than the English-only model it
+> replaces (−0.06, p = 0.036); if you only ever type English, use
+> [whatisit](https://github.com/ThorOdinson246/whatisit-nl2sh). Numbers,
+> including the failed runs, in [RESULTS.md](RESULTS.md).
 
 *camne* is how people say *macam mana* / *bagaimana*: "how".
 
@@ -92,15 +98,20 @@ somewhere.
 scorer, 300 tasks per register. Rojak — Malay grammar around English technical
 nouns — is what people actually type, so it is the column that matters.
 
-| model | BM | rojak | EN | size | tok/s @4t | RSS |
-|---|---|---|---|---|---|---|
-| nl2sh-1.5b (the English model camne used to ship) | 0.297 | 0.430 | **0.593** | 986 MB | 40 | 1.6 GB |
-| **camne-1.5b** | **0.417** | **0.490** | 0.533 | 986 MB | 40 | 1.6 GB |
+| model | BM | rojak | EN | beginner tasks* | size | tok/s @4t | RSS |
+|---|---|---|---|---|---|---|---|
+| nl2sh-1.5b (the English model camne used to ship) | 0.310 | 0.447 | **0.603** | — | 986 MB | 40 | 1.6 GB |
+| camne-1.5b, previous revision | 0.437 | 0.490 | 0.553 | 0.79 | 986 MB | 40 | 1.6 GB |
+| **camne-1.5b, this revision** | **0.487** | 0.490 | 0.543 | **0.90** | 986 MB | 37 | 1.6 GB |
 
-Malay +0.120 (p=0.0002) and rojak +0.060 (p=0.044) against the model it
-replaces. English is −0.060 at p=0.050, which 300 tasks cannot resolve — so
-the honest claim is "cannot distinguish", not "as good as". Speed and memory
-are unchanged: same base, same quantisation, same file size.
+\* `training/probe.py`: 35 beginner tasks asked in 177 phrasings the training
+data does not contain, scored on whether the right tool comes back.
+
+Against the English model: Malay +0.177 (p = 3e-08), rojak +0.043 (p = 0.13,
+unresolved at 300 tasks), English −0.060 (p = 0.036) — a real regression,
+stated. Against the previous revision the benchmark cannot tell them apart;
+the beginner probe can (+0.11, p = 0.002). Speed and memory are unchanged:
+same base, same quantisation, same file size.
 
 Full method, the runs that failed, and why, in [RESULTS.md](RESULTS.md).
 
