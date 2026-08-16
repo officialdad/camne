@@ -94,6 +94,9 @@ No model change merges without numbers. Not examples, numbers.
 - Include the untuned base as a row. A tune that does not beat its own base is
   not a result.
 - Seed 42, one variable changed per run.
+- Noise floor (issue #57): the same pool and seed reproduce to ≤ 0.013 per
+  register and 0 probe prompts, so one seed suffices when the paired CI
+  excludes zero. A delta inside ±0.02 is "no difference", not a trend.
 
 ## Dataset work
 

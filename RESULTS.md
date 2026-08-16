@@ -716,3 +716,61 @@ fixing.
 The `train.py` change (literal ChatML training text) stays: it is
 byte-identical for the incumbent and removes the chat-template dependency
 for every future base.
+
+## Run 7 repeated: the noise floor (issue #57)
+
+**Hypothesis, written before the run.** No run in this file has ever been
+repeated, so every gain claimed since run 4 (run 7's +0.05 BM included) has
+no error bar, and run 8's −0.06 BM from 85 rows was read as data order, not
+data. This run is run 7 again with nothing changed: same pool
+(`pool_v5.jsonl`), same recipe, seed 42, 1 epoch, same base, same pinned
+CPU llama build for the probe. **Same pool + same seed reproduces run 7
+within ±0.02 ALFA per register and ±3 probe prompts.** Falsified if any
+register differs by more than 0.02 or the probe differs on more than 3
+prompts out of 223 — then the seed-42 protocol is not deterministic on
+this box (GPU kernels, unsloth, data-loader nondeterminism) and the noise
+floor, not the rows, is what runs 5–8 have been measuring. Either way the
+number is the result.
+
+Zero variables changed from run 7. `train.py` gained a `--seed` flag
+(default 42, replacing the three hardcoded 42s: `random_state`,
+`shuffle(seed=)`, `SFTConfig(seed=)`) and `rebuild.sh` passes it as an
+optional fourth argument; with no argument the training call is
+byte-identical to run 7's.
+
+If the hypothesis holds, next is `pool_v6` under seeds 43 and 44
+(`rebuild.sh qwen-v6-s43 ../dataset/out/pool_v6.jsonl qwen 43`, same for
+44): mean ± sd per register, and that sd becomes the error bar in this
+file, the README table, and CLAUDE.md § "Model work". If it does not hold,
+seeds 43/44 go on `pool_v5` first, because the question becomes how wide
+the same run is, not how wide run 8 is.
+
+**Result (2026-08-16): the hypothesis holds.** `qwen-v5b` = run 7 recipe,
+untouched, 3 h 10 min train + 1 h post on the 3090.
+
+| register | run 7 | v5b | diff | 95% CI | lost / gained | p |
+|---|---|---|---|---|---|---|
+| BM | 0.487 | 0.483 | −0.003 | [−0.015, +0.008] | 2 / 1 | 1 |
+| rojak | 0.490 | 0.487 | −0.003 | [−0.015, +0.008] | 2 / 1 | 1 |
+| EN | 0.543 | 0.530 | −0.013 | [−0.029, +0.003] | 5 / 1 | 0.22 |
+
+Probe: **222 / 222 outputs byte-identical** to run 7's. The five prompts
+whose pass/fail differ (`empty a file` ×4, `printenv/collo`) are the
+`14d6c23` probe-scorer fix landing between the two probe runs, not the
+model — same string both times, judged differently. Bench within noise
+(4 threads: 0.47 s warm, 39 tok/s, 1.5 GB RSS).
+
+So the same pool and seed reproduce to a few ALFA tasks out of 300 and zero
+probe prompts. The run-to-run floor is ≤ 0.013 per register (≤ 4 tasks),
+inside the scorer's own ±5/300. Consequences:
+
+- Run 8's −0.060 BM (p = 0.027) is **not** shuffle noise; the 85 unnamed
+  rows really did move it, and #47's next attempt has to explain why.
+- A claim of a difference needs to clear about ±0.02 per register (roughly
+  the CI half-width above plus the scorer floor), which is what the paired
+  McNemar CI already reports; a second seed is not required for a delta
+  that clears its CI at p < 0.05. Seeds 43/44 (step 3 of the issue) are
+  therefore skipped — the trigger was "outside ±0.02", and it was not.
+- Protocol, going into CLAUDE.md § "Model work": one seed suffices when
+  the paired CI excludes zero; a delta inside ±0.02 is "no difference",
+  never a trend; anything read off a single register at p ≥ 0.05 is noise.
