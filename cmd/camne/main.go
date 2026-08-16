@@ -180,7 +180,7 @@ func usage() {
 	fmt.Fprint(os.Stderr, `camne — ask in plain Malay or English, get a shell command.
 
 Use:      camne <your question>
-Examples: camne nak buat file baru
+Examples: camne nak buat file nota.txt
           camne how do I find a file in this folder
 
 Also:     camne doctor   — check what is already installed
