@@ -597,3 +597,34 @@ stays open with the rows in place.
    three agreeing beats one run of anything.
 3. Only then weight the rows (`create file` ×5) — the variable the run 7
    hypothesis named as next if the rows drowned.
+
+
+## Work item 3, second gate: bases released after the first list
+
+The #48 list predates Qwen3.5 (March 2026), Gemma 4 (April) and LFM2.5
+(August). Same gate as above: `bench.py`, CPU only, pinned llama b10333,
+Q4_K_M, untuned instruct GGUFs. Warm/cold latency is still a worst case for
+non-Qwen bases (bench sends ChatML and an untuned model runs to the 64-token
+cap); tok/s and RSS are the numbers.
+
+| base | disk MB | tok/s 2t / 4t | RSS MB @4t | constraint 3 |
+|---|---|---|---|---|
+| Qwen3.5-0.8B | 533 | 35.9 / 44.7 | 1289 | clears |
+| Qwen3.5-2B | 1281 | 16.6 / 24.5 | 2328 | clears, 170 MB margin |
+| LFM2.5-2.6B | 1674 | 15.2 / 22.2 | **2948** | **out: RSS** |
+| gemma-4-E2B-it | **3107** | not run | — | **out: disk alone exceeds the RSS cap** |
+| Qwen2.5-Coder-1.5B (incumbent, from the first gate) | 986 | 25.1 / 40.0 | 1628 | clears |
+
+Qwen3.5-2B is the strongest candidate on paper (Apache-2.0, 201 languages,
+Unsloth 2026.8 trains it, GGUF exists) and it clears, but not comfortably:
+40% slower than the incumbent at 4 threads (24.5 vs 40.0 tok/s; a 30-token
+answer is 1.2 s of generation before prompt eval, against a 1.5 s warm
+budget on a slower box than this one) and 700 MB more resident. The
+Gated-DeltaNet hybrid does not buy CPU speed in llama.cpp at this size.
+Qwen3.5-0.8B clears everything with room and is 12% faster than the
+incumbent, at 55% of its parameters. Neither has an accuracy number yet;
+that is the arm.
+
+Order if arms are run: Qwen3.5-2B first (capability), Qwen3.5-0.8B second
+(the constraint-3 upgrade if its accuracy holds). Both need a `train.py`
+BASES entry; Qwen3.5 keeps ChatML so the template code is unchanged.
