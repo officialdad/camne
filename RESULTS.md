@@ -774,3 +774,385 @@ inside the scorer's own ±5/300. Consequences:
 - Protocol, going into CLAUDE.md § "Model work": one seed suffices when
   the paired CI excludes zero; a delta inside ±0.02 is "no difference",
   never a trend; anything read off a single register at p ≥ 0.05 is noise.
+
+## Run 9: the pool's tool prior (issue #54)
+
+**Hypothesis, written before the run.** Runs 7, 8 and the Qwen3.5-2B arm
+all answer `nak buat file baru` with a tldr placeholder or `fossil add`,
+and run 8 showed that 85 hand rows do not move that. The cause is the
+prior the pool teaches, not a coverage hole: 16% of pool_v6's rows have
+`path/to/...` or `<name>` in the command, `find` alone is 17% of the pool,
+and 4,819 distinct first tokens split the rest, so a prompt that lands
+off-distribution is answered with a placeholder from a tool the model saw
+300 times. Removing the placeholder rows, capping the long tail at 300
+rows per non-core tool and cutting `find` to 5% (`dataset/prior.py`,
+`pool_v7`) will (a) take the placeholder rate on the probe's outputs to
+zero, (b) fix `create file` unnamed (`nak buat file baru`,
+`nak buat satu file baru`, `tolong buat file baru`) with a real filename in
+the answer, and (c) hold ALFA English within run 7's CI. Falsified if the
+probe still emits `path/to` or a long-tail tool for the unnamed prompts —
+then the prior is in the base, not the pool — or if English drops by more
+than the CI, which would mean the 34% of rows removed were carrying
+accuracy (RESULTS.md, run 2, the mistake this cut is closest to
+repeating).
+
+One variable changed from run 7: the pool. `pool_v7 = prior.py(pool_v6)`,
+where `pool_v6 = pool_v4.bal + basics.jsonl` at 330 tasks; the 85 unnamed
+rows from #47 are in, so against run 7 the pool differs by the prior fix
+plus those rows, and against run 8 by the prior fix alone. Same recipe,
+seed 42, 1 epoch. Probe prompts unchanged, none verbatim in basics.txt.
+
+**What prior.py does, in order (`python3 prior.py out/pool_v6.jsonl
+out/pool_v7.jsonl`, seed 42, deterministic):**
+
+1. Placeholders. `path/to/...` and `<name>` in the command. Where every
+   placeholder also appears verbatim in the NL — the user typed the path,
+   `senarai folder kat /path/to/dir` → `find /path/to/dir -type d` — both
+   sides are rewritten to one concrete name (`path/to/dir` → `projek`,
+   `<file>` → `notes.txt`, otherwise the last path component) so the pair
+   stays consistent and `path/to` leaves the output vocabulary. Where the
+   NL never named it (every tldr `Create specific files` → `touch
+   path/to/file1 path/to/file2`), or there is no safe name (`<port>`,
+   `<package>`), the row is dropped. Keystrokes (`<Ctrl x>`, `<Enter>`,
+   `<q>`) are not placeholders and stay. 1,012 rows rewritten, 55,246
+   dropped. Rewritten commands are the only ones in the pool not
+   byte-identical to source; the diff is the placeholder token and nothing
+   else.
+2. Cap. 300 rows per first token for tools outside CORE (rebalance.py's
+   list plus every tool basics.txt teaches, plus shell keywords `for`,
+   `while`, `if`, `until`, `case`, which are composition, not tools).
+   Sampled by whole pair so the four registers of a command stay together.
+   15,754 rows dropped from 51 tools (`az`, `aws`, `kubectl`, `cargo`,
+   `gh`, `tlmgr`, `pio`, `shuf`, … each 1,200 → 300).
+3. `find` to 5% of the final pool. It is core and genuinely common, but at
+   17% it is the answer the model reaches for when unsure; 5% still leaves
+   it the single largest tool. 46,364 rows dropped. basics rows are exempt
+   from every rule.
+
+| | pool_v6 (run 8) | **pool_v7** |
+|---|---|---|
+| rows | 345,721 | **228,357** (−34%) |
+| distinct first tokens | 4,819 | 4,102 |
+| top-30 share | 35.3% | 29.4% |
+| rows with a placeholder in cmd | 56,258 (16.3%) | **0** |
+| `find` share | 16.9% (58,365) | 5.0% (11,484) |
+| `touch` / `mkdir` / `useradd` | 535 / 959 / 116 | 454 / 918 / 104 |
+| `az` / `aws` / `kubectl` / `shuf` | 1,200 each | 300 each |
+| `fossil` / `skicka` / `kcadm.sh` | 151 / 66 / 38 | 91 / 0 / 30 |
+| by source (nl2sh_train / tldr / extra / basics) | 187,891 / 95,848 / 59,401 / 2,581 | 109,995 / 66,758 / 49,047 / 2,581 |
+
+The `touch` rows lost are exactly the placeholder ones; every surviving
+`touch` names a real file. `nl2sh_train` lost the most: 26,869 of its
+rows carried `path/to` because that pool was itself partly tldr-derived.
+
+**Hand-read, 200 rows, `random.Random(42).sample`.** Registers read as
+intended: colloquial and rojak natural (`tlg buang all file _* and
+.DS_Store`, `nak tengok status semua job je kat sini`), formal circular-ish
+by design. Nothing prior.py rewrote read wrong (30 rewritten rows read
+separately: `Remount "bin"` and `mount device location` are dull but
+consistent on both sides). What did read wrong is older pool noise, none of
+it in this issue's scope, all counted so it can be its own issue: 246 rows
+whose command starts with a `$ ` prompt (`$ find /dev ...`, first token
+`$`); 11,779 rows (5%) with tldr's alternation syntax in the command
+(`ctest [-j|--parallel] 4`, `komac bash|elvish|fish|zsh`), which is not a
+runnable command; 139 `path\to\key` (wine reg, backslashes); 217
+`some_command`/`command1` placeholders; 48 rows where NL is the command
+itself; a few Indonesian slips (`kota`, `acak`) the stoplist does not
+know; and a handful of mismatched `extra` pairs (`Hapus entri dalam fail
+.bash_history` → `export HISTCONTROL=ignoreboth`).
+
+**Measure.** Run 7 to beat: ALFA BM 0.487 / rojak 0.490 / EN 0.543, probe
+basics 0.90 / holdout 0.78; run 8 for the same-rows comparison. New
+number: placeholder rate on the probe outputs (`path/to` or `<name>` in the
+answer), reported alongside. Then #47's exact-output prompts, `compare.py`
+vs run 7, bench, all with #57's error bar in mind.
+
+GPU command, from the worktree's `training/`:
+`./rebuild.sh qwen-v7 ../dataset/out/pool_v7.jsonl` — queued behind the
+running job, one at a time (#56, #57).
+
+**Result (2026-08-17): the pool prior moves the probe, not ALFA.** `qwen-v7`,
+228,357 rows, 2 h 40 min train on the 3090. Error bar from #57: same recipe
+reproduces to ≤ 0.013 per register.
+
+| register | run 7 | run 9 (v7) | diff | 95% CI | lost / gained | p |
+|---|---|---|---|---|---|---|
+| BM | 0.487 | 0.513 | +0.027 | [−0.029, +0.083] | 33 / 41 | 0.42 |
+| rojak | 0.490 | 0.517 | +0.027 | [−0.026, +0.080] | 29 / 37 | 0.39 |
+| EN | 0.543 | 0.563 | +0.020 | [−0.036, +0.076] | 34 / 40 | 0.56 |
+
+All three registers up, none clears its CI. The churn is the story: ~35
+tasks lost and ~40 gained per register — ten times run 7 vs v5b — so a
+34% pool cut is a different model, and 300 tasks cannot say whether it is
+a better one. English did not drop, so the run-2 fear did not come true.
+
+Probe: 199 / 222 both, not the same 199. What the issue was for is fixed:
+`create file` 8/9 → 9/9 (`touch newfile.txt` on every phrasing, no more
+`fossil add path/to/file`), `create folder` 8/8, `create user` 2/5 → **5/5**
+(`sudo useradd -m newuser`, no more `kcadm.sh`), placeholder answers
+29 → **6** across the 222 prompts. What broke: `delete file` ×4 →
+`git obliterate file_1 file_2 ...` (was `rm path/to/file1 ...`, tool-right
+placeholder), `list processes` ×3 → `pm2 list`/`pm2 monit` (was `ps aux`),
+`edit file` → `less`, holdout 36 → 33 (`chsh`, `timeout`, `whereis` lost;
+`tee` ×2, `reverse lines/en` gained). `rm` and `ps` rows barely moved
+(1,618 → 1,539, 928 → 868); what moved is share — the core list is
+uncapped, so `git` went from 4.3% to 5.8% of the pool and `pm2` (84 rows,
+under the cap) from 0.02% to 0.04%. Capping the tail without growing the
+head redistributes the prior, it does not flatten it. Bench unchanged
+(4 threads 0.53 s warm, 39 tok/s, 1.49 GB RSS).
+
+Verdict: not shipping on ALFA alone (inside CI, per #57's protocol), but
+the probe targets #47/#53/#54 exist for are met on this pool. The next
+pool change should add head rows for the beginner verbs (`rm`, `ps`,
+`nano`) rather than cut more tail — and #56's DPO pairs already encode
+exactly the `git obliterate`/`pm2` class of miss, so DPO on this
+checkpoint (`DPO_BASE=out/qwen-v7-lora-merged`) is the cheap next arm.
+
+
+## Run qwen-v5-dpo: DPO on the model's own mistakes (issue #56)
+
+**Hypothesis, written before the run.** Every SFT run so far has taught the
+model what to say and nothing about what not to say. Run 7's remaining
+misses are not coverage holes, they are near-misses on the same tokens the
+pool teaches: `touch path/to/file1 path/to/file2 ...` (right tool, tldr
+placeholder — 50,878 of the 345,636 pool rows carry `path/to`), and a
+same-pool obscure tool where the pool has a common one (`fossil add`,
+`skicka mkdir`, `kcadm.sh create users`, `lzop`, `gdu`, `fkill`, `smem`).
+Run 8 tried to fix these by adding rows and moved BM by −0.06 instead. A
+DPO stage that holds the gold as chosen and those exact outputs as rejected
+pushes against the failure directly, without adding rows to the SFT pool or
+changing its order. Prediction: on the shipped CPU path the placeholder
+rate on the probe's 177 basics-task prompts falls from **24/177 (0.14)** to
+under 0.03, `nak buat file baru` returns `touch newfile.txt` (or any
+`touch` with a real name), `nak buat user baru` returns `useradd`, and the
+three ALFA registers stay inside their run 7 CIs (BM 0.487, rojak 0.490,
+EN 0.543). Falsified if any ALFA register drops with p < 0.05 — then the
+preference stage is trading beginner exactness for one-liner accuracy and
+β or the pair mix is next — or if the placeholder rate does not move, which
+would mean 3,455 pairs at β = 0.1 do not shift a preference that 15% of the
+pool voted for.
+
+One variable vs run 7: the DPO stage. `training/dpo.py` puts a fresh
+r32/a64 LoRA on the run 7 merged checkpoint (`out/qwen-v5-lora-merged`),
+TRL `DPOTrainer`, sigmoid loss, β = 0.1, 1 epoch, seed 42, effective batch
+32, lr 5e-6 (Unsloth's DPO reference recipe; SFT's 2e-4 would wreck the
+policy), reference = the same weights with the adapter disabled. Prompt
+text is train.py's literal ChatML. Same GGUF path as every run
+(`finish.sh` → f16 → Q4_K_M), same pinned CPU probe. `trl` 0.24.0 was
+already in `uv.lock` (unsloth pulls it); nothing was added.
+
+**Pairs, `training/dpo_pairs.py` → `out/dpo_pairs.jsonl`, 3,455 total:**
+
+| kind | n | chosen | rejected |
+|---|---|---|---|
+| probe-wrong | 18 | basics.txt command for the probe task | run 7's actual output (`gdu --disk-usage`, `fkill :8080`, `kcadm.sh create users ...`, `jobs`, `smem --memstats`, `tempdir -c` ...) |
+| probe-placeholder | 22 | same | run 7's tool-level pass that was a placeholder (`touch path/to/file1 path/to/file2 ...`, `skicka mkdir path/to/folder`, `rm path/to/file1 ...`, `chmod 644 /path/to/file`) |
+| synth-placeholder | 999 | basics.txt gold, every phrasing | gold with names swapped for `path/to/file` / `path/to/directory` |
+| synth-tool-swap | 2,416 | basics.txt gold, every phrasing | gold's tool swapped for what run 7 reached for (`touch`→`fossil add`, `mkdir`→`skicka mkdir`, `useradd`→`kcadm.sh create users`, `tar`→`lzop`, `df`→`gdu`, `kill`→`fkill`, `free`→`smem`) or a low-count pool tool drawn with seed 42 |
+
+Unweighted: the 40 real-mistake pairs are 1.2% of the set. If the probe
+misses persist while the synthetic kinds land, weighting the real pairs is
+the next variable, not a bigger β.
+
+**Split, stated.** ALFA is not touched: no pair is built from any ALFA
+task, and the three basics.txt English phrasings that are verbatim
+nl2sh_test prompts (`print hello world`, `print the current user`, `list
+all users on the system`) are dropped from the pair set. The probe main
+block is **not** clean after this run: the 40 probe-* pairs train on the
+probe's own prompts, so post-DPO basics-task numbers measure recall of the
+fix, not phrasing generalisation; read them as "did the specific miss go
+away", and read the ALFA and HOLDOUT columns for generalisation. HOLDOUT
+(no basics.txt command to serve as chosen) and the homograph guard get no
+pairs and stay clean. Homograph EN-sense (`fails` = failure) is the
+regression to watch: `nak buat fail baru` → `touch` is now a chosen row.
+
+Measured before the run (run 7, shipped model, pinned CPU build): probe
+basics 0.90 / holdout 0.78 / homograph 1.00 / 0.67, placeholder rate 24/177
+on basics prompts and 25/223 overall, ALFA BM 0.487 / rojak 0.490 / EN
+0.543, bench 4 threads 36.8 tok/s / 0.57 s warm / 1.38 s cold / 1626 MB.
+#47 prompts exact: see the run 8 table above (run 7 column).
+
+Order: queued behind #54's retrain. If #54 ships, `DPO_BASE=out/<54
+merged>` puts this stage on top of it and the comparison row becomes #54's
+run instead of run 7; the pairs are rebuilt from that run's probe file
+(`dpo_pairs.py --probe out/probe_<54>.jsonl`). Not started; hypothesis
+written first.
+
+**Result (2026-08-17): both DPO arms ran; the hypothesis is falsified on
+run 7 and half-met on the pool_v7 checkpoint.** Each DPO stage is 3 min on
+the 3090 (3,4xx pairs, 1 epoch), reward accuracy 0.99 by the end — the
+pairs are learned; the question was whether that generalises. #57's error
+bar (≤ 0.013 same-recipe) applies.
+
+*Arm A — `qwen-v5-dpo`, on run 7's merged checkpoint, pairs from run 7's
+probe (3,455):*
+
+| register | run 7 | run 7 + DPO | diff | 95% CI | lost / gained | p |
+|---|---|---|---|---|---|---|
+| BM | 0.487 | 0.497 | +0.010 | [−0.023, +0.043] | 11 / 14 | 0.69 |
+| rojak | 0.490 | 0.510 | +0.020 | [−0.016, +0.056] | 12 / 18 | 0.36 |
+| EN | 0.543 | 0.530 | −0.013 | [−0.051, +0.025] | 19 / 15 | 0.61 |
+
+Probe 199 → 205 / 222, holdout 36 → 36. Placeholder answers **29 → 23**:
+`nak buat file baru` is now `touch path/to/file1 path/to/file2 ...`
+instead of `fossil add path/to/file` — the tool moved, the placeholder did
+not, although exactly that string is a rejected row. `create user` 2 → 3
+of 5, `kill process on port` gains ×2 (`fuser -k 8080/tcp`). Falsified:
+the placeholder rate went 0.13 → 0.10, not below 0.03; ALFA is inside
+every CI. Bench 0.65 s warm at 4 threads (was 0.47; retest before reading
+anything into it), 1.49 GB.
+
+*Arm B — `qwen-v7-dpo`, on run 9's checkpoint (`DPO_BASE=out/qwen-v7-lora-merged`),
+pairs rebuilt from run 9's probe (3,430):*
+
+| register | run 9 (v7) | v7 + DPO | diff | 95% CI | p | vs run 7 |
+|---|---|---|---|---|---|---|
+| BM | 0.513 | 0.497 | −0.017 | [−0.054, +0.021] | 0.49 | +0.010, p 0.82 |
+| rojak | 0.517 | 0.517 | 0.000 | [−0.032, +0.032] | 1 | +0.027, p 0.40 |
+| EN | 0.563 | 0.543 | −0.020 | [−0.057, +0.017] | 0.38 | 0.000, p 1 |
+
+Probe 199 → **205** / 222, holdout 33 → 34, placeholders **6 → 2**.
+Run 9's regressions come back: `delete file` 2 → 5 of 6 (`rm filename`,
+`git obliterate` gone on three of four phrasings), `list processes` 0 → 2
+of 4 (`ps aux`, `pm2` gone on two). Lost: `change permission` ×2 →
+`icacls file_or_directory` (Windows tool, tldr row; not in the pair set —
+DPO pushed `chmod` down for reasons the pairs do not name), `change
+shell/rojak`. Bench 0.43 s warm at 4 threads, 1.5 GB.
+
+Reading. DPO on ~40 real mistakes plus 3,400 synthetic pairs does what the
+pairs literally say — the specific `fossil`/`kcadm.sh`/`git obliterate`/
+`pm2` misses it was shown flip back — and nothing further: the placeholder
+habit survives on run 7 (23 answers), ALFA does not move on either base,
+and every gain is offset by a new obscure-tool miss elsewhere (`icacls`).
+Three minutes of preference tuning cannot fix a prior that 345k SFT rows
+set; it can only patch the misses it was handed. Neither arm ships:
+v7-dpo has the best probe (205, 2 placeholders, all #47 targets pass) but
+is inside run 7's CI on every register and −0.02 EN on its own base.
+
+Next, if this thread continues: weight the real-mistake pairs (1.2% of the
+set today), or grow the head of the pool for the beginner verbs (#54's
+note) and DPO on top of that — the pool sets the prior, DPO trims it.
+
+
+## Retrieval over tldr in the prompt (issue #55)
+
+The issue says the cost measurement decides, so it comes first. Everything
+below is the pinned CPU build (`b10333`), `-ngl 0`, run 7 GGUF
+(`qwen-v5-Q4_K_M`), same decoding as `bench.py`, `training/bench_retrieval.py`.
+The GPU was busy with a training job while this ran, so absolute numbers
+carry that noise; the baseline row reproduces run 7's bench within it.
+
+**Embedding model.** `bge-small-en-v1.5` f16 GGUF, 67 MB on disk (the
+`bge-small / e5-small / arctic-xs` class the issue names; English-only, which
+matters below). Served by the same pinned `llama-server` with `--embeddings
+--pooling cls -c 512`: 0.2 s to load, **101 MB RSS**, **6–9 ms** per query
+embed at 2–4 threads. The embedder is not the cost.
+
+**Index.** `dataset/raw/tldr.csv` deduped on (description, command): 29,153
+lines, description embedded, line shape `description: command`. Vectors
+29,153 × 384 f16 = **22 MB** (the `.npz` with the text is 70 MB); building
+it is 4 min of CPU at 4 threads. Query → top-3 is 16–21 ms end to end.
+
+**Cost, both servers resident, 12 queries, median.** Three (or one)
+*distinct* tldr lines per query — a fixed set is not a measurement: the
+pinned server keeps evicted prompts in RAM and served a rotated fixed set
+from cache at 13 prompt tokens instead of 80.
+
+| threads | prompt | prompt tokens evaluated | warm s (max) | tok/s | combined RSS MB |
+|---|---|---|---|---|---|
+| 2 | baseline | 12 | 0.73–0.77 (1.4–1.7) | 26–27 | 1768 |
+| 2 | + top-3 `Examples:` | 80 | **2.06–2.18 (3.1)** | 26–28 | 1817 |
+| 2 | + top-1 | 31 | 1.10 (1.6) | 28 | 1821 |
+| 4 | baseline | 12 | 0.43–0.53 (0.8–1.3) | 30–42 | 1768 |
+| 4 | + top-3 `Examples:` | 80 | **1.30–1.31 (1.8)** | 38–41 | 1813 |
+| 4 | + top-1 | 31 | 0.61 (1.0) | 42 | 1816 |
+
+Two runs, both shown where they differ. RSS is not the problem: 1.8 GB
+combined, 0.7 GB under the ceiling. Prompt evaluation is: the tuned 1.5B
+processes prompt tokens at ~60–80 tok/s on 2 threads, so 68 extra tokens
+per query is 1.3 s before the first output token, every query, because the
+retrieved lines differ per query and defeat `cache_prompt`.
+
+**Verdict vs constraint 3.** `engine.go` gives a 4-core box 2 threads. At 2
+threads top-3 retrieval is **2.1 s median, 3.1 s worst**, over the 1.5 s
+warm budget on a host that is already faster than the target box. At 4
+threads it is 1.3 s median with a 1.8 s tail: under the median budget here,
+over it on the target. **Top-3 as the issue specifies does not fit.** Top-1
+fits (1.1 s at 2 threads, 0.6 s at 4), with less headroom than baseline and
+one line of context instead of three, so it is measured below rather than
+assumed useless.
+
+**Hypothesis, written before the probe run.** With top-1 retrieval on, the
+run 7 model will gain on the probe's holdout block (tools absent from
+basics.txt: `truncate`, `tac`, `tee`, `timeout`, `chsh`, `printenv`, `nl`)
+by ≥ +0.05, because for those tasks the right tldr line is the answer, and
+hold basics tasks within 0.02, because those the model already knows. Two
+things say the gain will be smaller than the idea promises: the embedder is
+English-only, so Malay phrasings that carry no English technical noun
+retrieve wrong lines (`nak buat file baru` → `hexedit`, `kioclient`;
+spot-checked before the run), and a bad line in front of a 1.5B model is a
+distractor, not a no-op. Falsified if holdout does not move or basics
+drops; then retrieval needs a multilingual embedder (`multilingual-e5-small`
+Q8 is ~120 MB, over the issue's cap) or a retrained model that has seen
+`Examples:` in training, both out of scope here.
+
+### Result: falsified, retrieval on halves the probe
+
+`probe.py --retrieve 1`, run 7 GGUF, same 223 prompts, `training/out/probe_qwen-v5_ret1.jsonl`;
+the off column is `probe_qwen-v5.jsonl` rescored with today's regexes so both
+columns share them.
+
+| | retrieval off (run 7) | retrieval on, top-1 | n |
+|---|---|---|---|
+| basics tasks (unseen phrasings) | 0.90 | **0.53** | 177 |
+| holdout (tools absent from basics.txt) | 0.90 | **0.30** | 40 |
+| english | 1.00 | 0.57 | 35 |
+| rojak | 0.91 | 0.57 | 35 |
+| colloquial | 0.84 | 0.35 | 31 |
+| formal | 0.83 | 0.71 | 35 |
+| homograph BM-sense / EN-sense | 1.00 / 0.67 | 0.33 / 0.67 | 3 / 3 |
+
+Paired over all 223 prompts: **lost 93, gained 7** (exact two-sided
+p ≈ 3e-20). Not a small miss; the mechanism does the opposite of the
+hypothesis.
+
+**What the failures look like.** The model treats the retrieved line as the
+answer, not as context: `nak buat fail baru` → `systemctl edit foo.service`,
+`nak tukar default shell ke zsh` → `unshare --shell=ash|bash|dash|ksh|zsh`,
+`tunjuk nilai variable HOME` → `flux var set --home`. When the retrieved
+line is right the answer is right — `empty the file app.log without
+deleting it` → `truncate [-s|--size] 0 app.log` (gained), `run ./slow.sh
+but stop it after 10 seconds` → `timeout 10 ./slow.sh`, `find where git and
+its man page are installed` → `whereis -s gcc -m git`. The seven gains are
+all of that shape and six of them are English or formal BM. So retrieval is
+only as good as the embedder, and an English-only embedder over Malay
+queries is wrong most of the time (`nak buat file baru` → `hexedit`,
+`kioclient`); the model then copies the wrong tool with confidence, and the
+`Examples:` framing also breaks phrasings it answered correctly with no
+context at all — 93 of them.
+
+**Reading.** Two independent problems, either fatal on its own:
+
+1. Cost. Top-3 is 2.1 s warm at the thread count camne gives a 4-core box,
+   on a host faster than the target. RSS is fine (1.8 GB). It is prompt
+   evaluation of ~70 uncacheable tokens per query on a 1.5B model at
+   ~70 tok/s. Nothing in the retrieval design changes that except fewer
+   tokens, and top-1 is already the floor.
+2. Accuracy. The run 7 model has never seen `Examples:` in a user turn and
+   copies whatever is there. That is fixable only by the thing the issue
+   puts out of scope — training rows with retrieved context — and only
+   worth attempting with an embedder that reads Malay, which is over the
+   100 MB cap (`multilingual-e5-small` Q8 ≈ 120 MB, f16 ≈ 230 MB).
+
+**Not running ALFA**: the probe result is a 40-point drop on the block the
+issue cares about, and ALFA generation is CPU-only while the GPU is busy
+(900 prompts × ~1.5 s ≈ 25 min per register per arm; feasible, pointless
+here). Command, if someone wants the number anyway, is the run 7 recipe with
+`probe.py --retrieve 1`'s prefix applied in `eval_gen.py`; that flag does not
+exist in `eval_gen.py` and is not being added for a result this clear.
+
+**Decision: closes #55 as measured.** Nothing ships. `retrieve.py`,
+`bench_retrieval.py` and `probe.py --retrieve K` stay so the next attempt
+(multilingual embedder + retrieval-aware training rows, if ever) starts
+from the measurement instead of the idea. Index file (`out/tldr_index.npz`)
+and the bge GGUF are build artifacts, not committed.
