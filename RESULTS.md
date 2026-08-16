@@ -977,3 +977,58 @@ merged>` puts this stage on top of it and the comparison row becomes #54's
 run instead of run 7; the pairs are rebuilt from that run's probe file
 (`dpo_pairs.py --probe out/probe_<54>.jsonl`). Not started; hypothesis
 written first.
+
+**Result (2026-08-17): both DPO arms ran; the hypothesis is falsified on
+run 7 and half-met on the pool_v7 checkpoint.** Each DPO stage is 3 min on
+the 3090 (3,4xx pairs, 1 epoch), reward accuracy 0.99 by the end — the
+pairs are learned; the question was whether that generalises. #57's error
+bar (≤ 0.013 same-recipe) applies.
+
+*Arm A — `qwen-v5-dpo`, on run 7's merged checkpoint, pairs from run 7's
+probe (3,455):*
+
+| register | run 7 | run 7 + DPO | diff | 95% CI | lost / gained | p |
+|---|---|---|---|---|---|---|
+| BM | 0.487 | 0.497 | +0.010 | [−0.023, +0.043] | 11 / 14 | 0.69 |
+| rojak | 0.490 | 0.510 | +0.020 | [−0.016, +0.056] | 12 / 18 | 0.36 |
+| EN | 0.543 | 0.530 | −0.013 | [−0.051, +0.025] | 19 / 15 | 0.61 |
+
+Probe 199 → 205 / 222, holdout 36 → 36. Placeholder answers **29 → 23**:
+`nak buat file baru` is now `touch path/to/file1 path/to/file2 ...`
+instead of `fossil add path/to/file` — the tool moved, the placeholder did
+not, although exactly that string is a rejected row. `create user` 2 → 3
+of 5, `kill process on port` gains ×2 (`fuser -k 8080/tcp`). Falsified:
+the placeholder rate went 0.13 → 0.10, not below 0.03; ALFA is inside
+every CI. Bench 0.65 s warm at 4 threads (was 0.47; retest before reading
+anything into it), 1.49 GB.
+
+*Arm B — `qwen-v7-dpo`, on run 9's checkpoint (`DPO_BASE=out/qwen-v7-lora-merged`),
+pairs rebuilt from run 9's probe (3,430):*
+
+| register | run 9 (v7) | v7 + DPO | diff | 95% CI | p | vs run 7 |
+|---|---|---|---|---|---|---|
+| BM | 0.513 | 0.497 | −0.017 | [−0.054, +0.021] | 0.49 | +0.010, p 0.82 |
+| rojak | 0.517 | 0.517 | 0.000 | [−0.032, +0.032] | 1 | +0.027, p 0.40 |
+| EN | 0.563 | 0.543 | −0.020 | [−0.057, +0.017] | 0.38 | 0.000, p 1 |
+
+Probe 199 → **205** / 222, holdout 33 → 34, placeholders **6 → 2**.
+Run 9's regressions come back: `delete file` 2 → 5 of 6 (`rm filename`,
+`git obliterate` gone on three of four phrasings), `list processes` 0 → 2
+of 4 (`ps aux`, `pm2` gone on two). Lost: `change permission` ×2 →
+`icacls file_or_directory` (Windows tool, tldr row; not in the pair set —
+DPO pushed `chmod` down for reasons the pairs do not name), `change
+shell/rojak`. Bench 0.43 s warm at 4 threads, 1.5 GB.
+
+Reading. DPO on ~40 real mistakes plus 3,400 synthetic pairs does what the
+pairs literally say — the specific `fossil`/`kcadm.sh`/`git obliterate`/
+`pm2` misses it was shown flip back — and nothing further: the placeholder
+habit survives on run 7 (23 answers), ALFA does not move on either base,
+and every gain is offset by a new obscure-tool miss elsewhere (`icacls`).
+Three minutes of preference tuning cannot fix a prior that 345k SFT rows
+set; it can only patch the misses it was handed. Neither arm ships:
+v7-dpo has the best probe (205, 2 placeholders, all #47 targets pass) but
+is inside run 7's CI on every register and −0.02 EN on its own base.
+
+Next, if this thread continues: weight the real-mistake pairs (1.2% of the
+set today), or grow the head of the pool for the beginner verbs (#54's
+note) and DPO on top of that — the pool sets the prior, DPO trims it.
