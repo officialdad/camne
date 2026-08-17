@@ -69,8 +69,9 @@ Reads like a government circular → pipeline broken, fix before scaling.
 ```
 
 `register` ∈ formal | colloquial | rojak | english. `cmd` byte-identical to
-source, all four rows. Optional `target` field (shell/OS context line) is
-tolerated by verify.py but not generated — decision pending (issue #1).
+source, all four rows. No `target` (shell/OS context) field: three shipped
+models never needed one, and adding it means every row changes and a run
+to measure it (decided in #49).
 
 ## Translation route
 
