@@ -1458,3 +1458,42 @@ prompt still comes back translated — then 236 rows are not enough weight
 against the prior and the lever is DPO pairs on exactly that shape, not
 more SFT rows. Ship rule unchanged: the README quoting workaround comes
 out only when a shipped model shows 8/8.
+
+**Result (2026-08-18): falsified on the one prompt it was for.** `qwen-v10`
+235,159 rows, then `qwen-v10-dpo` on its own probe misses (3,432 pairs;
+`exact` prompts get no pairs — they are not in dpo_pairs.py's GOLD, so
+`#51 exact` stays a generalisation number after DPO).
+
+| register | shipped (v7-dpo) | v10 | v10-dpo | v10-dpo vs shipped, 95% CI | p |
+|---|---|---|---|---|---|
+| BM | 0.497 | 0.453 | 0.453 | −0.043 [−0.097, +0.011] | 0.15 |
+| rojak | 0.517 | 0.480 | 0.490 | −0.027 [−0.083, +0.029] | 0.42 |
+| EN | 0.543 | 0.523 | 0.543 | 0.000 [−0.050, +0.050] | 1 |
+
+Inside every CI. Probe: v10 basics 160, holdout 33; v10-dpo basics 166,
+holdout 32 (shipped 166 / 34); `path/to` 0. `delete file` 5/6 on v10-dpo
+(v9-dpo 2/6) with nothing in this pool aimed at it — the churn again. Bench
+0.54 s warm at 4 threads, 1.58 GB RSS.
+
+`#51 exact` **7/8 on both**, the same miss: `nak rename fail baru.txt jadi
+lama.txt` → `mv new.txt old.txt`. But the rename block did land — on v10,
+`nak tukar nama fail lama.txt jadi baru.txt` → `mv lama.txt baru.txt`,
+`rename nota.txt ke surat.txt` → `mv nota.txt surat.txt`, `nak rename fail
+a.txt jadi b.txt` → `mv a.txt b.txt`. Every phrasing that carries
+`baru.txt` before `lama.txt` (`kepada`, `jadi`, `to`, `boleh?`) comes back
+`mv new.txt old.txt`, which is basics.txt's own rename block (`nak tukar
+nama fail old.txt jadi new.txt` → `mv old.txt new.txt`, 28 rows) reached
+through the prior `baru`=new, `lama`=old. `lama.txt` is in the slot lists
+(345 rows) and survives; `baru.txt` is in zero pool rows and does not. So
+the miss is not the rename shape, it is the one Malay filename the lists
+never carried.
+
+**Run 13, hypothesis before the run.** `pool_v11` = pool_v10 with
+`baru.txt` in place of `notes.txt` in the `{t}` list (head.py NAMES): 220
+rows change, `notes.txt` → `baru.txt` on both sides, nothing else moves
+(checked row for row). One variable. Hypothesis: `#51 exact` 8/8, ALFA
+inside the CI vs shipped, probe within the ±3 churn. Falsified if the
+rename still comes back `new.txt old.txt` with 220 rows naming `baru.txt` —
+then a Malay word that is also an adjective needs more than the ~200-row
+dose `lama.txt` needed, and the honest fix is the README line, not more
+rows.

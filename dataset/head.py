@@ -51,7 +51,7 @@ HOLDOUT = {"truncate", "tac", "whereis", "dirname", "tee", "timeout", "chsh",
            "printenv", "nl"}
 
 NAMES = {
-    "t": "notes.txt nota.txt lama.txt laporan.txt senarai.txt surat.txt jadual.csv "
+    "t": "baru.txt nota.txt lama.txt laporan.txt senarai.txt surat.txt jadual.csv "
          "data.csv todo.md catatan.md draf.txt minit.txt ucapan.txt config.yaml "
          "index.html main.py skrip.sh output.log error.log resit.txt".split(),
     "f": "laporan.pdf gambar.jpg nota.txt lama.txt foto.png resume.docx senarai.txt "
