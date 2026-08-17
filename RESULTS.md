@@ -1368,3 +1368,49 @@ task loses more than one phrasing, placeholders on the probe ≤ 2, ALFA
 inside run 10's CI on every register. Falsified if `delete file` stays
 below 5/6 — then the `git obliterate` habit is not that row and the
 head-rows idea needs a different lever (weight, not count).
+
+**Result (2026-08-17): falsified — the row was not the habit.** `qwen-v9`
+235,169 rows, then `qwen-v9-dpo` on its own probe misses.
+
+| register | shipped (v7-dpo) | v9 | v9-dpo | v9-dpo vs shipped, 95% CI | p |
+|---|---|---|---|---|---|
+| BM | 0.497 | 0.447 | 0.477 | −0.020 [−0.072, +0.032] | 0.53 |
+| rojak | 0.517 | 0.483 | 0.483 | −0.033 [−0.085, +0.019] | 0.26 |
+| EN | 0.543 | 0.533 | 0.543 | 0.000 [−0.053, +0.053] | 1 |
+
+v9's SFT BM of 0.447 was −0.050 vs the shipped model (p = 0.086) and DPO
+took back +0.030 (p = 0.09); both sit on the CI edge and neither clears it.
+Probe: v9 205, v9-dpo 204 (shipped 205); basics 168 → 171 (shipped 166);
+holdout 33 → **29** (shipped 34: `change shell` ×3 → `update-alternatives`,
+`whereis` → `git --exec-path`, `number lines` → `less -N`); placeholders 0
+on both. Bench 0.45 s warm at 4 threads, 1.61 GB RSS — RSS has crept
+1.49 → 1.56 → 1.61 across v7-dpo/v8/v9 for the same file size, which is
+either the box or something in `finish.sh` worth checking before the next
+ship.
+
+`delete file`: 1/6 (v9: `clido --remove file_name`, `echo $(ls -1 | sort
+-R | head -n 1)`) → 2/6 (v9-dpo: `coreutils rm file`, `clido --remove
+name`). Removing `git obliterate` moved the miss to the next obscure tool,
+not to `rm`. The reason is in the pool, and it is #47 again: the six probe
+phrasings are unnamed — `nak buang file ni`, `nak padam file ni`, `delete a
+file`, `Hapuskan file tersebut`. In pool_v9 the NL "delete/buang/padam/
+hapus file/fail (ni/tu)" with no filename occurs four times: three rows
+answer `<Enter>`, one `pvesm [f|free] local:iso/...`, **zero `rm`**.
+Every one of the 253 head rows for `rm` and every basics row carries a
+filename. Run 8's unnamed rows fixed `create` and never got a `delete`
+twin, so an unnamed delete has nothing to imitate but noise, and each pool
+change reshuffles which noise wins. `list processes` 4/4, `edit file` 5/5,
+`change permission` 5/5 held from run 10 — the head rows keep what they
+name.
+
+Not shipping: no register better than v0.9.0, holdout down 5, one beginner
+task still broken. Two runs (four models) on this thread say the same
+thing three ways: the pool fixes exactly the phrasing it contains, ALFA
+cannot see any of it, and each 4 h run trades one probe task for another
+inside the noise. Next, if anything: unnamed `delete`/`copy`/`move`/`edit`
+rows in the #47 shape (`nak buang file ni` → `rm file.txt`), plus a drop
+rule for rows whose NL is a bare beginner verb and whose command is not a
+core tool (`<Enter>`, `pvesm`), bundled with the next change that has an
+ALFA-sized reason to retrain — not on their own. `dataset/lists.py` stays
+(4,864 unrunnable rows out is right regardless), pool_v9 is the pool the
+next run starts from.
