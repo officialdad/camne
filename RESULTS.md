@@ -1316,3 +1316,55 @@ rate. GPU commands, from the worktree's `training/`:
 `python3 dpo_pairs.py --probe out/probe_qwen-v8.jsonl --out out/dpo_pairs_v8.jsonl`
 and `DPO_BASE=out/qwen-v8-lora-merged ./rebuild.sh qwen-v8-dpo out/dpo_pairs_v8.jsonl dpo`.
 Not started; hypothesis written first.
+
+**Result (2026-08-17): the head rows fix what they name and one poisoned
+row breaks what they do not.** `qwen-v8` 240,033 rows, 2 h 50 min; then
+`qwen-v8-dpo` on its own probe misses (3,4xx pairs, 3 min).
+
+| register | run 7 | v7-dpo (shipped) | v8 | v8-dpo | v8-dpo vs shipped, 95% CI | p |
+|---|---|---|---|---|---|---|
+| BM | 0.487 | 0.497 | 0.493 | 0.497 | 0.000 [−0.052, +0.052] | 1 |
+| rojak | 0.490 | 0.517 | 0.477 | 0.497 | −0.020 [−0.071, +0.031] | 0.52 |
+| EN | 0.543 | 0.543 | 0.530 | 0.530 | −0.013 [−0.066, +0.039] | 0.71 |
+
+Inside every CI, as expected by now. Probe: v8 206 / 222, v8-dpo 205 (the
+shipped model: 205); basics 169 → 168 (shipped 166); holdout 33 (shipped
+34); placeholders 5 → 3 (shipped 2). Bench 0.37–0.44 s warm at 4 threads,
+1.56–1.58 GB RSS (up ~70 MB from 1.49; within constraint 3, worth a second
+look before any ship).
+
+What the head rows bought, on the tasks they were written for: `edit file`
+3/5 → 5/5 (`nano readme.txt` on every phrasing), `change permission`
+2/5 → 5/5 (`chmod 644 file`, `chmod +x filename` — `icacls` gone),
+`list processes` 2/4 → 3/4 (`ps aux`; one `jobs` left), `ram usage/formal`
+`smem --mem` → `free -h`. Hypothesis held there.
+
+What broke: `delete file` 5/6 → 1/6 (v8) → **0/6** (v8-dpo). v8 says
+`git obliterate file_1 file_2 ...` on four phrasings; DPO, shown that as a
+rejected row, moves to `delete .file_name` and `touch /tmp/foo.txt && echo
+"Deleting /tmp/foo.txt"` — anywhere but `rm`. The cause is one tldr row,
+not the prior: `git obliterate file_1 file_2 ...` carries the description
+"Erase the existence of specific files", which SEA-LION rendered as `buang
+fail tu` (colloquial) and `nak delete file ni je` (rojak) — the exact
+beginner phrasing for `rm`, attached to a git-extras command. 253 head rows
+for `rm` cannot outvote a row whose NL *is* the probe prompt. prior.py's
+placeholder rule caught `path/to` and `<name>`; it did not catch the
+`file_1 file_2 ...` list shape, and pool_v8 still has 4,947 rows (2.1%)
+with `X1 X2 ...`, `argument1 argument2`, `filename`, `file_name`,
+`file_or_directory`, `directory_name` in the command — the tldr "list of
+things" idiom. Every one of those is a row where the NL is generic and the
+command is not runnable.
+
+Not shipping: same ALFA, same probe total as v0.9.0, and a beginner task
+went from five of six to none. Held-out `change shell` came back (0/3 →
+3/3, `chsh -s zsh`) and `reverse lines` went (3/3 → 0/3), which is the
+±3-prompt churn the holdout always shows.
+
+**Run 11, hypothesis before the run.** `pool_v9` = `pool_v8` minus the
+4,947 list/name-placeholder rows (`dataset/lists.py`, one regex, whole
+pairs, commands otherwise untouched, count printed). One variable vs run
+10. Hypothesis: `delete file` returns to ≥ 5/6 with `rm`, no other probe
+task loses more than one phrasing, placeholders on the probe ≤ 2, ALFA
+inside run 10's CI on every register. Falsified if `delete file` stays
+below 5/6 — then the `git obliterate` habit is not that row and the
+head-rows idea needs a different lever (weight, not count).
