@@ -160,15 +160,16 @@ you get plain bytes. `NO_COLOR` or `TERM=dumb` turns colour off everywhere.
 
 ### The model
 
-camne-1.5b is Qwen2.5-Coder-1.5B tuned on 76k command pairs in four
+camne-1.5b is Qwen2.5-Coder-1.5B tuned on 228k command rows in four
 registers (formal Malay, colloquial, rojak, English) plus 330 hand-written
-beginner tasks. Status: beta.
+beginner tasks, then one epoch of preference tuning against its own wrong
+answers. Status: beta.
 
 Malay and rojak questions answer well, and the first fifty things a beginner
 asks (create, list, delete, copy, find, disk, permissions, "how do I quit
-vim") pass 90% of unseen phrasings on the repo's probe. On advanced English
+vim") pass 94% of unseen phrasings on the repo's probe. On advanced English
 one-liners it is worse than the English-only model it replaces (-0.06,
-p = 0.036). If you only ever type English, use
+p = 0.05). If you only ever type English, use
 [whatisit](https://github.com/ThorOdinson246/whatisit-nl2sh).
 
 Scores below are [InterCode-ALFA](https://github.com/westenfelder/InterCode-ALFA),
@@ -179,17 +180,23 @@ matters.
 | model | BM | rojak | EN | beginner tasks* | size | tok/s @4t | RSS |
 |---|---|---|---|---|---|---|---|
 | nl2sh-1.5b (the English model camne used to ship) | 0.310 | 0.447 | **0.603** | — | 986 MB | 40 | 1.6 GB |
-| camne-1.5b, previous revision | 0.437 | 0.490 | 0.553 | 0.79 | 986 MB | 40 | 1.6 GB |
-| **camne-1.5b, this revision** | **0.487** | 0.490 | 0.543 | **0.90** | 986 MB | 37 | 1.6 GB |
+| camne-1.5b, previous revision | 0.487 | 0.490 | 0.543 | 0.90 | 986 MB | 37 | 1.6 GB |
+| **camne-1.5b, this revision** | **0.497** | **0.517** | 0.543 | **0.94** | 986 MB | 38 | 1.6 GB |
 
-\* `training/probe.py`: 35 beginner tasks asked in 177 phrasings the training
+\* `training/probe.py`: 35 beginner tasks asked in 176 phrasings the training
 data does not contain, scored on whether the right tool comes back.
 
-Against the English model: Malay +0.177 (p = 3e-08), rojak +0.043 (p = 0.13,
-unresolved at 300 tasks), English -0.060 (p = 0.036). Against the previous
-revision the benchmark cannot tell them apart; the beginner probe can (+0.11,
-p = 0.002). Speed and memory are unchanged: same base, same quantisation,
-same file size.
+Against the English model: Malay +0.187 (p = 6e-08), rojak +0.070
+(p = 0.031), English -0.060 (p = 0.05). Against the previous revision the
+benchmark cannot tell them apart (every register inside the 95% CI; the same
+recipe re-run reproduces to ±0.013), and the probe pass rate moves only
++0.04 (p = 0.12). What changed is the answers themselves: the previous
+revision said `touch path/to/file1 path/to/file2 ...` for "create a new
+file", `skicka mkdir path/to/folder` for a folder and `kcadm.sh create
+users` for a user; this one says `touch newfile.txt`, `mkdir newfolder`,
+`sudo useradd -m newuser`. Placeholder answers on the probe went 29 → 2 of
+222. It shipped on that, not on a score. Speed and memory are unchanged:
+same base, same quantisation, same file size.
 
 Full method, the runs that failed, and why, in [RESULTS.md](RESULTS.md).
 
