@@ -1497,3 +1497,34 @@ rename still comes back `new.txt old.txt` with 220 rows naming `baru.txt` —
 then a Malay word that is also an adjective needs more than the ~200-row
 dose `lama.txt` needed, and the honest fix is the README line, not more
 rows.
+
+**Result (2026-08-18): hypothesis held on #51, ALFA says no ship.** `qwen-v11`
+235,159 rows, then `qwen-v11-dpo` (3,428 pairs).
+
+| register | shipped (v7-dpo) | v11 | v11-dpo | v11-dpo vs shipped, 95% CI | p |
+|---|---|---|---|---|---|
+| BM | 0.497 | 0.433 | 0.423 | **−0.073 [−0.125, −0.022]** | 0.008 |
+| rojak | 0.517 | 0.480 | 0.477 | −0.040 [−0.092, +0.012] | 0.17 |
+| EN | 0.543 | 0.517 | 0.527 | −0.017 [−0.070, +0.037] | 0.63 |
+
+`#51 exact` **8/8** on v11 and v11-dpo; every rename phrasing right
+(`nak tukar nama fail baru.txt kepada lama.txt`, `rename file baru.txt to
+lama.txt`, `... boleh?` all → `mv baru.txt lama.txt`). 220 rows naming
+`baru.txt` were the dose. Probe: v11 basics 164 / holdout 31; v11-dpo
+basics **169** / holdout 31, `delete file` **6/6** on both, `path/to` 0.
+Bench 0.52 s warm at 4 threads, 1.56 GB RSS.
+
+Not shipping: BM is worse than v0.9.0 and the CI excludes zero — the first
+time in this thread it has. v10-dpo → v11-dpo alone is −0.030 [−0.075,
++0.015] (p = 0.24), inside the noise, and two of the 28 BM losses are the
+same command scored pass then fail (`gzip -k /testbed/hello.php`), so the
+220-row swap is not what moved BM. What moved it is the whole head-row
+family: v7-dpo 0.497 → v8-dpo 0.497 → v9-dpo 0.477 → v10-dpo 0.453 →
+v11-dpo 0.423, each step inside its CI, the sum not. Runs 10–13 each fixed
+what they named on the probe (edit, chmod, ps, rename, Malay names, now
+`delete file` too) and paid for it on ALFA a little at a time. Issue #51
+is answered — the data fix is `basics_head.txt` + the `{t}` list, verified
+8/8 — and it ships with whatever next model clears ALFA. The README
+quoting workaround stays until then. Next lever, if this thread continues:
+find which ALFA-BM tasks the head-row family loses (v7-dpo right, v11-dpo
+wrong, 43 of them) and whether they share a tool the head rows out-vote.
