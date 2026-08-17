@@ -5,12 +5,18 @@ the License at http://www.apache.org/licenses/LICENSE-2.0
 
 ---
 
-Training data sources, by share of the NL->command pair pool:
+Training data sources, by measured share of the 228,357-row pool
+(dataset/NOTICE has the full table and the per-row source key):
 
-  58.2%  NL2SH-ALFA training split   MIT
+  48.2%  NL2SH-ALFA training split   MIT
          https://huggingface.co/datasets/westenfelder/NL2SH-ALFA
-  41.8%  tldr-pages                  CC-BY-4.0
+  29.2%  tldr-pages                  CC-BY-4.0
          https://github.com/tldr-pages/tldr
+  18.5%  cli-commands-explained      CC0-1.0    (declared, unverified)
+         https://huggingface.co/datasets/b-mc2/cli-commands-explained
+   3.0%  git-instruction-dataset     MIT        (declared, unverified)
+         https://huggingface.co/datasets/0xrushi/git-instruction-dataset
+   1.1%  hand-written basics rows    Apache-2.0 (this repository)
 
 Attribution, required by CC-BY-4.0: this work includes content from
 tldr-pages (https://github.com/tldr-pages/tldr) under CC-BY-4.0

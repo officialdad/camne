@@ -163,6 +163,12 @@ Three things vary and the pool flattens all of them:
 
 ### Sources, licensing
 
+Pool sources, measured shares and licences: [`NOTICE`](NOTICE). The pool
+itself (pool_v7, basics, both eval sets, dataset card) is published at
+https://huggingface.co/datasets/opariffazman/camne-pool.
+
+Future colloquial-input sources:
+
 - Direct solicitation: [`survey.md`](survey.md). Own the data; no licence issue.
 - [Malaya](https://github.com/mesolitica/malaya) datasets — MIT/CC mixed;
   check per-set before ingesting. Useful for the shortcut lexicon.
