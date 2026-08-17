@@ -27,6 +27,8 @@ prior.py          # pool_v6 (= pool_v4.bal + basics) → out/pool_v7.jsonl
 head.py           # pool_v7 + basics_head.txt → out/pool_v8.jsonl  head rows
                   # for beginner verbs under 1,000 real rows, slots filled
                   # 20 ways; restores translated filenames in NL (#62, #51)
+lists.py          # pool_v8 → out/pool_v9.jsonl  drop tldr's `file1 file2 ...`
+                  # / `filename` list-placeholder rows (issue #62, run 11)
 ```
 
 Full rebuild from raw, no GPU:

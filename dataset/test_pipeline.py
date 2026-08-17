@@ -310,3 +310,14 @@ for nl, cmd, want in (
         ("guna fail selain build.xml", "ant -f buildfile.xml", "guna fail selain build.xml")):
     assert restore_name(nl, cmd) == want, (nl, cmd, restore_name(nl, cmd))
 print("ok: head checks pass")
+
+# lists.py: tldr's list/name placeholder idiom, whole pairs go
+from lists import LIST, stem
+for cmd, hit in (
+        ("git obliterate file_1 file_2 ...", True), ("nohup command argument1 argument2 ...", True),
+        ("rm filename", True), ("chmod 644 file_or_directory", True), ("mkdir directory_name", True),
+        ("rm notes.txt", False), ("touch file{1..5}", False), ("ls -1", False), ("cat file2.txt", False),
+        ("mv a1 b2", False), ("git log --oneline -3", False)):
+    assert bool(LIST.search(cmd)) == hit, cmd
+assert stem("tldr:12+verb") == stem("tldr:12~3") == "tldr:12"
+print("ok: lists checks pass")

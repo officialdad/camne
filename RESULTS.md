@@ -1349,7 +1349,7 @@ fail tu` (colloquial) and `nak delete file ni je` (rojak) — the exact
 beginner phrasing for `rm`, attached to a git-extras command. 253 head rows
 for `rm` cannot outvote a row whose NL *is* the probe prompt. prior.py's
 placeholder rule caught `path/to` and `<name>`; it did not catch the
-`file_1 file_2 ...` list shape, and pool_v8 still has 4,947 rows (2.1%)
+`file_1 file_2 ...` list shape, and pool_v8 still has 4,864 rows (2.0%)
 with `X1 X2 ...`, `argument1 argument2`, `filename`, `file_name`,
 `file_or_directory`, `directory_name` in the command — the tldr "list of
 things" idiom. Every one of those is a row where the NL is generic and the
@@ -1361,7 +1361,7 @@ went from five of six to none. Held-out `change shell` came back (0/3 →
 ±3-prompt churn the holdout always shows.
 
 **Run 11, hypothesis before the run.** `pool_v9` = `pool_v8` minus the
-4,947 list/name-placeholder rows (`dataset/lists.py`, one regex, whole
+4,864 list/name-placeholder rows (`dataset/lists.py`, one regex, whole
 pairs, commands otherwise untouched, count printed). One variable vs run
 10. Hypothesis: `delete file` returns to ≥ 5/6 with `rm`, no other probe
 task loses more than one phrasing, placeholders on the probe ≤ 2, ALFA
