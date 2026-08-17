@@ -1,0 +1,695 @@
+# Head rows for the beginner verbs (issue #62). Same block format as
+# basics.txt, read by head.py, plus slots that head.py fills twenty ways:
+#   {t} text file   {f} any file   {f2} another file   {d} folder   {d2} another
+#   {u} user  {h} host  {n} count  {pid} PID  {port}  {sshport}  {p} process
+#   {z} zip  {url}  {log} log file
+# A phrasing must carry every slot its cmd carries. No path/to. Probe
+# prompts (training/probe.py) are not here; HOLDOUT tools are refused.
+# Slot lists carry Malay filenames on purpose (issue #51): lama.txt stays
+# lama.txt on both sides.
+
+## --- nano ------------------------------------------------------------------
+
+cmd: nano {t}
+F: Buka fail {t} dalam editor nano | Sunting fail {t} menggunakan nano | Edit kandungan fail {t}
+C: nak edit fail {t} | buka {t} guna nano | tolong buka fail {t} nak ubah sikit | nak ubah isi fail {t} | edit {t} sekejap | boleh tak buka {t} untuk edit | nak tukar isi {t} | tlg buka fail {t} dalam nano
+R: nak edit file {t} dengan nano | open {t} in nano | edit file {t} | nak open {t} untuk edit | edit {t} guna nano
+E: edit {t} with nano | open {t} in nano | edit the file {t} | open {t} so I can change it
+
+cmd: nano {d}/{t}
+F: Buka fail {t} dalam direktori {d} menggunakan nano | Sunting fail {d}/{t}
+C: nak edit fail {t} dalam folder {d} | buka {d}/{t} guna nano | tolong buka {t} kat folder {d} untuk edit
+R: nak edit file {t} dalam folder {d} | open {d}/{t} in nano | edit {t} inside {d}
+E: edit {t} in the {d} folder with nano | open {d}/{t} in nano
+
+cmd: nano +{n} {t}
+F: Buka fail {t} dalam nano terus pada baris {n}
+C: nak buka {t} terus kat baris {n} | edit fail {t} mula dari baris {n} | buka {t} guna nano, terus lompat ke baris {n}
+R: nak open {t} in nano at line {n} | edit {t} terus jump ke line {n}
+E: open {t} in nano at line {n} | edit {t} starting at line {n}
+
+cmd: nano -l {t}
+F: Buka fail {t} dalam nano dengan nombor baris dipaparkan
+C: nak edit {t} dengan nombor baris sekali | buka {t} guna nano tunjuk nombor baris
+R: nak edit {t} in nano with line numbers | open {t} nano show line number
+E: edit {t} in nano showing line numbers | open {t} in nano with line numbers on
+
+cmd: sudo nano {t}
+F: Buka fail {t} dalam nano sebagai root | Sunting fail sistem {t} dengan kebenaran root
+C: nak edit fail {t} tapi kena guna sudo | buka {t} guna nano sebagai root | fail {t} tak boleh save, nak edit guna sudo
+R: nak edit {t} with sudo | open {t} in nano as root | sudo edit file {t}
+E: edit {t} as root with nano | open {t} in nano using sudo
+
+## --- less ------------------------------------------------------------------
+
+cmd: less {t}
+F: Buka fail {t} untuk dibaca muka surat demi muka surat | Paparkan fail {t} dalam pager | Baca kandungan {t} secara berskrol
+C: nak baca fail {t} sikit-sikit boleh scroll | buka {t} yang panjang tu | nak tengok isi {t} boleh scroll atas bawah | tolong buka {t} untuk baca je | nak baca {t} muka demi muka | tgk fail {t} boleh scroll | baca {t} tanpa edit
+R: nak baca file {t} page by page | open {t} boleh scroll | view {t} in pager | nak view file {t} je, tak nak edit | read {t} dalam less
+E: read {t} page by page | open {t} in a pager | view {t} without editing | scroll through {t}
+
+cmd: less {d}/{t}
+F: Baca fail {t} dalam direktori {d} muka surat demi muka surat
+C: nak baca {t} dalam folder {d} boleh scroll | buka fail {d}/{t} untuk baca je
+R: nak view file {t} dalam folder {d} | open {d}/{t} in pager
+E: read {d}/{t} page by page | view {t} in the {d} folder with a pager
+
+cmd: less -N {t}
+F: Baca fail {t} dengan nombor baris dipaparkan
+C: nak baca {t} dengan nombor baris sekali | buka {t} boleh scroll, tunjuk nombor baris
+R: nak view {t} with line numbers | read {t} in less show line number
+E: view {t} with line numbers | read {t} page by page showing line numbers
+
+cmd: less +F {log}
+F: Ikuti fail {log} secara langsung di dalam pager
+C: nak tengok {log} secara live tapi boleh scroll ke atas | follow fail {log} guna less
+R: nak follow file {log} in less | tail {log} live tapi boleh scroll
+E: follow {log} live inside less | watch {log} grow but keep scrolling
+
+cmd: less +G {t}
+F: Buka fail {t} dan terus ke penghujungnya
+C: nak buka {t} terus kat hujung fail | baca {t} mula dari bawah sekali
+R: nak open {t} terus jump to end | view {t} start from the bottom
+E: open {t} jumping straight to the end | view {t} starting at the last line
+
+cmd: less -S {t}
+F: Baca fail {t} tanpa membalut baris yang panjang
+C: nak baca {t} tapi jangan wrap baris panjang | buka {t} baris panjang jangan patah
+R: nak view {t} without line wrap | read {t} tapi long lines jangan wrap
+E: view {t} without wrapping long lines | read {t} with long lines cut off instead of wrapped
+
+## --- head ------------------------------------------------------------------
+
+cmd: head {t}
+F: Paparkan sepuluh baris pertama fail {t} | Tunjukkan bahagian awal fail {t}
+C: nak tengok baris awal fail {t} | tunjuk 10 baris pertama {t} | nak tengok permulaan {t} je | tgk atas sikit fail {t}
+R: nak tengok first few lines file {t} | show top of {t} | preview {t} atas sikit
+E: show the first lines of {t} | print the first 10 lines of {t} | peek at the top of {t}
+
+cmd: head -n {n} {t}
+F: Paparkan {n} baris pertama fail {t} | Tunjukkan {n} baris teratas {t}
+C: nak tengok {n} baris pertama {t} | tunjuk {n} baris awal fail {t} | bagi {n} baris atas {t} je | tgk {n} baris pertama dalam {t}
+R: nak tengok first {n} lines {t} | show {n} baris pertama file {t} | print top {n} lines of {t} | head {t} {n} lines je
+E: show the first {n} lines of {t} | print the top {n} lines of {t} | display {n} lines from the start of {t}
+
+cmd: head -n {n} {d}/{t}
+F: Paparkan {n} baris pertama fail {t} dalam direktori {d}
+C: nak tengok {n} baris pertama {t} dalam folder {d} | tunjuk {n} baris awal {d}/{t}
+R: nak tengok first {n} lines {d}/{t} | show top {n} lines of {t} dalam {d}
+E: show the first {n} lines of {d}/{t} | print the first {n} lines of {t} in {d}
+
+cmd: head -c {n} {t}
+F: Paparkan {n} bait pertama fail {t}
+C: nak tengok {n} bait pertama {t} | tunjuk {n} byte awal fail {t}
+R: nak tengok first {n} bytes {t} | show {n} bytes pertama file {t}
+E: show the first {n} bytes of {t} | print {n} bytes from the start of {t}
+
+cmd: head -n {n} *.txt
+F: Paparkan {n} baris pertama setiap fail .txt dalam direktori ini
+C: nak tengok {n} baris pertama semua fail txt kat sini | tunjuk {n} baris awal setiap fail .txt
+R: nak tengok first {n} lines semua file txt | show top {n} lines of every .txt kat sini
+E: show the first {n} lines of every .txt file here | print the top {n} lines of each txt file
+
+cmd: head -n -{n} {t}
+F: Paparkan fail {t} kecuali {n} baris terakhir
+C: nak tengok {t} tapi buang {n} baris hujung | tunjuk semua {t} kecuali {n} baris bawah
+R: nak print {t} except last {n} lines | show {t} tapi skip {n} baris terakhir
+E: print {t} except the last {n} lines | show all of {t} but the last {n} lines
+
+## --- tail ------------------------------------------------------------------
+
+cmd: tail {t}
+F: Paparkan sepuluh baris terakhir fail {t} | Tunjukkan penghujung fail {t}
+C: nak tengok baris akhir fail {t} | tunjuk hujung fail {t} | tgk bawah sikit {t} | nak tengok baris bawah {t} je
+R: nak tengok last few lines {t} | show bottom of file {t} | print hujung {t}
+E: show the last lines of {t} | print the end of {t} | show the bottom of {t}
+
+cmd: tail -n {n} {t}
+F: Paparkan {n} baris terakhir fail {t} | Tunjukkan {n} baris terbawah {t}
+C: nak tengok {n} baris terakhir {t} | tunjuk {n} baris hujung fail {t} | bagi {n} baris bawah {t} | tgk {n} baris akhir dalam {t}
+R: nak tengok last {n} lines {t} | show {n} baris terakhir file {t} | print bottom {n} lines of {t}
+E: show the last {n} lines of {t} | print the last {n} lines from {t} | display the final {n} lines of {t}
+
+cmd: tail -f {log}
+F: Ikuti fail {log} secara langsung apabila baris baharu ditambah | Paparkan {log} secara berterusan
+C: nak tengok {log} secara live, baris baru terus keluar | tunjuk {log} yang tengah jalan | nak monitor fail {log} masa dia update | tgk {log} live | follow fail {log}
+R: nak follow file {log} live | tengok {log} real time | monitor {log} as it grows | tail {log} live
+E: follow {log} as it grows | watch {log} live | keep printing new lines of {log} | tail {log} in real time
+
+cmd: tail -f {d}/{log}
+F: Ikuti fail {log} dalam direktori {d} secara langsung
+C: nak tengok {log} dalam folder {d} secara live | follow fail {d}/{log}
+R: nak follow {d}/{log} live | monitor {log} inside {d} real time
+E: follow {d}/{log} live | watch {log} in the {d} folder as it grows
+
+## --- rm --------------------------------------------------------------------
+
+cmd: rm {f}
+F: Padam fail {f} | Hapuskan fail {f} | Buang fail {f} daripada direktori ini
+C: nak buang fail {f} | tolong padam fail {f} | delete {f} | nak hapus fail {f} | buang {f} je | boleh tak padam {f} | tlg buang {f} | nak padam fail {f} ni | buang fail {f} dari sini
+R: nak delete file {f} | remove file {f} | tolong buang file {f} | nak padam file {f} | delete {f} please | remove {f} kat sini
+E: delete {f} | remove the file {f} | get rid of {f} | delete the file {f}
+
+cmd: rm -r {d}
+F: Padam direktori {d} beserta semua kandungannya | Hapuskan folder {d} dan isinya
+C: nak buang folder {d} dengan semua isi dia | padam folder {d} sekali dengan isi | tolong hapus folder {d} | buang folder {d} terus | nak padam direktori {d}
+R: nak delete folder {d} dengan semua isi | remove folder {d} and everything inside | buang folder {d} sekali | delete directory {d}
+E: delete the folder {d} and everything in it | remove the directory {d} recursively | delete the {d} folder
+
+cmd: rm {f} {f2}
+F: Padam fail {f} dan {f2} | Hapuskan dua fail {f} dan {f2}
+C: nak buang {f} dengan {f2} sekali | padam fail {f} dan {f2} | tolong delete {f} {f2}
+R: nak delete {f} and {f2} | remove file {f} dan {f2} sekali
+E: delete {f} and {f2} | remove the files {f} and {f2}
+
+## --- ps --------------------------------------------------------------------
+
+cmd: ps aux
+F: Paparkan senarai semua proses yang sedang berjalan | Senaraikan setiap proses pada sistem ini
+C: nak tengok semua proses yang tengah jalan | tunjuk semua program yang tengah run | apa proses yang jalan sekarang | senarai proses kat komputer ni | nak tengok proses semua sekali
+R: nak tengok semua process yang running | show all process | list every process kat sistem ni | apa process tengah jalan sekarang
+E: show all running processes | list every process on the system | what processes are running
+
+cmd: ps -ef
+F: Senaraikan semua proses dalam format penuh
+C: nak senarai semua proses format penuh | tunjuk semua proses dengan PID dan parent dia
+R: nak list all process full format | show semua process dengan PID
+E: list all processes in full format | show every process with its PID and parent
+
+cmd: ps aux | grep {p}
+F: Cari proses {p} dalam senarai proses | Semak sama ada {p} sedang berjalan
+C: nak tengok {p} tengah jalan ke tak | cari proses {p} | {p} ni ada jalan ke | tunjuk proses {p} je | nak check {p} running tak
+R: nak check {p} running ke tak | find {p} process | is {p} running | show process {p} je | list process {p}
+E: is {p} running | find the {p} process | show processes named {p} | check if {p} is running
+
+cmd: ps -u {u}
+F: Senaraikan proses milik pengguna {u}
+C: nak tengok proses user {u} je | tunjuk semua proses yang {u} tengah jalankan | proses apa yang {u} run
+R: nak list process user {u} | show process belonging to {u} | apa process yang {u} run
+E: list processes owned by {u} | show what user {u} is running | show {u}'s processes
+
+cmd: ps -p {pid}
+F: Paparkan maklumat proses dengan ID {pid}
+C: nak tengok proses PID {pid} tu apa | proses {pid} tu program apa | tunjuk info proses nombor {pid}
+R: nak check process {pid} apa | show process with PID {pid} | what is process {pid}
+E: show the process with PID {pid} | what is process {pid} | show info on process {pid}
+
+## --- chmod -----------------------------------------------------------------
+
+cmd: chmod +x setup.sh
+F: Jadikan fail setup.sh boleh dilaksanakan
+C: nak buat setup.sh boleh run | bagi permission execute kat setup.sh
+R: nak make setup.sh executable | bagi execute permission to setup.sh
+E: make setup.sh executable | give setup.sh execute permission
+
+cmd: chmod +x backup.sh
+F: Berikan kebenaran laksana kepada backup.sh
+C: nak buat backup.sh boleh dijalankan | bagi backup.sh permission untuk run
+R: nak make backup.sh executable | allow backup.sh to run
+E: make backup.sh executable | let backup.sh be executed
+
+cmd: chmod +x run.py
+F: Jadikan skrip run.py boleh dilaksanakan terus
+C: nak buat run.py boleh run terus | bagi permission execute kat run.py
+R: nak make run.py executable | chmod run.py boleh run
+E: make run.py executable | give run.py execute permission
+
+cmd: chmod 644 {f}
+F: Tetapkan kebenaran fail {f} kepada 644 | Jadikan {f} boleh dibaca semua tetapi ditulis oleh pemilik sahaja
+C: nak set permission {f} jadi 644 | buat {f} boleh baca semua orang tapi aku je boleh tulis | tukar permission fail {f} ke 644
+R: nak set permission {f} to 644 | make {f} readable by everyone, writable by me only | chmod 644 file {f}
+E: set {f} permissions to 644 | make {f} readable by all but writable only by me | chmod {f} to 644
+
+cmd: chmod 600 {f}
+F: Hadkan fail {f} supaya hanya pemilik boleh membaca dan menulis
+C: nak buat {f} aku je boleh baca | set permission {f} jadi private | orang lain jangan boleh baca {f}
+R: nak set {f} permission to 600 | make {f} private, owner only | lock file {f} untuk aku je
+E: make {f} readable only by me | set {f} permissions to 600 | keep {f} private to the owner
+
+cmd: chmod 755 {d}
+F: Tetapkan kebenaran direktori {d} kepada 755
+C: nak set permission folder {d} 755 | bagi folder {d} 755 | tukar permission direktori {d} jadi 755
+R: nak chmod 755 folder {d} | set folder {d} permission 755 | make folder {d} 755
+E: set the {d} folder permissions to 755 | chmod {d} to 755 | give the directory {d} 755
+
+cmd: chmod -R 755 {d}
+F: Tetapkan kebenaran 755 kepada direktori {d} dan semua kandungannya
+C: nak set permission 755 untuk folder {d} sekali dengan semua isi | tukar permission satu folder {d} | bagi 755 kat {d} dan semua dalam dia
+R: nak chmod 755 recursively folder {d} | set permission 755 for whole folder {d} | chmod -R {d} 755
+E: set 755 permissions on {d} and everything inside | recursively chmod {d} to 755 | apply 755 to the whole {d} tree
+
+cmd: chmod a+r {f}
+F: Benarkan semua pengguna membaca fail {f}
+C: nak bagi semua orang boleh baca {f} | buat {f} boleh dibaca sesiapa | bagi permission baca {f} kat semua
+R: nak make {f} readable by everyone | bagi semua orang read {f} | allow all users to read {f}
+E: let everyone read {f} | make {f} readable by all users | give everyone read permission on {f}
+
+cmd: chmod u+w {f}
+F: Berikan kebenaran tulis kepada pemilik fail {f}
+C: nak bagi aku boleh tulis {f} | fail {f} read only, nak buat boleh edit | tambah permission tulis kat {f}
+R: nak make {f} writable for me | add write permission to {f} | {f} read only, nak unlock
+E: give me write permission on {f} | make {f} writable by the owner | add write permission to {f}
+
+## --- chown -----------------------------------------------------------------
+
+cmd: chown {u} {f}
+F: Tukar pemilik fail {f} kepada pengguna {u} | Jadikan {u} pemilik fail {f}
+C: nak tukar owner {f} jadi {u} | buat {u} jadi pemilik fail {f} | tukar pemilik {f} ke {u}
+R: nak change owner file {f} to {u} | set owner {f} jadi {u} | chown {f} kepada {u}
+E: change the owner of {f} to {u} | make {u} own {f} | set {u} as the owner of {f}
+
+cmd: chown {u}:{u} {f}
+F: Tukar pemilik dan kumpulan fail {f} kepada {u}
+C: nak tukar owner dan group {f} jadi {u} | buat {f} milik {u} dengan group {u} sekali
+R: nak change owner and group of {f} to {u} | chown {f} to {u}:{u} | set owner dan group file {f} jadi {u}
+E: change the owner and group of {f} to {u} | make {u} the owner and group of {f}
+
+cmd: chown -R {u}:{u} {d}
+F: Tukar pemilik dan kumpulan direktori {d} beserta kandungannya kepada {u}
+C: nak tukar owner folder {d} dengan semua isi jadi {u} | buat satu folder {d} milik {u} | tukar pemilik semua dalam {d} ke {u}
+R: nak change owner folder {d} recursively to {u} | chown -R {d} to {u} | make {u} own whole folder {d}
+E: change the owner of {d} and everything in it to {u} | recursively chown {d} to {u} | make {u} own the whole {d} folder
+
+cmd: chown -R {u} {d}
+F: Tukar pemilik direktori {d} dan semua kandungannya kepada {u}
+C: nak {u} jadi owner folder {d} sekali dengan isi | tukar pemilik folder {d} ke {u}, isi dia sekali
+R: nak change owner of folder {d} to {u} recursively | set {u} as owner of {d} and everything inside
+E: make {u} the owner of {d} and all its contents | change the owner of the {d} tree to {u}
+
+cmd: sudo chown {u} {f}
+F: Tukar pemilik fail {f} kepada {u} dengan kebenaran root
+C: nak tukar owner {f} jadi {u} tapi kena sudo | fail {f} milik root, tukar owner ke {u}
+R: nak sudo chown {f} to {u} | change owner {f} to {u} with sudo
+E: change the owner of {f} to {u} using sudo | chown {f} to {u} as root
+
+cmd: sudo chown -R {u}:{u} {d}
+F: Tukar pemilik dan kumpulan direktori {d} kepada {u} sebagai root
+C: nak tukar owner folder {d} jadi {u} guna sudo, isi sekali | folder {d} kena root, tukar ke {u} semua
+R: nak sudo chown -R folder {d} to {u} | change owner of whole {d} to {u} as root
+E: change the owner and group of the whole {d} folder to {u} as root | sudo chown {d} recursively to {u}
+
+## --- cp --------------------------------------------------------------------
+
+cmd: cp {f} {d}/
+F: Salin fail {f} ke dalam direktori {d} | Letakkan salinan {f} dalam folder {d}
+C: nak salin {f} masuk folder {d} | copy fail {f} ke {d} | tolong salin {f} ke dalam {d} | buat salinan {f} kat folder {d}
+R: nak copy file {f} masuk folder {d} | copy {f} into {d} | duplicate {f} ke folder {d}
+E: copy {f} into the {d} folder | put a copy of {f} in {d} | copy the file {f} to {d}
+
+cmd: cp -r {d} {d2}
+F: Salin direktori {d} beserta kandungannya kepada {d2} | Buat salinan folder {d} bernama {d2}
+C: nak salin satu folder {d} jadi {d2} | copy folder {d} dengan semua isi dia ke {d2} | buat salinan folder {d} nama {d2} | tolong copy folder {d} jadi {d2}
+R: nak copy folder {d} to {d2} | copy whole folder {d} jadi {d2} | duplicate folder {d} as {d2}
+E: copy the folder {d} to {d2} | duplicate the folder {d} as {d2} | copy the directory {d} with everything inside to {d2}
+
+cmd: cp {f} {f}.bak
+F: Buat salinan sandaran fail {f} bernama {f}.bak
+C: nak buat backup {f} dulu sebelum ubah | salin {f} jadi {f}.bak | tolong backup fail {f}
+R: nak backup file {f} to {f}.bak | make a copy of {f} as {f}.bak | backup {f} dulu
+E: back up {f} as {f}.bak | make a backup copy of {f} | copy {f} to {f}.bak
+
+## --- mv --------------------------------------------------------------------
+
+cmd: mv {f} {d}/
+F: Pindahkan fail {f} ke dalam direktori {d} | Alihkan {f} ke folder {d}
+C: nak pindah fail {f} masuk folder {d} | alih {f} ke {d} | tolong move {f} ke folder {d} | letak {f} dalam folder {d} | pindahkan {f} masuk {d}
+R: nak move file {f} ke folder {d} | move {f} into {d} | pindah {f} to {d} | put {f} inside folder {d}
+E: move {f} into {d} | put {f} in the {d} folder | move the file {f} to {d}
+
+cmd: mv {d} {d2}
+F: Namakan semula direktori {d} sebagai {d2} | Tukar nama folder {d} kepada {d2}
+C: nak tukar nama folder {d} jadi {d2} | rename folder {d} ke {d2} | tolong tukar nama direktori {d} kepada {d2}
+R: nak rename folder {d} to {d2} | tukar nama folder {d} jadi {d2} | rename directory {d} as {d2}
+E: rename the folder {d} to {d2} | change the directory name {d} to {d2}
+
+cmd: mv {t} {t}.old
+F: Namakan semula fail {t} sebagai {t}.old
+C: nak tukar nama {t} jadi {t}.old | rename {t} ke {t}.old | tolong tambah .old kat nama {t}
+R: nak rename {t} to {t}.old | tukar nama file {t} jadi {t}.old
+E: rename {t} to {t}.old | add .old to the name of {t}
+
+cmd: mv {d}/{f} .
+F: Pindahkan fail {f} dari direktori {d} ke direktori semasa
+C: nak pindah {f} dari folder {d} ke sini | alih {d}/{f} keluar ke sini | ambil {f} dalam {d} bawa ke folder ni
+R: nak move {f} from {d} to here | move {d}/{f} ke current folder | pull {f} out of {d} to here
+E: move {f} out of {d} into the current folder | move {d}/{f} here | bring {f} from {d} to this folder
+
+## --- mkdir -----------------------------------------------------------------
+
+cmd: mkdir {d}
+F: Cipta satu direktori baharu bernama {d} | Wujudkan folder {d}
+C: nak buat folder baru nama {d} | tolong buat direktori {d} | buat folder {d} kat sini | nak cipta folder {d} | buat satu folder nama {d}
+R: nak create folder {d} | create new folder nama {d} | tolong buat folder {d} | make directory {d}
+E: create a new folder called {d} | make a directory named {d} | mkdir {d}
+
+cmd: mkdir -p {d}/{d2}
+F: Cipta direktori {d}/{d2} beserta direktori induk yang belum wujud
+C: nak buat folder {d2} dalam {d}, kalau {d} takde buat sekali | buat folder bersarang {d}/{d2} | tolong buat {d}/{d2} dengan folder atas dia sekali
+R: nak create folder {d}/{d2} dengan parent folder sekali | create nested folder {d}/{d2} | mkdir {d}/{d2} including parents
+E: create the nested folders {d}/{d2} | make {d}/{d2} including parent directories | create {d2} inside {d}, creating {d} if needed
+
+cmd: mkdir {d} {d2}
+F: Cipta dua direktori bernama {d} dan {d2}
+C: nak buat dua folder {d} dan {d2} | buat folder {d} {d2} sekali gus | tolong buat folder {d} dengan {d2}
+R: nak create 2 folder {d} {d2} | create folders {d} and {d2} sekali
+E: create two folders {d} and {d2} | make folders {d} and {d2} at once
+
+## --- touch -----------------------------------------------------------------
+
+cmd: touch {t}
+F: Cipta satu fail baharu bernama {t} | Wujudkan fail kosong {t}
+C: nak buat fail baru nama {t} | tolong buat fail {t} | buat file baru {t} | nak cipta fail {t} kat sini | buat fail kosong {t} | nak buat {t} baru
+R: nak create file baru {t} | create new file {t} kat sini | tolong buat file {t} | nak buat empty file {t}
+E: create a new file called {t} | make an empty file {t} | create {t}
+
+cmd: touch {f}
+F: Cipta fail kosong bernama {f}
+C: nak buat fail kosong nama {f} | buat fail {f} je, kosong pun takpe | tolong cipta fail {f}
+R: nak create empty file {f} | create file {f} | buat new file {f}
+E: create an empty file named {f} | make a new file {f}
+
+cmd: touch {d}/{t}
+F: Cipta fail baharu {t} di dalam direktori {d}
+C: nak buat fail {t} dalam folder {d} | buat fail baru {t} kat {d} | tolong cipta {d}/{t}
+R: nak create file {t} dalam folder {d} | create new file {t} inside {d} | buat file {d}/{t}
+E: create a new file {t} inside the {d} folder | make an empty file {d}/{t}
+
+cmd: touch {t} {f}
+F: Cipta dua fail baharu bernama {t} dan {f}
+C: nak buat dua fail {t} dan {f} | buat fail {t} dengan {f} sekali gus | tolong cipta {t} dan {f}
+R: nak create 2 file {t} {f} | create files {t} and {f} sekali
+E: create two files {t} and {f} | make the files {t} and {f} at once
+
+## --- df --------------------------------------------------------------------
+
+cmd: df -h {d}
+F: Paparkan ruang cakera yang masih kosong pada partition yang memuatkan direktori {d}
+C: nak tengok berapa banyak space tinggal kat partition folder {d} | folder {d} ni duduk kat disk yang tinggal berapa | tgk baki space untuk {d}
+R: nak check disk space for folder {d} | berapa free space kat partition {d} | disk usage untuk {d} punya partition
+E: how much disk space is left on the partition holding {d} | show free space for the filesystem of {d} | check disk space where {d} lives
+
+cmd: df -h /home
+F: Paparkan ruang cakera yang tinggal pada /home
+C: nak tengok berapa space tinggal kat /home | /home tinggal berapa GB lagi
+R: nak check disk space kat /home | free space on /home berapa
+E: how much space is left on /home | show disk usage for /home
+
+cmd: df -h /
+F: Paparkan ruang cakera pada partition root
+C: nak tengok berapa space tinggal kat partition root | disk utama tinggal berapa
+R: nak check disk space kat root partition | show free space on /
+E: how much space is left on the root partition | show disk usage for /
+
+cmd: df -h .
+F: Paparkan ruang cakera pada partition direktori semasa
+C: nak tengok space tinggal kat disk folder ni | partition folder ni tinggal berapa
+R: nak check disk space kat current folder punya partition | free space here berapa
+E: how much disk space is left on this partition | show free space for the current directory's disk
+
+cmd: df -hT
+F: Paparkan penggunaan cakera beserta jenis sistem fail setiap partition
+C: nak tengok disk usage sekali dengan jenis filesystem dia | tunjuk space setiap partition dengan jenis dia
+R: nak check disk space with filesystem type | show disk usage plus fs type
+E: show disk usage with the filesystem type of each partition | list disk space including filesystem types
+
+cmd: df -h --total
+F: Paparkan penggunaan cakera semua partition beserta jumlah keseluruhan
+C: nak tengok disk usage semua partition dengan total sekali | berapa jumlah space semua disk
+R: nak check disk usage with total | show total disk space semua partition
+E: show disk usage for every partition with a grand total | how much total disk space do I have
+
+## --- du --------------------------------------------------------------------
+
+cmd: du -sh {d}
+F: Tunjukkan saiz keseluruhan direktori {d} | Paparkan jumlah saiz folder {d}
+C: berapa besar folder {d} ni | nak tahu saiz folder {d} | folder {d} makan berapa banyak space | tgk saiz {d}
+R: nak check size folder {d} | berapa besar folder {d} | folder {d} berapa MB | how big is {d}
+E: how big is the {d} folder | show the size of the {d} directory | how much space does {d} take
+
+cmd: du -sh {f}
+F: Tunjukkan saiz fail {f}
+C: berapa besar fail {f} ni | nak tahu saiz {f} | fail {f} berapa MB
+R: nak check size file {f} | berapa besar {f} | how big is file {f}
+E: how big is {f} | show the size of {f} | what is the size of the file {f}
+
+cmd: du -h --max-depth=1 {d}
+F: Paparkan saiz setiap sub-direktori di dalam {d}
+C: nak tengok saiz setiap folder dalam {d} | apa yang besar dalam folder {d} | tunjuk saiz semua sub-folder {d}
+R: nak check size setiap folder inside {d} | show size of each sub-folder in {d}
+E: show the size of each folder inside {d} | what takes up space in {d}
+
+## --- kill ------------------------------------------------------------------
+
+cmd: kill {pid}
+F: Hentikan proses dengan ID {pid} | Tamatkan proses {pid}
+C: nak matikan proses nombor {pid} | tolong bunuh proses {pid} | stop proses PID {pid} | matikan proses {pid} tu | nak stop program PID {pid}
+R: nak kill process {pid} | stop process id {pid} | matikan process PID {pid} | terminate process {pid}
+E: kill process {pid} | stop the process with PID {pid} | terminate process {pid}
+
+cmd: kill -9 {pid}
+F: Hentikan proses {pid} secara paksa
+C: nak matikan proses {pid} secara paksa, dia tak nak mati | bunuh terus proses {pid} | proses {pid} hang, matikan paksa
+R: nak force kill process {pid} | kill process {pid} yang hang tu | kill -9 {pid} terus
+E: force kill process {pid} | forcefully terminate PID {pid} | kill {pid} immediately
+
+cmd: kill $(lsof -t -i:{port})
+F: Hentikan proses yang menggunakan port {port}
+C: nak matikan proses yang guna port {port} | bunuh apa-apa yang tengah pakai port {port} | port {port} kena guna, matikan proses tu
+R: stop whatever is using port {port} | free up port {port} | kill process on port {port}
+E: stop whatever is listening on port {port} | free port {port} | kill whatever process is using port {port}
+
+cmd: kill -HUP {pid}
+F: Hantar isyarat HUP kepada proses {pid} supaya ia memuat semula konfigurasinya
+C: nak suruh proses {pid} reload config dia | hantar HUP kat proses {pid}
+R: nak send HUP to process {pid} | reload process {pid} config without restart
+E: send HUP to process {pid} to reload its config | reload process {pid} without restarting it
+
+cmd: kill $(pgrep {p})
+F: Hentikan semua proses bernama {p}
+C: nak matikan semua proses {p} | bunuh {p} yang tengah jalan | stop program {p}
+R: nak kill all {p} process | stop {p} yang running | kill {p}
+E: kill every {p} process | stop all running {p} processes | terminate {p}
+
+## --- zip -------------------------------------------------------------------
+
+cmd: zip -r {d}.zip {d}
+F: Mampatkan direktori {d} menjadi {d}.zip | Zipkan folder {d}
+C: nak zip folder {d} | mampatkan folder {d} jadi {d}.zip | tolong buat zip dari folder {d} | zipkan satu folder {d} | nak compress folder {d}
+R: nak zip folder {d} jadi {d}.zip | compress folder {d} to zip | buat zip file dari folder {d} | zip up {d}
+E: zip the {d} folder | compress the folder {d} into {d}.zip | make a zip of {d}
+
+cmd: zip {f}.zip {f}
+F: Mampatkan fail {f} menjadi {f}.zip
+C: nak zip fail {f} | mampatkan {f} jadi {f}.zip | tolong zipkan {f}
+R: nak zip file {f} | compress {f} to {f}.zip | zip {f}
+E: zip {f} | compress {f} into {f}.zip | make a zip of the file {f}
+
+cmd: zip -r {z} {d}
+F: Mampatkan direktori {d} ke dalam arkib {z}
+C: nak zip folder {d} nama dia {z} | mampatkan {d} jadi {z} | buat {z} dari folder {d}
+R: nak zip folder {d} into {z} | compress {d} to {z} | create {z} from folder {d}
+E: zip the folder {d} into {z} | compress {d} into an archive called {z}
+
+cmd: zip {z} {f} {f2}
+F: Mampatkan fail {f} dan {f2} ke dalam {z}
+C: nak zip {f} dan {f2} jadi {z} | masukkan {f} dengan {f2} dalam satu zip {z} | tolong zip dua fail {f} {f2} nama {z}
+R: nak zip {f} and {f2} into {z} | compress {f} dan {f2} to {z}
+E: zip {f} and {f2} into {z} | put {f} and {f2} into a zip called {z}
+
+cmd: zip -e {f}.zip {f}
+F: Mampatkan fail {f} menjadi {f}.zip dengan kata laluan
+C: nak zip {f} letak password | mampatkan {f} jadi zip yang ada password | tolong zip {f} kunci dengan password
+R: nak zip {f} with password | compress {f} to zip protected dengan password | password protect zip {f}
+E: zip {f} with a password | compress {f} into a password-protected zip
+
+cmd: zip -r {z} *.jpg
+F: Mampatkan semua fail .jpg dalam direktori ini menjadi {z}
+C: nak zip semua gambar jpg jadi {z} | masukkan semua fail jpg kat sini dalam {z}
+R: nak zip semua jpg into {z} | compress all jpg files to {z}
+E: zip all jpg files into {z} | put every .jpg here into {z}
+
+## --- unzip -----------------------------------------------------------------
+
+cmd: unzip {z}
+F: Ekstrak fail zip {z} | Nyahmampat {z} | Keluarkan kandungan arkib {z}
+C: nak buka fail zip {z} | tolong unzip {z} | keluarkan isi {z} | nak nyahmampat {z} | extract {z} kat sini | buka {z} ni | tlg unzip fail {z}
+R: nak unzip {z} | extract zip file {z} | buka {z} | unzip file {z} kat sini | nak extract {z}
+E: unzip {z} | extract {z} | open the zip file {z} | unpack {z}
+
+cmd: unzip {z} -d {d}
+F: Ekstrak {z} ke dalam direktori {d} | Nyahmampat {z} ke folder {d}
+C: nak unzip {z} masuk folder {d} | keluarkan isi {z} dalam folder {d} | extract {z} ke {d} | tolong unzip {z} letak dalam {d}
+R: nak unzip {z} into folder {d} | extract {z} ke folder {d} | unzip {z} to {d} | extract {z} inside {d}
+E: unzip {z} into the {d} folder | extract {z} to a folder called {d} | unpack {z} into {d}
+
+cmd: unzip -l {z}
+F: Senaraikan kandungan {z} tanpa mengekstraknya
+C: nak tengok apa ada dalam {z} tanpa unzip | tunjuk isi {z} je | apa fail dalam {z} tu | senarai isi zip {z}
+R: nak list content {z} without extract | tengok apa dalam {z} | show files inside {z} je
+E: list the files inside {z} without extracting | show what is in {z} | what does {z} contain
+
+cmd: unzip -o {z}
+F: Ekstrak {z} dan tulis ganti fail sedia ada tanpa bertanya
+C: nak unzip {z} terus overwrite, jangan tanya | extract {z} ganti fail lama terus
+R: nak unzip {z} overwrite existing files | extract {z} tanpa tanya, replace je
+E: unzip {z} overwriting existing files without asking | extract {z} and replace whatever is there
+
+cmd: unzip {d}/{z}
+F: Ekstrak fail zip {z} yang berada dalam direktori {d}
+C: nak unzip {z} yang ada dalam folder {d} | keluarkan isi {d}/{z} | extract fail zip dalam {d} nama {z}
+R: nak unzip {d}/{z} | extract {z} inside folder {d} | unzip file {z} dalam {d}
+E: unzip {d}/{z} | extract the zip {z} that is in the {d} folder
+
+cmd: unzip -q {z}
+F: Ekstrak {z} secara senyap tanpa memaparkan setiap fail
+C: nak unzip {z} tapi jangan print semua nama fail | extract {z} senyap-senyap je
+R: nak unzip {z} quietly | extract {z} without printing every file
+E: unzip {z} quietly | extract {z} without listing every file
+
+## --- ssh -------------------------------------------------------------------
+
+cmd: ssh {u}@{h}
+F: Sambung ke pelayan {h} sebagai pengguna {u} melalui SSH | Log masuk ke {h} sebagai {u}
+C: nak masuk server {h} guna user {u} | ssh ke {h} sebagai {u} | nak connect ke pelayan {h} dengan user {u} | tolong sambung ke {h}, user {u} | login {h} guna {u}
+R: nak ssh into {h} as {u} | connect to server {h} user {u} | remote masuk {h} as {u} | login ke {h} guna user {u}
+E: ssh into {h} as {u} | connect to the server {h} as user {u} | log in remotely to {h} as {u}
+
+cmd: ssh -p {sshport} {u}@{h}
+F: Sambung ke {h} melalui SSH pada port {sshport} sebagai {u}
+C: nak ssh ke {h} port {sshport} user {u} | masuk server {h} guna port {sshport} sebagai {u} | ssh {h} tapi port dia {sshport}, user {u}
+R: nak ssh {h} on port {sshport} as {u} | connect {h} port {sshport} user {u} | ssh into {h} guna port {sshport} as {u}
+E: ssh to {h} on port {sshport} as {u} | connect to {h} over ssh using port {sshport} as {u}
+
+cmd: ssh {h}
+F: Sambung ke pelayan {h} melalui SSH
+C: nak ssh ke {h} | masuk server {h} | nak connect ke {h} guna ssh
+R: nak ssh into {h} | connect to {h} | ssh {h}
+E: ssh into {h} | connect to {h} over ssh | log in to {h}
+
+## --- scp -------------------------------------------------------------------
+
+cmd: scp {f} {u}@{h}:~/
+F: Salin fail {f} ke direktori rumah pengguna {u} pada pelayan {h} | Muat naik {f} ke {h} sebagai {u}
+C: nak hantar {f} ke server {h} user {u} | copy fail {f} masuk pelayan {h} guna user {u} | upload {f} ke {h} sebagai {u} | tolong hantar fail {f} ke {u}@{h}
+R: nak copy {f} to server {h} as {u} | send {f} ke {h} via scp user {u} | upload {f} to {u}@{h} | scp {f} ke {h}, user {u}
+E: copy {f} to the server {h} as {u} | send {f} to {u}@{h} | upload {f} to {h} over ssh as {u}
+
+cmd: scp {u}@{h}:~/{f} .
+F: Salin fail {f} dari pelayan {h} (pengguna {u}) ke direktori semasa | Muat turun {f} daripada {h} sebagai {u}
+C: nak ambil {f} dari server {h} user {u} | download fail {f} dari pelayan {h} ke sini, user {u} | copy {f} dari {u}@{h} ke sini | tolong tarik {f} dari server {h} guna user {u}
+R: nak copy {f} from server {h} as {u} to here | download {f} dari {h} via scp user {u} | grab {f} from {u}@{h} | scp {f} from {h} to here, user {u}
+E: copy {f} from the server {h} to here as {u} | download {f} from {u}@{h} | fetch {f} from {h} over ssh as {u}
+
+cmd: scp -r {d} {u}@{h}:~/
+F: Salin direktori {d} ke pelayan {h} sebagai pengguna {u}
+C: nak hantar satu folder {d} ke server {h} user {u} | copy folder {d} masuk pelayan {h} sebagai {u} | upload folder {d} ke {u}@{h}
+R: nak copy folder {d} to server {h} as {u} | upload whole folder {d} via scp to {h}, user {u} | scp folder {d} ke {u}@{h}
+E: copy the {d} folder to the server {h} as {u} | upload the directory {d} to {u}@{h} over ssh
+
+cmd: scp {f} {u}@{h}:/tmp
+F: Salin fail {f} ke /tmp pada pelayan {h} sebagai {u}
+C: nak hantar {f} ke /tmp kat server {h}, user {u} | copy {f} masuk /tmp pelayan {h} guna {u}
+R: nak scp {f} to /tmp on {h} as {u} | send {f} ke {h} /tmp, user {u}
+E: copy {f} to /tmp on the server {h} as {u} | send {f} to {u}@{h} into /tmp
+
+cmd: scp -P {sshport} {f} {u}@{h}:~/
+F: Salin fail {f} ke pelayan {h} pada port {sshport} sebagai {u}
+C: nak hantar {f} ke server {h} port {sshport} user {u} | scp {f} ke {h} tapi port dia {sshport}, user {u}
+R: nak scp {f} to {h} port {sshport} as {u} | upload {f} ke {u}@{h} using port {sshport}
+E: copy {f} to {h} on port {sshport} as {u} | scp {f} to {u}@{h} using port {sshport}
+
+cmd: scp -r {u}@{h}:~/{d} .
+F: Salin direktori {d} dari pelayan {h} (pengguna {u}) ke direktori semasa
+C: nak ambil folder {d} dari server {h} user {u} | download satu folder {d} dari pelayan {h} sebagai {u} ke sini
+R: nak copy folder {d} from {h} as {u} to here | download folder {d} dari {u}@{h} via scp
+E: copy the folder {d} from the server {h} to here as {u} | download the directory {d} from {u}@{h}
+
+## --- wget ------------------------------------------------------------------
+
+cmd: wget {url}
+F: Muat turun fail dari {url} | Dapatkan fail di {url}
+C: nak download {url} | tolong muat turun fail dari {url} | download fail kat {url} | nak ambil {url} | muat turun {url} ke sini
+R: nak download {url} | download file dari {url} | grab {url} | fetch {url} to here
+E: download {url} | fetch the file at {url} | save {url} to this folder
+
+cmd: wget -c {url}
+F: Sambung semula muat turun {url} yang terhenti
+C: nak sambung download {url} yang putus tadi | resume download {url} | download {url} tergendala, sambung balik
+R: nak resume download {url} | continue download {url} yang tergendala | wget {url} resume
+E: resume downloading {url} | continue an interrupted download of {url}
+
+cmd: wget -P {d} {url}
+F: Muat turun {url} ke dalam direktori {d}
+C: nak download {url} terus masuk folder {d} | muat turun {url} simpan dalam {d} | tolong download {url} ke folder {d}
+R: nak download {url} into folder {d} | save {url} to {d} | wget {url} masuk {d}
+E: download {url} into the {d} folder | save {url} to {d}
+
+## --- top -------------------------------------------------------------------
+
+cmd: top
+F: Paparkan proses yang sedang berjalan secara langsung | Pantau penggunaan CPU dan memori secara masa nyata
+C: nak tengok proses secara live | tunjuk apa yang makan CPU sekarang | nak monitor proses yang jalan | apa yang buat laptop ni slow | tgk proses live
+R: nak monitor process live | show top process | what is eating my CPU | check process usage real time
+E: show running processes live | monitor cpu and memory in real time | what is using my cpu right now
+
+cmd: top -u {u}
+F: Pantau proses milik pengguna {u} secara langsung
+C: nak tengok proses user {u} je secara live | monitor apa yang {u} tengah jalankan | tunjuk proses {u} dalam top
+R: nak monitor process user {u} live | show top for user {u} | top process belonging to {u}
+E: monitor processes owned by {u} live | show top for user {u} only | watch what {u} is running
+
+cmd: top -p {pid}
+F: Pantau proses {pid} secara langsung
+C: nak monitor proses {pid} je secara live | tengok proses PID {pid} dalam top | pantau proses {pid} makan berapa CPU
+R: nak monitor process {pid} live | show top for PID {pid} only | watch process {pid}
+E: monitor process {pid} live | show top for PID {pid} only | watch the cpu use of process {pid}
+
+cmd: top -o %MEM
+F: Paparkan proses disusun mengikut penggunaan memori tertinggi
+C: nak tengok proses mana yang makan RAM paling banyak | susun proses ikut memori dalam top
+R: nak monitor process sorted by memory | show top sort by RAM | which process makan memory paling banyak
+E: show processes sorted by memory usage | which process is using the most memory | top sorted by RAM
+
+cmd: top -d {n}
+F: Pantau proses secara langsung dengan kemas kini setiap {n} saat
+C: nak tengok top tapi refresh setiap {n} saat | monitor proses, update tiap {n} saat
+R: nak run top with {n} second refresh | monitor process live, refresh every {n} seconds
+E: monitor processes refreshing every {n} seconds | run top with a {n} second delay
+
+cmd: top -n 1
+F: Paparkan senarai proses sekali sahaja tanpa kemas kini berterusan
+C: nak tengok output top sekali je, tak nak dia refresh | tunjuk proses macam top tapi terus keluar
+R: nak run top once and exit | show top output sekali je
+E: show top output once and exit | run top for a single iteration
+
+## --- free ------------------------------------------------------------------
+
+cmd: free -h
+F: Paparkan penggunaan memori RAM dalam unit yang mudah dibaca | Tunjukkan jumlah RAM yang digunakan dan yang masih kosong
+C: nak tengok RAM tinggal berapa | berapa memori yang tengah guna | tgk RAM usage | RAM ni penuh ke tak | berapa RAM free sekarang | nak check memori laptop ni | tunjuk penggunaan RAM
+R: nak check RAM usage | berapa memory free sekarang | show RAM tinggal berapa | check memory usage laptop ni | RAM used berapa GB
+E: how much RAM is free | show memory usage | check RAM usage | how much memory is my machine using
+
+cmd: free -m
+F: Paparkan penggunaan memori dalam megabait
+C: nak tengok RAM dalam MB | tunjuk memori guna berapa MB | RAM tinggal berapa MB
+R: nak check RAM usage in MB | show memory in megabytes | free memory berapa MB
+E: show memory usage in megabytes | how much RAM is used, in MB
+
+cmd: free -g
+F: Paparkan penggunaan memori dalam gigabait
+C: nak tengok RAM dalam GB | RAM tinggal berapa GB
+R: nak check RAM in GB | show memory usage in gigabytes
+E: show memory usage in gigabytes | how many GB of RAM are free
+
+cmd: free -h -s {n}
+F: Paparkan penggunaan memori setiap {n} saat secara berterusan
+C: nak tengok RAM usage refresh setiap {n} saat | monitor memori tiap {n} saat | tunjuk RAM setiap {n} saat
+R: nak monitor RAM usage every {n} seconds | check memory setiap {n} saat | show RAM usage refresh every {n}s
+E: show memory usage every {n} seconds | monitor RAM refreshing every {n} seconds
+
+cmd: free -t
+F: Paparkan penggunaan memori beserta jumlah RAM dan swap
+C: nak tengok RAM dengan swap sekali, ada total | tunjuk jumlah memori campur swap
+R: nak check RAM plus swap total | show memory usage with total line
+E: show memory usage with a total for RAM plus swap | how much memory and swap combined

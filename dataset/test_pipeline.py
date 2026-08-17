@@ -252,3 +252,61 @@ _k = sample_ids(_rows, 30)
 assert _k == sample_ids(_rows, 30) and 30 <= 4 * len(_k) < 34, _k
 assert sample_ids(_rows, 1000) == {f"t:{i}" for i in range(50)}
 print("ok: prior checks pass")
+
+# --- head.py (issue #62: slot expansion, per-tool budget, #51 filename restore)
+from head import K, budget, expand, fill, pick, restore_name
+
+# every slot of the cmd must be in every phrasing; a NL that never names what
+# the command names is the placeholder bug that prior.py removed
+got = _parse_text("cmd: rm {f}\nF: Padam fail {f}\nC: buang {f}\nR: delete {f}\nE: delete {f}\n")
+with tempfile.NamedTemporaryFile("w", suffix=".txt", delete=False, encoding="utf-8") as _f:
+    _f.write("cmd: rm {f} {f2}\nF: Padam {f} dan {f2}\nC: buang {f} {f2}\nR: delete {f} {f2}\nE: delete {f} and {f2}\n\n"
+             "cmd: free -h\nF: Paparkan RAM\nC: RAM berapa\nR: check RAM\nE: show RAM\n")
+_x = expand(_f.name)
+os.unlink(_f.name)
+assert len(_x) == K + 1, len(_x)                       # slotted block x K, plain block x 1
+assert _x[0][1] == "rm laporan.pdf video.mp4" and _x[0][2]["english"] == ["delete laporan.pdf and video.mp4"]
+assert all(cmd.split()[1] != cmd.split()[2] for _, cmd, _ in _x[:K])   # {f} != {f2}
+assert _x[K] == ("head:1.0", "free -h", {"formal": ["Paparkan RAM"], "colloquial": ["RAM berapa"],
+                                          "rojak": ["check RAM"], "english": ["show RAM"]})
+for bad in ("cmd: rm {f}\nF: Padam fail\nC: buang {f}\nR: delete {f}\nE: delete {f}\n",  # F misses {f}
+            "cmd: chsh -s /bin/zsh\nF: x\nC: x\nR: x\nE: x\n"):                        # probe HOLDOUT tool
+    with tempfile.NamedTemporaryFile("w", suffix=".txt", delete=False, encoding="utf-8") as _f:
+        _f.write(bad)
+    try:
+        expand(_f.name)
+    except ValueError:
+        pass
+    else:
+        raise AssertionError(f"accepted bad head block: {bad!r}")
+    finally:
+        os.unlink(_f.name)
+assert fill("nano {d}/{t}", 3) == "nano backup/laporan.txt"
+
+# budget counts real rows only: augment `+verb` and rebalance `~i` ids are duplicates
+_pool = ([{"id": f"a:{i}", "cmd": "nano x"} for i in range(30)] +
+         [{"id": f"a:{i}+padam", "cmd": "nano x"} for i in range(30)] +
+         [{"id": f"b:{i}", "cmd": "git status"} for i in range(1200)])
+assert budget(_pool, cap=918)["nano"] == 918 and budget(_pool, cap=50)["nano"] == 50
+assert "git" not in budget(_pool, cap=918)
+assert budget(_pool + [{"id": f"c:{i}", "cmd": "less y"} for i in range(990)], cap=918)["less"] == 10
+# pick: whole tasks, cut to budget, no budget -> no rows, deterministic
+_head = [{"id": f"head:{b}.{k}.{j}", "register": reg, "cmd": f"nano f{k}"}
+         for b in range(2) for k in range(K) for j, reg in enumerate(("formal", "colloquial", "rojak", "english"))]
+_head += [{"id": "head:9.0.0", "register": "formal", "cmd": "git status"}]
+_p = pick(_head, {"nano": 40})
+assert 40 <= len(_p) < 44 and _p == pick(_head, {"nano": 40}) and not any("git" in r["cmd"] for r in _p)
+assert len({r["id"].rsplit(".", 1)[0] for r in _p}) * 4 == len(_p)   # every kept task has all 4 rows
+
+# #51: the translator renamed the file in the NL, the command kept it
+for nl, cmd, want in (
+        ("Cetak bilangan baris dalam fail.txt", "wc -l file.txt", "Cetak bilangan baris dalam file.txt"),
+        ("nak zip folder ni jadi dokumen.zip", "zip -r documents.zip docs", "nak zip folder ni jadi documents.zip"),
+        ("gabung fail1.csv dengan data.csv", "join file1.csv data.csv", "gabung file1.csv dengan data.csv"),
+        # both sides already agree, or the command names two files: untouched
+        ("nak buang lama.txt", "rm lama.txt", "nak buang lama.txt"),
+        ("tukar dokumen.pdf jadi dua", "pdftk in.pdf out.pdf", "tukar dokumen.pdf jadi dua"),
+        # a different English name is not a translation (`build.xml` vs `buildfile.xml`)
+        ("guna fail selain build.xml", "ant -f buildfile.xml", "guna fail selain build.xml")):
+    assert restore_name(nl, cmd) == want, (nl, cmd, restore_name(nl, cmd))
+print("ok: head checks pass")

@@ -24,6 +24,9 @@ basics.py         # basics.txt → out/basics.jsonl  hand-written beginner rows
 prior.py          # pool_v6 (= pool_v4.bal + basics) → out/pool_v7.jsonl
                   # drop/rewrite path/to placeholders, cap the long tail at
                   # 300, find to 5% (issue #54)
+head.py           # pool_v7 + basics_head.txt → out/pool_v8.jsonl  head rows
+                  # for beginner verbs under 1,000 real rows, slots filled
+                  # 20 ways; restores translated filenames in NL (#62, #51)
 ```
 
 Full rebuild from raw, no GPU:
