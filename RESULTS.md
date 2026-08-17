@@ -1214,7 +1214,7 @@ path/to/file2`), and the rows disambiguate.py dropped earlier are
 same-prompt pipe one-liners (`ps -ef |grep oracle |grep pmon |awk …`), 0 to
 164 per tool. So the head is written the way basics.txt was, in a new file
 so basics.txt's phrasings stay what probe.py's "not in training data" claim
-was made against: 118 blocks, four registers, plus slots — `{f}` file,
+was made against: 107 blocks, four registers, plus slots — `{f}` file,
 `{t}` text file, `{d}` folder, `{u}` user, `{h}` host, `{n}` count, `{pid}`,
 `{p}` process, `{z}` zip, `{url}`, `{port}`, `{sshport}`, `{log}` — that
 head.py fills twenty ways from fixed lists, the k-th name of every list, so
