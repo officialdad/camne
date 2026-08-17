@@ -1032,6 +1032,25 @@ is inside run 7's CI on every register and −0.02 EN on its own base.
 Next, if this thread continues: weight the real-mistake pairs (1.2% of the
 set today), or grow the head of the pool for the beginner verbs (#54's
 note) and DPO on top of that — the pool sets the prior, DPO trims it.
+Filed as #62.
+
+**Shipped anyway, as `camne` v0.9.0 (2026-08-17), and here is the reasoning
+so it can be argued with.** The rule in CLAUDE.md is "a tune that does not
+beat its own base is not a result", and on ALFA v7-dpo does not beat run 7:
+BM +0.010, rojak +0.027, EN 0.000, every CI straddles zero. #57 says the
+benchmark cannot resolve less than about ±0.02 at 300 tasks, so "cannot
+tell apart" is the honest reading, not "worse". What the benchmark does not
+score is the shape of the answer on the tasks the product exists for: run 7
+answers `nak buat file baru` with `touch path/to/file1 path/to/file2 ...`,
+`nak buat folder baru` with `skicka mkdir path/to/folder`, `nak buat user
+baru` with `kcadm.sh create users -s username=username -r realm_name`.
+v7-dpo answers `touch newfile.txt`, `mkdir newfolder`, `sudo useradd -m
+newuser`. Placeholder answers on the probe 29 → 2 of 222; beginner tasks
+0.90 → 0.94 (p = 0.12); held-out tools 0.90 → 0.85 (5 lost, 3 gained, p =
+0.73); vs the English model rojak is now +0.070 (p = 0.031), resolved for
+the first time. Not one register worse than run 7, and the beginner
+answers are the ones a person can type. Digest `cbf78111…5fcb`, 986,048,032
+bytes, README and model card state the CI-straddling numbers as such.
 
 
 ## Retrieval over tldr in the prompt (issue #55)
