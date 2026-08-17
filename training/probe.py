@@ -545,6 +545,20 @@ HOMOGRAPH = [
     ("en-sense", "show only lines where the test failed", r"\b(grep|awk|sed)\b"),
 ]
 
+# Issue #51: a Malay-word filename must come back byte-identical, not
+# translated (`lama.txt` -> `old.txt`). Exact match on the whole line, the
+# one place this probe is stricter than tool-level.
+EXACT = [
+    ("nak delete lama.txt", "rm lama.txt"),
+    ("nak rename fail baru.txt jadi lama.txt", "mv baru.txt lama.txt"),
+    ("nak tengok isi file nota.txt", "cat nota.txt"),
+    ("nak delete file 'lama.txt'", "rm lama.txt"),
+    ("nak copy laporan.pdf ke folder kerja", "cp laporan.pdf kerja/"),
+    ("nak buang fail gambar_lama.jpg", "rm gambar_lama.jpg"),
+    ("nak buat folder projek_baru", "mkdir projek_baru"),
+    ("delete senarai_beli.txt", "rm senarai_beli.txt"),
+]
+
 
 RETRIEVE = 0  # --retrieve K: prepend K tldr lines (retrieve.py) to the user turn
 
@@ -609,14 +623,19 @@ def main():
         train |= {r["nl"].lower() for r in head_rows(os.path.join(dataset, "basics_head.txt"))}
         leaked = [p for t in TASKS + HOLDOUT for p in t["p"].values()
                   if p.lower() in train]
+        leaked += [p for p, _ in EXACT if p.lower() in train]
         if leaked:
             raise SystemExit(f"probe prompts present in basics*.txt: {leaked}")
 
     if args.rescore:
         okre = {t["task"]: t["ok"] for t in TASKS + HOLDOUT}
         okre.update({("homograph", p): r for _, p, r in HOMOGRAPH})
+        exact = dict(EXACT)
         rows = [json.loads(l) for l in open(args.rescore, encoding="utf-8")]
         for r in rows:
+            if r["task"] == "exact":
+                r["ok"] = r["got"] == exact[r["prompt"]]
+                continue
             pat = okre[("homograph", r["prompt"])] if r["task"] == "homograph" else okre[r["task"]]
             r["ok"] = bool(re.search(pat, r["got"]))
         report(rows)
@@ -645,6 +664,10 @@ def main():
             got = ask(prompt)
             rows.append({"task": "homograph", "axis": axis, "prompt": prompt,
                          "got": got, "ok": bool(re.search(ok_re, got))})
+        for prompt, want in EXACT:
+            got = ask(prompt)
+            rows.append({"task": "exact", "axis": "#51", "prompt": prompt,
+                         "got": got, "ok": got == want})
     finally:
         proc.send_signal(signal.SIGTERM)
         proc.wait(timeout=30)
@@ -680,7 +703,7 @@ def report(rows):
     print(f"\n{len(rows)} prompts, tool-level scoring\n")
     fam = {}
     for r in rows:
-        if r["task"] == "homograph" or r["task"].startswith("holdout"):
+        if r["task"] in ("homograph", "exact") or r["task"].startswith("holdout"):
             continue
         f_ = family(r["axis"])
         fam.setdefault(f_, []).append(r["ok"])
@@ -690,7 +713,7 @@ def report(rows):
 
     ho = [r["ok"] for r in rows if r["task"].startswith("holdout")]
     seen = [r["ok"] for r in rows
-            if r["task"] != "homograph" and not r["task"].startswith("holdout")]
+            if r["task"] not in ("homograph", "exact") and not r["task"].startswith("holdout")]
     print(f"\n{'basics tasks':12s} {sum(seen)/len(seen):8.2f}  {len(seen)}   (tasks in basics.txt, phrasings not)")
     print(f"{'holdout':12s} {sum(ho)/len(ho):8.2f}  {len(ho)}   (tools absent from basics.txt)")
 
@@ -701,6 +724,9 @@ def report(rows):
     print(f"\nhomograph guard")
     for a, v in sorted(hom.items()):
         print(f"{a:12s} {sum(v)/len(v):8.2f}  {len(v)}")
+    ex = [r["ok"] for r in rows if r["task"] == "exact"]
+    if ex:
+        print(f"\n#51 exact     {sum(ex)}/{len(ex)}   (Malay filename byte-identical)")
 
     print("\nfailures:")
     for r in rows:

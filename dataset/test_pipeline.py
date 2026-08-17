@@ -267,6 +267,7 @@ os.unlink(_f.name)
 assert len(_x) == K + 1, len(_x)                       # slotted block x K, plain block x 1
 assert _x[0][1] == "rm laporan.pdf video.mp4" and _x[0][2]["english"] == ["delete laporan.pdf and video.mp4"]
 assert all(cmd.split()[1] != cmd.split()[2] for _, cmd, _ in _x[:K])   # {f} != {f2}
+assert fill("mv {t} {t2}", 2) == "mv lama.txt catatan.md"
 assert _x[K] == ("head:1.0", "free -h", {"formal": ["Paparkan RAM"], "colloquial": ["RAM berapa"],
                                           "rojak": ["check RAM"], "english": ["show RAM"]})
 for bad in ("cmd: rm {f}\nF: Padam fail\nC: buang {f}\nR: delete {f}\nE: delete {f}\n",  # F misses {f}

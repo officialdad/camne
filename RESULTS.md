@@ -1414,3 +1414,47 @@ core tool (`<Enter>`, `pvesm`), bundled with the next change that has an
 ALFA-sized reason to retrain — not on their own. `dataset/lists.py` stays
 (4,864 unrunnable rows out is right regardless), pool_v9 is the pool the
 next run starts from.
+
+## Issue #51: Malay filenames come back translated (no run)
+
+**Measured (2026-08-18), no GPU.** Eight exact-output prompts, now
+`EXACT` in `training/probe.py` (printed as `#51 exact n/8`; the two that
+turned out to be head-row phrasings were reworded — the leak check caught
+them). Whole line must match, e.g. `nak delete lama.txt` → `rm lama.txt`.
+
+| model | #51 exact | misses |
+|---|---|---|
+| shipped v0.9.0 (v7-dpo) | **2/8** | `rm old.txt`, `mv new.txt old.txt`, `cat note.txt`, `cp report.pdf work/`, `rm -f files/images_lager.jpg`, `rm list_of_files.txt` |
+| qwen-v8-dpo (run 10) | 7/8 | `mv new.txt old.txt` |
+| qwen-v9 / v9-dpo (run 11) | 7/8 | `mv new_file_name old_file_name` / `mv new_file.txt old_file.txt` |
+
+The issue's hypothesis — the pool holds `lama.txt` in the NL against
+`old.txt` in the command — is falsified: `grep lama.txt | grep old.txt` is
+0 in pool_v5 and pool_v9, and a scan of every NL filename absent from its
+command finds 219 rows in pool_v9, all legitimate mentions (`Node.js`,
+`output.txt` for tesseract's implied output, `0.5s`). The mapping is the
+base model's translation prior, and what pushes back is run 10's head rows
+with Malay names on both sides (`lama.txt`, `nota.txt`, `laporan.pdf`,
+`senarai.txt`, `projek`): 2/8 → 7/8 without a row that names the fix.
+
+The one that stays is the two-file rename. `basics_head.txt` has
+`mv {d} {d2}` (folder) and `mv {t} {t}.old` but no `mv file other-file`,
+so the model falls back to the prior. Added: `mv {t} {t2}` block (`nak
+tukar nama fail {t} jadi {t2}`, `rename {t} ke {t2}`, …; `{t2}` is the text
+list shifted by 7 like `{f2}`), 20 fills × 14 phrasings. `pool_v10` =
+`head.py pool_v7` + `lists.py` with the new block: 235,159 rows; every
+row that is not `mv` is byte-identical to pool_v9 in the same order; `mv`
+resampled under the same budget (500 tasks, seed 42) — 236 rename rows in,
+253 other mv head rows out.
+
+**Run 12, hypothesis before the run (owner: retrain, 2026-08-18).**
+`qwen-v10` = pool_v10, one variable vs run 11 (the mv resample), then
+`qwen-v10-dpo` on its own probe misses, same chain as runs 10/11.
+Hypothesis: `#51 exact` 8/8 on v10-dpo (the rename shape now has rows to
+imitate); every other probe number within run 11's ±3 churn (basics 171,
+holdout 29, `delete file` still broken — nothing here touches it); ALFA
+inside the CI vs shipped on every register. Falsified if the rename
+prompt still comes back translated — then 236 rows are not enough weight
+against the prior and the lever is DPO pairs on exactly that shape, not
+more SFT rows. Ship rule unchanged: the README quoting workaround comes
+out only when a shipped model shows 8/8.

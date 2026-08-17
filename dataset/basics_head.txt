@@ -1,6 +1,6 @@
 # Head rows for the beginner verbs (issue #62). Same block format as
 # basics.txt, read by head.py, plus slots that head.py fills twenty ways:
-#   {t} text file   {f} any file   {f2} another file   {d} folder   {d2} another
+#   {t} text file   {t2} another   {f} any file   {f2} another file   {d} folder   {d2} another
 #   {u} user  {h} host  {n} count  {pid} PID  {port}  {sshport}  {p} process
 #   {z} zip  {url}  {log} log file
 # A phrasing must carry every slot its cmd carries. No path/to. Probe
@@ -321,6 +321,12 @@ F: Namakan semula direktori {d} sebagai {d2} | Tukar nama folder {d} kepada {d2}
 C: nak tukar nama folder {d} jadi {d2} | rename folder {d} ke {d2} | tolong tukar nama direktori {d} kepada {d2}
 R: nak rename folder {d} to {d2} | tukar nama folder {d} jadi {d2} | rename directory {d} as {d2}
 E: rename the folder {d} to {d2} | change the directory name {d} to {d2}
+
+cmd: mv {t} {t2}
+F: Namakan semula fail {t} sebagai {t2} | Tukar nama fail {t} kepada {t2}
+C: nak tukar nama fail {t} jadi {t2} | rename {t} ke {t2} | nak rename fail {t} jadi {t2} | tolong tukar nama {t} kepada {t2} | tukar nama file {t} jadi {t2}
+R: nak rename file {t} to {t2} | rename {t} jadi {t2} | tukar nama {t} to {t2} | nak rename fail {t} jadi {t2} boleh?
+E: rename {t} to {t2} | change the file name {t} to {t2} | rename the file {t} as {t2}
 
 cmd: mv {t} {t}.old
 F: Namakan semula fail {t} sebagai {t}.old
