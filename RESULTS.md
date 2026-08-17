@@ -1175,3 +1175,242 @@ exist in `eval_gen.py` and is not being added for a result this clear.
 (multilingual embedder + retrieval-aware training rows, if ever) starts
 from the measurement instead of the idea. Index file (`out/tldr_index.npz`)
 and the bge GGUF are build artifacts, not committed.
+
+
+## Run 10: head rows for the beginner verbs (issue #62)
+
+**Hypothesis, written before the run.** Run 9 fixed `create file/folder/
+user` by cutting the tail, and the share it freed went to whatever was
+left uncapped: `git` 4.3% → 5.8% of the pool, and `delete file` came back
+`git obliterate`, `list processes` `pm2`, `edit file` `less`. v7-dpo
+flipped those exact misses back and moved nothing else, which is what
+three minutes of preference tuning on 40 real pairs can do. The prior is
+set by the SFT pool, so this run grows the head instead of trimming the
+tail again: `pool_v8 = pool_v7 + 11,676 rows` for the beginner verbs that
+have fewer than 1,000 real rows (`nano` 52, `less` 87, `unzip` 106, `zip`
+125, `scp` 137, … `ps` 769, `rm` 758 once augment_verbs duplicates are not
+counted). Prediction: on the probe, `delete file` (2/6 on run 9), `list
+processes` (0/4), `edit file` and `change permission` return to run 7's
+level or better with `rm` / `ps` / `nano` / `chmod` as the tool, with no
+placeholder regression (run 9 had 6 placeholder answers of 222; ≤ 6
+here); `create file/folder/user` hold 9/9, 8/8, 5/5; ALFA stays inside run
+9's CI on every register (BM 0.513, rojak 0.517, EN 0.563, ± ~0.055).
+Falsified if the four probe tasks do not move — then 1,000 rows per tool
+is not what sets the prior against 13k `git` rows and the next variable is
+share, not count — or if any ALFA register drops with p < 0.05, which would
+mean 12k templated rows are teaching the templates rather than the verbs.
+Then DPO on top with pairs rebuilt from this run's probe (`qwen-v8-dpo`),
+comparison row this run, same reading rule as arm B of #56.
+
+One variable vs run 9: the pool. Same recipe, seed 42, 1 epoch, probe
+prompts unchanged, none verbatim in basics.txt or basics_head.txt (probe.py
+now checks both at startup).
+
+**Where the rows come from (`dataset/head.py`, `dataset/basics_head.txt`).**
+Re-admitting real rows was the first choice and there is nothing to
+re-admit: the rows prior.py dropped for these tools are tldr placeholders
+whose NL never names the file (`Remove specific files` → `rm path/to/file1
+path/to/file2`), and the rows disambiguate.py dropped earlier are
+same-prompt pipe one-liners (`ps -ef |grep oracle |grep pmon |awk …`), 0 to
+164 per tool. So the head is written the way basics.txt was, in a new file
+so basics.txt's phrasings stay what probe.py's "not in training data" claim
+was made against: 107 blocks, four registers, plus slots — `{f}` file,
+`{t}` text file, `{d}` folder, `{u}` user, `{h}` host, `{n}` count, `{pid}`,
+`{p}` process, `{z}` zip, `{url}`, `{port}`, `{sshport}`, `{log}` — that
+head.py fills twenty ways from fixed lists, the k-th name of every list, so
+`rm {f}` / `nak buang fail {f}` is twenty consistent pairs. A phrasing must
+carry every slot its command carries (the parser refuses otherwise): a row
+whose NL never names what the command names is the placeholder bug again.
+18,568 rows expanded; budget per tool `min(918, 1000 − real rows)`, 918
+being `mkdir`'s row count in pool_v7 so no single tool jumps past the head
+it joins; whole tasks sampled with `prior.sample_ids`, seed 42. `chsh` is
+in the issue's list and gets nothing: it is a probe HOLDOUT tool, and a
+head row for it would un-hold it (head.py refuses HOLDOUT tools outright).
+
+| tool | pool_v7 | real | budget | added | **pool_v8** |
+|---|---|---|---|---|---|
+| nano | 53 | 52 | 918 | 918 | 971 |
+| less | 90 | 87 | 913 | 918 | 1,008 |
+| unzip | 174 | 106 | 894 | 904 | 1,078 |
+| zip | 197 | 125 | 875 | 876 | 1,073 |
+| scp | 164 | 137 | 863 | 864 | 1,028 |
+| head | 266 | 254 | 746 | 749 | 1,015 |
+| kill | 521 | 321 | 679 | 687 | 1,208 |
+| touch | 454 | 358 | 642 | 644 | 1,098 |
+| chown | 599 | 374 | 626 | 634 | 1,233 |
+| top | 168 | 159 | 841 | 570 | 738 |
+| chmod | 527 | 444 | 556 | 563 | 1,090 |
+| mv | 743 | 502 | 498 | 510 | 1,253 |
+| tail | 601 | 590 | 410 | 413 | 1,014 |
+| mkdir | 918 | 606 | 394 | 396 | 1,314 |
+| cp | 963 | 686 | 314 | 318 | 1,281 |
+| wget | 715 | 696 | 304 | 310 | 1,025 |
+| rm | 1,580 | 758 | 242 | 253 | 1,833 |
+| ssh | 806 | 757 | 243 | 249 | 1,055 |
+| ps | 880 | 769 | 231 | 238 | 1,118 |
+| df | 294 | 280 | 720 | 235 | 529 |
+| free | 87 | 82 | 918 | 221 | 308 |
+| du | 841 | 794 | 206 | 206 | 1,047 |
+| chsh | 16 | 16 | — | 0 | 16 |
+| cat / ls / grep / tar / curl / find | ≥ 1,000 real | | 0 | | unchanged |
+
+`top`, `df`, `free` land short of budget on purpose: they have three or
+four real command shapes (`free -h`, `df -h`, `top`) and no filename to
+vary, so the rows that exist are phrasings, not expansions; padding them
+to 900 would be the same sentence 900 times.
+
+| | pool_v7 (run 9) | **pool_v8** |
+|---|---|---|
+| rows | 228,357 | **240,033** (+5.1%) |
+| distinct first tokens | 4,102 | 4,102 |
+| top-30 share | 29.4% | 29.8% |
+| `git` share | 5.8% | 5.6% |
+| `find` share | 5.0% | 4.8% |
+| placeholders in cmd | 0 | 0 |
+| added, by register | | colloquial 3,761 / rojak 3,389 / english 2,965 / formal 1,561 |
+| added, by source | | re-admitted 0 / generated 11,676 |
+
+Every pool_v7 row is in pool_v8 in the same order with its command
+byte-identical (checked, 228,357/228,357); the 11,676 head rows match
+their block's command byte for byte; no `path/to`, no `<name>`; no head NL
+equals a probe prompt (one did — `kill the process using port 8080` at
+`{port}` = 8080 — and was reworded before the build).
+
+**Issue #51 rides along, two ways.** (a) 112 pool_v7 rows had the
+translator rename the file in the NL while the command kept it —
+`fail.txt` for `file.txt` (91), `fail1.csv`, `dokumen.zip` for
+`documents.zip`, `teks.txt`, `senarai.txt` for `list.txt`, `arkib.zip` —
+which is exactly the Malay-name → English-name mapping the issue reports
+the model learned. head.py restores the command's name in the NL where the
+command names one file the NL does not and the NL names one file whose
+stem is the Malay of it (a fixed nine-stem list; `build.xml` vs
+`buildfile.xml` is left alone). Commands untouched. (b) every slot list
+carries Malay filenames — `lama.txt`, `nota.txt`, `laporan.pdf`,
+`senarai.txt`, `gambar.jpg`, `projek`, `dokumen`, `tugasan` — byte-identical
+on both sides: 2,873 of the added rows, the positive example the pool never
+had. Not done: `grep -c lama.txt pool_v5` is 0, so the mapping in #51 was
+never a literal pair in the pool; it is the base model's translation prior
+plus the 112 rows, and (b) is what pushes against it. Measure with #51's
+four prompts exact after the run.
+
+**Hand-read, 200 of the added rows, `random.Random(42).sample`.** Registers
+read as intended and each row's NL names what its command names. What
+reads wrong, fixed before the build: `ssh -p 3306` / `scp -P 5432` — the
+port list is shared with `kill $(lsof -t -i:{port})`, where 3306 is
+right, so ssh/scp got their own `{sshport}` list; `tail -f data.csv` /
+`less +F main.py` — following a csv reads odd, so the follow blocks got a
+`{log}` list. Left as is, counted: slot lists are independent, so
+`zip -r resit.zip kuliah` and `unzip projek.zip -d gambar` pair unrelated
+names (consistent on both sides, just dull); `chmod 600 video.mp4` and
+`chmod u+w foto.png` are valid but not something anyone asks; two rojak
+phrasings are stiff (`chown -R arkib to farah`, `wget {url} resume`); the
+formal register is 13% of the added rows against 32% colloquial, the same
+skew basics.txt has (352 of 2,581). No Indonesian, no `lah`, no
+`Bagaimanakah`, no probe phrasing.
+
+**Measure.** Run 9 to beat on the probe (199/222, 6 placeholders, holdout
+33), run 7 for the tasks run 9 lost; ALFA vs run 9 paired, #57's error bar;
+`compare.py`, bench, #47 prompts exact, #51 prompts exact, placeholder
+rate. GPU commands, from the worktree's `training/`:
+`./rebuild.sh qwen-v8 ../dataset/out/pool_v8.jsonl`, then
+`python3 dpo_pairs.py --probe out/probe_qwen-v8.jsonl --out out/dpo_pairs_v8.jsonl`
+and `DPO_BASE=out/qwen-v8-lora-merged ./rebuild.sh qwen-v8-dpo out/dpo_pairs_v8.jsonl dpo`.
+Not started; hypothesis written first.
+
+**Result (2026-08-17): the head rows fix what they name and one poisoned
+row breaks what they do not.** `qwen-v8` 240,033 rows, 2 h 50 min; then
+`qwen-v8-dpo` on its own probe misses (3,4xx pairs, 3 min).
+
+| register | run 7 | v7-dpo (shipped) | v8 | v8-dpo | v8-dpo vs shipped, 95% CI | p |
+|---|---|---|---|---|---|---|
+| BM | 0.487 | 0.497 | 0.493 | 0.497 | 0.000 [−0.052, +0.052] | 1 |
+| rojak | 0.490 | 0.517 | 0.477 | 0.497 | −0.020 [−0.071, +0.031] | 0.52 |
+| EN | 0.543 | 0.543 | 0.530 | 0.530 | −0.013 [−0.066, +0.039] | 0.71 |
+
+Inside every CI, as expected by now. Probe: v8 206 / 222, v8-dpo 205 (the
+shipped model: 205); basics 169 → 168 (shipped 166); holdout 33 (shipped
+34); placeholders 5 → 3 (shipped 2). Bench 0.37–0.44 s warm at 4 threads,
+1.56–1.58 GB RSS (up ~70 MB from 1.49; within constraint 3, worth a second
+look before any ship).
+
+What the head rows bought, on the tasks they were written for: `edit file`
+3/5 → 5/5 (`nano readme.txt` on every phrasing), `change permission`
+2/5 → 5/5 (`chmod 644 file`, `chmod +x filename` — `icacls` gone),
+`list processes` 2/4 → 3/4 (`ps aux`; one `jobs` left), `ram usage/formal`
+`smem --mem` → `free -h`. Hypothesis held there.
+
+What broke: `delete file` 5/6 → 1/6 (v8) → **0/6** (v8-dpo). v8 says
+`git obliterate file_1 file_2 ...` on four phrasings; DPO, shown that as a
+rejected row, moves to `delete .file_name` and `touch /tmp/foo.txt && echo
+"Deleting /tmp/foo.txt"` — anywhere but `rm`. The cause is one tldr row,
+not the prior: `git obliterate file_1 file_2 ...` carries the description
+"Erase the existence of specific files", which SEA-LION rendered as `buang
+fail tu` (colloquial) and `nak delete file ni je` (rojak) — the exact
+beginner phrasing for `rm`, attached to a git-extras command. 253 head rows
+for `rm` cannot outvote a row whose NL *is* the probe prompt. prior.py's
+placeholder rule caught `path/to` and `<name>`; it did not catch the
+`file_1 file_2 ...` list shape, and pool_v8 still has 4,864 rows (2.0%)
+with `X1 X2 ...`, `argument1 argument2`, `filename`, `file_name`,
+`file_or_directory`, `directory_name` in the command — the tldr "list of
+things" idiom. Every one of those is a row where the NL is generic and the
+command is not runnable.
+
+Not shipping: same ALFA, same probe total as v0.9.0, and a beginner task
+went from five of six to none. Held-out `change shell` came back (0/3 →
+3/3, `chsh -s zsh`) and `reverse lines` went (3/3 → 0/3), which is the
+±3-prompt churn the holdout always shows.
+
+**Run 11, hypothesis before the run.** `pool_v9` = `pool_v8` minus the
+4,864 list/name-placeholder rows (`dataset/lists.py`, one regex, whole
+pairs, commands otherwise untouched, count printed). One variable vs run
+10. Hypothesis: `delete file` returns to ≥ 5/6 with `rm`, no other probe
+task loses more than one phrasing, placeholders on the probe ≤ 2, ALFA
+inside run 10's CI on every register. Falsified if `delete file` stays
+below 5/6 — then the `git obliterate` habit is not that row and the
+head-rows idea needs a different lever (weight, not count).
+
+**Result (2026-08-17): falsified — the row was not the habit.** `qwen-v9`
+235,169 rows, then `qwen-v9-dpo` on its own probe misses.
+
+| register | shipped (v7-dpo) | v9 | v9-dpo | v9-dpo vs shipped, 95% CI | p |
+|---|---|---|---|---|---|
+| BM | 0.497 | 0.447 | 0.477 | −0.020 [−0.072, +0.032] | 0.53 |
+| rojak | 0.517 | 0.483 | 0.483 | −0.033 [−0.085, +0.019] | 0.26 |
+| EN | 0.543 | 0.533 | 0.543 | 0.000 [−0.053, +0.053] | 1 |
+
+v9's SFT BM of 0.447 was −0.050 vs the shipped model (p = 0.086) and DPO
+took back +0.030 (p = 0.09); both sit on the CI edge and neither clears it.
+Probe: v9 205, v9-dpo 204 (shipped 205); basics 168 → 171 (shipped 166);
+holdout 33 → **29** (shipped 34: `change shell` ×3 → `update-alternatives`,
+`whereis` → `git --exec-path`, `number lines` → `less -N`); placeholders 0
+on both. Bench 0.45 s warm at 4 threads, 1.61 GB RSS — RSS has crept
+1.49 → 1.56 → 1.61 across v7-dpo/v8/v9 for the same file size, which is
+either the box or something in `finish.sh` worth checking before the next
+ship.
+
+`delete file`: 1/6 (v9: `clido --remove file_name`, `echo $(ls -1 | sort
+-R | head -n 1)`) → 2/6 (v9-dpo: `coreutils rm file`, `clido --remove
+name`). Removing `git obliterate` moved the miss to the next obscure tool,
+not to `rm`. The reason is in the pool, and it is #47 again: the six probe
+phrasings are unnamed — `nak buang file ni`, `nak padam file ni`, `delete a
+file`, `Hapuskan file tersebut`. In pool_v9 the NL "delete/buang/padam/
+hapus file/fail (ni/tu)" with no filename occurs four times: three rows
+answer `<Enter>`, one `pvesm [f|free] local:iso/...`, **zero `rm`**.
+Every one of the 253 head rows for `rm` and every basics row carries a
+filename. Run 8's unnamed rows fixed `create` and never got a `delete`
+twin, so an unnamed delete has nothing to imitate but noise, and each pool
+change reshuffles which noise wins. `list processes` 4/4, `edit file` 5/5,
+`change permission` 5/5 held from run 10 — the head rows keep what they
+name.
+
+Not shipping: no register better than v0.9.0, holdout down 5, one beginner
+task still broken. Two runs (four models) on this thread say the same
+thing three ways: the pool fixes exactly the phrasing it contains, ALFA
+cannot see any of it, and each 4 h run trades one probe task for another
+inside the noise. Next, if anything: unnamed `delete`/`copy`/`move`/`edit`
+rows in the #47 shape (`nak buang file ni` → `rm file.txt`), plus a drop
+rule for rows whose NL is a bare beginner verb and whose command is not a
+core tool (`<Enter>`, `pvesm`), bundled with the next change that has an
+ALFA-sized reason to retrain — not on their own. `dataset/lists.py` stays
+(4,864 unrunnable rows out is right regardless), pool_v9 is the pool the
+next run starts from.

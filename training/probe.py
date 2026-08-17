@@ -596,20 +596,21 @@ def main():
                     help="re-apply the current regexes to a saved run; no server")
     args = ap.parse_args()
 
-    # The probe must not score its own training data. dataset/basics.txt is
-    # hand-written and lives next door, so check every prompt against it.
-    basics_txt = os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                              "..", "dataset", "basics.txt")
-    if os.path.exists(basics_txt):
+    # The probe must not score its own training data. dataset/basics.txt and
+    # basics_head.txt (issue #62, slots expanded) are hand-written and live
+    # next door, so check every prompt against both.
+    dataset = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "dataset")
+    if os.path.exists(os.path.join(dataset, "basics.txt")):
         import sys
-        sys.path.insert(0, os.path.dirname(basics_txt))
-        from basics import parse as parse_basics
-        train = {p.lower() for _, regs in parse_basics(basics_txt)
-                 for ps in regs.values() for p in ps}
+        sys.path.insert(0, dataset)
+        from basics import rows as basics_rows
+        from head import rows as head_rows
+        train = {r["nl"].lower() for r in basics_rows(os.path.join(dataset, "basics.txt"))}
+        train |= {r["nl"].lower() for r in head_rows(os.path.join(dataset, "basics_head.txt"))}
         leaked = [p for t in TASKS + HOLDOUT for p in t["p"].values()
                   if p.lower() in train]
         if leaked:
-            raise SystemExit(f"probe prompts present in basics.txt: {leaked}")
+            raise SystemExit(f"probe prompts present in basics*.txt: {leaked}")
 
     if args.rescore:
         okre = {t["task"]: t["ok"] for t in TASKS + HOLDOUT}
