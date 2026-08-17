@@ -1,7 +1,5 @@
 ---
 license: apache-2.0
-license_name: apache-2.0-with-source-notices
-license_link: NOTICE
 language:
   - ms
   - en
@@ -22,10 +20,10 @@ pretty_name: camne four-register pool
 Natural-language request in, one shell command out, with the request in four
 registers: formal Bahasa Melayu, colloquial Malay, rojak (Malay-English
 mix), English. This is the training pool behind
-[camne](https://github.com/opariffazman/camne) and the shipped model
+[camne](https://github.com/officialdad/camne) and the shipped model
 [opariffazman/camne-1.5b-Q4_K_M](https://huggingface.co/opariffazman/camne-1.5b-Q4_K_M).
 Numbers for every run are in the repo's
-[RESULTS.md](https://github.com/opariffazman/camne/blob/main/RESULTS.md).
+[RESULTS.md](https://github.com/officialdad/camne/blob/main/RESULTS.md).
 
 ## Files
 
