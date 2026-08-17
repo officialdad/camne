@@ -1,0 +1,42 @@
+camne four-register pool
+Copyright 2026 Ariff Azman
+
+Licensed under the Apache License, Version 2.0. You may obtain a copy of
+the License at http://www.apache.org/licenses/LICENSE-2.0
+
+---
+
+Training data, by measured share of the 228,357-row pool_v7 (the pool
+camne v0.9.0 shipped on; pool_v8 = pool_v7 + 11,676 hand-written head rows,
+240,033 rows, same sources plus 4.9% hand-written):
+
+  48.2%  NL2SH-ALFA training split   MIT        verified (HF license field)
+         https://huggingface.co/datasets/westenfelder/NL2SH-ALFA
+  29.2%  tldr-pages                  CC-BY-4.0  verified (repo LICENSE.md)
+         https://github.com/tldr-pages/tldr
+  18.5%  cli-commands-explained      CC0-1.0    declared, unverified
+         (commandlinefu.com submissions via b-mc2/cli-commands-explained)
+         https://huggingface.co/datasets/b-mc2/cli-commands-explained
+   3.0%  git-instruction-dataset     MIT        declared, unverified
+         https://huggingface.co/datasets/0xrushi/git-instruction-dataset
+   1.1%  hand-written basics rows    Apache-2.0 (this repository, dataset/basics.txt)
+
+Every row's `id` names its source (`nl2sh_train:`, `tldr:`, `extra:`,
+`basics:`, `head:`); `extra:` indices below 14722 are cli-commands-explained,
+the rest git-instruction-dataset.
+
+Attribution, required by CC-BY-4.0: this work includes content from
+tldr-pages (https://github.com/tldr-pages/tldr) under CC-BY-4.0
+(https://creativecommons.org/licenses/by/4.0/). Page content is CC-BY-4.0;
+only that repository's scripts/ directory is MIT.
+
+The natural-language side of every sourced pair was machine-translated into
+Bahasa Melayu (formal, colloquial and rojak registers) with
+Gemma-SEA-LION-v3-9B-IT (https://huggingface.co/aisingapore/Gemma-SEA-LION-v3-9B-IT),
+run locally, no external API. That model is distributed under the Gemma
+Terms of Use (https://ai.google.dev/gemma/terms); the terms govern the model
+weights, not the Malay text it produced. Only the outputs are in this pool.
+
+Commands are byte-identical to their source and were never translated,
+except 633 rows in pool_v7 whose `path/to/...` placeholder was replaced by
+a concrete name on both sides of the pair (dataset/prior.py, issue #54).
