@@ -1175,3 +1175,144 @@ exist in `eval_gen.py` and is not being added for a result this clear.
 (multilingual embedder + retrieval-aware training rows, if ever) starts
 from the measurement instead of the idea. Index file (`out/tldr_index.npz`)
 and the bge GGUF are build artifacts, not committed.
+
+
+## Run 10: head rows for the beginner verbs (issue #62)
+
+**Hypothesis, written before the run.** Run 9 fixed `create file/folder/
+user` by cutting the tail, and the share it freed went to whatever was
+left uncapped: `git` 4.3% → 5.8% of the pool, and `delete file` came back
+`git obliterate`, `list processes` `pm2`, `edit file` `less`. v7-dpo
+flipped those exact misses back and moved nothing else, which is what
+three minutes of preference tuning on 40 real pairs can do. The prior is
+set by the SFT pool, so this run grows the head instead of trimming the
+tail again: `pool_v8 = pool_v7 + 11,676 rows` for the beginner verbs that
+have fewer than 1,000 real rows (`nano` 52, `less` 87, `unzip` 106, `zip`
+125, `scp` 137, … `ps` 769, `rm` 758 once augment_verbs duplicates are not
+counted). Prediction: on the probe, `delete file` (2/6 on run 9), `list
+processes` (0/4), `edit file` and `change permission` return to run 7's
+level or better with `rm` / `ps` / `nano` / `chmod` as the tool, with no
+placeholder regression (run 9 had 6 placeholder answers of 222; ≤ 6
+here); `create file/folder/user` hold 9/9, 8/8, 5/5; ALFA stays inside run
+9's CI on every register (BM 0.513, rojak 0.517, EN 0.563, ± ~0.055).
+Falsified if the four probe tasks do not move — then 1,000 rows per tool
+is not what sets the prior against 13k `git` rows and the next variable is
+share, not count — or if any ALFA register drops with p < 0.05, which would
+mean 12k templated rows are teaching the templates rather than the verbs.
+Then DPO on top with pairs rebuilt from this run's probe (`qwen-v8-dpo`),
+comparison row this run, same reading rule as arm B of #56.
+
+One variable vs run 9: the pool. Same recipe, seed 42, 1 epoch, probe
+prompts unchanged, none verbatim in basics.txt or basics_head.txt (probe.py
+now checks both at startup).
+
+**Where the rows come from (`dataset/head.py`, `dataset/basics_head.txt`).**
+Re-admitting real rows was the first choice and there is nothing to
+re-admit: the rows prior.py dropped for these tools are tldr placeholders
+whose NL never names the file (`Remove specific files` → `rm path/to/file1
+path/to/file2`), and the rows disambiguate.py dropped earlier are
+same-prompt pipe one-liners (`ps -ef |grep oracle |grep pmon |awk …`), 0 to
+164 per tool. So the head is written the way basics.txt was, in a new file
+so basics.txt's phrasings stay what probe.py's "not in training data" claim
+was made against: 118 blocks, four registers, plus slots — `{f}` file,
+`{t}` text file, `{d}` folder, `{u}` user, `{h}` host, `{n}` count, `{pid}`,
+`{p}` process, `{z}` zip, `{url}`, `{port}`, `{sshport}`, `{log}` — that
+head.py fills twenty ways from fixed lists, the k-th name of every list, so
+`rm {f}` / `nak buang fail {f}` is twenty consistent pairs. A phrasing must
+carry every slot its command carries (the parser refuses otherwise): a row
+whose NL never names what the command names is the placeholder bug again.
+18,568 rows expanded; budget per tool `min(918, 1000 − real rows)`, 918
+being `mkdir`'s row count in pool_v7 so no single tool jumps past the head
+it joins; whole tasks sampled with `prior.sample_ids`, seed 42. `chsh` is
+in the issue's list and gets nothing: it is a probe HOLDOUT tool, and a
+head row for it would un-hold it (head.py refuses HOLDOUT tools outright).
+
+| tool | pool_v7 | real | budget | added | **pool_v8** |
+|---|---|---|---|---|---|
+| nano | 53 | 52 | 918 | 918 | 971 |
+| less | 90 | 87 | 913 | 918 | 1,008 |
+| unzip | 174 | 106 | 894 | 904 | 1,078 |
+| zip | 197 | 125 | 875 | 876 | 1,073 |
+| scp | 164 | 137 | 863 | 864 | 1,028 |
+| head | 266 | 254 | 746 | 749 | 1,015 |
+| kill | 521 | 321 | 679 | 687 | 1,208 |
+| touch | 454 | 358 | 642 | 644 | 1,098 |
+| chown | 599 | 374 | 626 | 634 | 1,233 |
+| top | 168 | 159 | 841 | 570 | 738 |
+| chmod | 527 | 444 | 556 | 563 | 1,090 |
+| mv | 743 | 502 | 498 | 510 | 1,253 |
+| tail | 601 | 590 | 410 | 413 | 1,014 |
+| mkdir | 918 | 606 | 394 | 396 | 1,314 |
+| cp | 963 | 686 | 314 | 318 | 1,281 |
+| wget | 715 | 696 | 304 | 310 | 1,025 |
+| rm | 1,580 | 758 | 242 | 253 | 1,833 |
+| ssh | 806 | 757 | 243 | 249 | 1,055 |
+| ps | 880 | 769 | 231 | 238 | 1,118 |
+| df | 294 | 280 | 720 | 235 | 529 |
+| free | 87 | 82 | 918 | 221 | 308 |
+| du | 841 | 794 | 206 | 206 | 1,047 |
+| chsh | 16 | 16 | — | 0 | 16 |
+| cat / ls / grep / tar / curl / find | ≥ 1,000 real | | 0 | | unchanged |
+
+`top`, `df`, `free` land short of budget on purpose: they have three or
+four real command shapes (`free -h`, `df -h`, `top`) and no filename to
+vary, so the rows that exist are phrasings, not expansions; padding them
+to 900 would be the same sentence 900 times.
+
+| | pool_v7 (run 9) | **pool_v8** |
+|---|---|---|
+| rows | 228,357 | **240,033** (+5.1%) |
+| distinct first tokens | 4,102 | 4,102 |
+| top-30 share | 29.4% | 29.8% |
+| `git` share | 5.8% | 5.6% |
+| `find` share | 5.0% | 4.8% |
+| placeholders in cmd | 0 | 0 |
+| added, by register | | colloquial 3,761 / rojak 3,389 / english 2,965 / formal 1,561 |
+| added, by source | | re-admitted 0 / generated 11,676 |
+
+Every pool_v7 row is in pool_v8 in the same order with its command
+byte-identical (checked, 228,357/228,357); the 11,676 head rows match
+their block's command byte for byte; no `path/to`, no `<name>`; no head NL
+equals a probe prompt (one did — `kill the process using port 8080` at
+`{port}` = 8080 — and was reworded before the build).
+
+**Issue #51 rides along, two ways.** (a) 112 pool_v7 rows had the
+translator rename the file in the NL while the command kept it —
+`fail.txt` for `file.txt` (91), `fail1.csv`, `dokumen.zip` for
+`documents.zip`, `teks.txt`, `senarai.txt` for `list.txt`, `arkib.zip` —
+which is exactly the Malay-name → English-name mapping the issue reports
+the model learned. head.py restores the command's name in the NL where the
+command names one file the NL does not and the NL names one file whose
+stem is the Malay of it (a fixed nine-stem list; `build.xml` vs
+`buildfile.xml` is left alone). Commands untouched. (b) every slot list
+carries Malay filenames — `lama.txt`, `nota.txt`, `laporan.pdf`,
+`senarai.txt`, `gambar.jpg`, `projek`, `dokumen`, `tugasan` — byte-identical
+on both sides: 2,873 of the added rows, the positive example the pool never
+had. Not done: `grep -c lama.txt pool_v5` is 0, so the mapping in #51 was
+never a literal pair in the pool; it is the base model's translation prior
+plus the 112 rows, and (b) is what pushes against it. Measure with #51's
+four prompts exact after the run.
+
+**Hand-read, 200 of the added rows, `random.Random(42).sample`.** Registers
+read as intended and each row's NL names what its command names. What
+reads wrong, fixed before the build: `ssh -p 3306` / `scp -P 5432` — the
+port list is shared with `kill $(lsof -t -i:{port})`, where 3306 is
+right, so ssh/scp got their own `{sshport}` list; `tail -f data.csv` /
+`less +F main.py` — following a csv reads odd, so the follow blocks got a
+`{log}` list. Left as is, counted: slot lists are independent, so
+`zip -r resit.zip kuliah` and `unzip projek.zip -d gambar` pair unrelated
+names (consistent on both sides, just dull); `chmod 600 video.mp4` and
+`chmod u+w foto.png` are valid but not something anyone asks; two rojak
+phrasings are stiff (`chown -R arkib to farah`, `wget {url} resume`); the
+formal register is 13% of the added rows against 32% colloquial, the same
+skew basics.txt has (352 of 2,581). No Indonesian, no `lah`, no
+`Bagaimanakah`, no probe phrasing.
+
+**Measure.** Run 9 to beat on the probe (199/222, 6 placeholders, holdout
+33), run 7 for the tasks run 9 lost; ALFA vs run 9 paired, #57's error bar;
+`compare.py`, bench, #47 prompts exact, #51 prompts exact, placeholder
+rate. GPU commands, from the worktree's `training/`:
+`./rebuild.sh qwen-v8 ../dataset/out/pool_v8.jsonl`, then
+`python3 dpo_pairs.py --probe out/probe_qwen-v8.jsonl --out out/dpo_pairs_v8.jsonl`
+and `DPO_BASE=out/qwen-v8-lora-merged ./rebuild.sh qwen-v8-dpo out/dpo_pairs_v8.jsonl dpo`.
+Not started; hypothesis written first.
