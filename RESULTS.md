@@ -1414,3 +1414,117 @@ core tool (`<Enter>`, `pvesm`), bundled with the next change that has an
 ALFA-sized reason to retrain — not on their own. `dataset/lists.py` stays
 (4,864 unrunnable rows out is right regardless), pool_v9 is the pool the
 next run starts from.
+
+## Issue #51: Malay filenames come back translated (no run)
+
+**Measured (2026-08-18), no GPU.** Eight exact-output prompts, now
+`EXACT` in `training/probe.py` (printed as `#51 exact n/8`; the two that
+turned out to be head-row phrasings were reworded — the leak check caught
+them). Whole line must match, e.g. `nak delete lama.txt` → `rm lama.txt`.
+
+| model | #51 exact | misses |
+|---|---|---|
+| shipped v0.9.0 (v7-dpo) | **2/8** | `rm old.txt`, `mv new.txt old.txt`, `cat note.txt`, `cp report.pdf work/`, `rm -f files/images_lager.jpg`, `rm list_of_files.txt` |
+| qwen-v8-dpo (run 10) | 7/8 | `mv new.txt old.txt` |
+| qwen-v9 / v9-dpo (run 11) | 7/8 | `mv new_file_name old_file_name` / `mv new_file.txt old_file.txt` |
+
+The issue's hypothesis — the pool holds `lama.txt` in the NL against
+`old.txt` in the command — is falsified: `grep lama.txt | grep old.txt` is
+0 in pool_v5 and pool_v9, and a scan of every NL filename absent from its
+command finds 219 rows in pool_v9, all legitimate mentions (`Node.js`,
+`output.txt` for tesseract's implied output, `0.5s`). The mapping is the
+base model's translation prior, and what pushes back is run 10's head rows
+with Malay names on both sides (`lama.txt`, `nota.txt`, `laporan.pdf`,
+`senarai.txt`, `projek`): 2/8 → 7/8 without a row that names the fix.
+
+The one that stays is the two-file rename. `basics_head.txt` has
+`mv {d} {d2}` (folder) and `mv {t} {t}.old` but no `mv file other-file`,
+so the model falls back to the prior. Added: `mv {t} {t2}` block (`nak
+tukar nama fail {t} jadi {t2}`, `rename {t} ke {t2}`, …; `{t2}` is the text
+list shifted by 7 like `{f2}`), 20 fills × 14 phrasings. `pool_v10` =
+`head.py pool_v7` + `lists.py` with the new block: 235,159 rows; every
+row that is not `mv` is byte-identical to pool_v9 in the same order; `mv`
+resampled under the same budget (500 tasks, seed 42) — 236 rename rows in,
+253 other mv head rows out.
+
+**Run 12, hypothesis before the run (owner: retrain, 2026-08-18).**
+`qwen-v10` = pool_v10, one variable vs run 11 (the mv resample), then
+`qwen-v10-dpo` on its own probe misses, same chain as runs 10/11.
+Hypothesis: `#51 exact` 8/8 on v10-dpo (the rename shape now has rows to
+imitate); every other probe number within run 11's ±3 churn (basics 171,
+holdout 29, `delete file` still broken — nothing here touches it); ALFA
+inside the CI vs shipped on every register. Falsified if the rename
+prompt still comes back translated — then 236 rows are not enough weight
+against the prior and the lever is DPO pairs on exactly that shape, not
+more SFT rows. Ship rule unchanged: the README quoting workaround comes
+out only when a shipped model shows 8/8.
+
+**Result (2026-08-18): falsified on the one prompt it was for.** `qwen-v10`
+235,159 rows, then `qwen-v10-dpo` on its own probe misses (3,432 pairs;
+`exact` prompts get no pairs — they are not in dpo_pairs.py's GOLD, so
+`#51 exact` stays a generalisation number after DPO).
+
+| register | shipped (v7-dpo) | v10 | v10-dpo | v10-dpo vs shipped, 95% CI | p |
+|---|---|---|---|---|---|
+| BM | 0.497 | 0.453 | 0.453 | −0.043 [−0.097, +0.011] | 0.15 |
+| rojak | 0.517 | 0.480 | 0.490 | −0.027 [−0.083, +0.029] | 0.42 |
+| EN | 0.543 | 0.523 | 0.543 | 0.000 [−0.050, +0.050] | 1 |
+
+Inside every CI. Probe: v10 basics 160, holdout 33; v10-dpo basics 166,
+holdout 32 (shipped 166 / 34); `path/to` 0. `delete file` 5/6 on v10-dpo
+(v9-dpo 2/6) with nothing in this pool aimed at it — the churn again. Bench
+0.54 s warm at 4 threads, 1.58 GB RSS.
+
+`#51 exact` **7/8 on both**, the same miss: `nak rename fail baru.txt jadi
+lama.txt` → `mv new.txt old.txt`. But the rename block did land — on v10,
+`nak tukar nama fail lama.txt jadi baru.txt` → `mv lama.txt baru.txt`,
+`rename nota.txt ke surat.txt` → `mv nota.txt surat.txt`, `nak rename fail
+a.txt jadi b.txt` → `mv a.txt b.txt`. Every phrasing that carries
+`baru.txt` before `lama.txt` (`kepada`, `jadi`, `to`, `boleh?`) comes back
+`mv new.txt old.txt`, which is basics.txt's own rename block (`nak tukar
+nama fail old.txt jadi new.txt` → `mv old.txt new.txt`, 28 rows) reached
+through the prior `baru`=new, `lama`=old. `lama.txt` is in the slot lists
+(345 rows) and survives; `baru.txt` is in zero pool rows and does not. So
+the miss is not the rename shape, it is the one Malay filename the lists
+never carried.
+
+**Run 13, hypothesis before the run.** `pool_v11` = pool_v10 with
+`baru.txt` in place of `notes.txt` in the `{t}` list (head.py NAMES): 220
+rows change, `notes.txt` → `baru.txt` on both sides, nothing else moves
+(checked row for row). One variable. Hypothesis: `#51 exact` 8/8, ALFA
+inside the CI vs shipped, probe within the ±3 churn. Falsified if the
+rename still comes back `new.txt old.txt` with 220 rows naming `baru.txt` —
+then a Malay word that is also an adjective needs more than the ~200-row
+dose `lama.txt` needed, and the honest fix is the README line, not more
+rows.
+
+**Result (2026-08-18): hypothesis held on #51, ALFA says no ship.** `qwen-v11`
+235,159 rows, then `qwen-v11-dpo` (3,428 pairs).
+
+| register | shipped (v7-dpo) | v11 | v11-dpo | v11-dpo vs shipped, 95% CI | p |
+|---|---|---|---|---|---|
+| BM | 0.497 | 0.433 | 0.423 | **−0.073 [−0.125, −0.022]** | 0.008 |
+| rojak | 0.517 | 0.480 | 0.477 | −0.040 [−0.092, +0.012] | 0.17 |
+| EN | 0.543 | 0.517 | 0.527 | −0.017 [−0.070, +0.037] | 0.63 |
+
+`#51 exact` **8/8** on v11 and v11-dpo; every rename phrasing right
+(`nak tukar nama fail baru.txt kepada lama.txt`, `rename file baru.txt to
+lama.txt`, `... boleh?` all → `mv baru.txt lama.txt`). 220 rows naming
+`baru.txt` were the dose. Probe: v11 basics 164 / holdout 31; v11-dpo
+basics **169** / holdout 31, `delete file` **6/6** on both, `path/to` 0.
+Bench 0.52 s warm at 4 threads, 1.56 GB RSS.
+
+Not shipping: BM is worse than v0.9.0 and the CI excludes zero — the first
+time in this thread it has. v10-dpo → v11-dpo alone is −0.030 [−0.075,
++0.015] (p = 0.24), inside the noise, and two of the 28 BM losses are the
+same command scored pass then fail (`gzip -k /testbed/hello.php`), so the
+220-row swap is not what moved BM. What moved it is the whole head-row
+family: v7-dpo 0.497 → v8-dpo 0.497 → v9-dpo 0.477 → v10-dpo 0.453 →
+v11-dpo 0.423, each step inside its CI, the sum not. Runs 10–13 each fixed
+what they named on the probe (edit, chmod, ps, rename, Malay names, now
+`delete file` too) and paid for it on ALFA a little at a time. Issue #51
+is answered — the data fix is `basics_head.txt` + the `{t}` list, verified
+8/8 — and it ships with whatever next model clears ALFA. The README
+quoting workaround stays until then. Next lever, if this thread continues:
+find which ALFA-BM tasks the head-row family loses (v7-dpo right, v11-dpo
+wrong, 43 of them) and whether they share a tool the head rows out-vote.

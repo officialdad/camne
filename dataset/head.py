@@ -51,7 +51,7 @@ HOLDOUT = {"truncate", "tac", "whereis", "dirname", "tee", "timeout", "chsh",
            "printenv", "nl"}
 
 NAMES = {
-    "t": "notes.txt nota.txt lama.txt laporan.txt senarai.txt surat.txt jadual.csv "
+    "t": "baru.txt nota.txt lama.txt laporan.txt senarai.txt surat.txt jadual.csv "
          "data.csv todo.md catatan.md draf.txt minit.txt ucapan.txt config.yaml "
          "index.html main.py skrip.sh output.log error.log resit.txt".split(),
     "f": "laporan.pdf gambar.jpg nota.txt lama.txt foto.png resume.docx senarai.txt "
@@ -87,14 +87,14 @@ NAMES = {
 }
 K = 20
 assert all(len(v) == K for v in NAMES.values())
-SLOT = re.compile(r"\{(t|f2|f|d2|d|u|h|n|pid|sshport|port|p|z|url|log)\}")
+SLOT = re.compile(r"\{(t2|t|f2|f|d2|d|u|h|n|pid|sshport|port|p|z|url|log)\}")
 
 
 def fill(text, k):
-    """Slot k of every list; `{f2}`/`{d2}` are the same lists shifted by 7."""
+    """Slot k of every list; `{t2}`/`{f2}`/`{d2}` are the same lists shifted by 7."""
     def one(m):
         s = m.group(1)
-        return NAMES[s[0]][(k + 7) % K] if s in ("f2", "d2") else NAMES[s][k % K]
+        return NAMES[s[0]][(k + 7) % K] if s in ("t2", "f2", "d2") else NAMES[s][k % K]
     return SLOT.sub(one, text)
 
 
