@@ -97,6 +97,49 @@ No model change merges without numbers. Not examples, numbers.
 - Noise floor (issue #57): the same pool and seed reproduce to ≤ 0.013 per
   register and 0 probe prompts, so one seed suffices when the paired CI
   excludes zero. A delta inside ±0.02 is "no difference", not a trend.
+  That floor is the **scorer**, not the training (PR #68): ~1% of tasks
+  return a different verdict for a byte-identical command, because the task
+  itself is not deterministic — `find -mtime/-mmin/-atime` against
+  build-time file stamps, unsorted `find -print`, `ps aux`, `dig`, and the
+  mtime gzip and tar write into their own headers. Upstream documents none
+  of this; assume it is there.
+
+### Scoring hygiene
+
+The scorer and the container are never edited — that is what makes a number
+comparable to anyone else's. Everything below controls the *measurement*
+around it, which is the same split
+[lm-evaluation-harness](https://github.com/EleutherAI/lm-evaluation-harness/blob/main/docs/interface.md)
+draws with `--use_cache` and [arXiv 2405.14782](https://arxiv.org/pdf/2405.14782)
+argues for.
+
+- Generation and scoring stay separate files, so scoring can be re-run
+  without re-generating. Already true: `answers_*.jsonl` → `.scored.jsonl`.
+- Cache the verdict on `(index, command)` and reuse it. 61% of our scoring
+  calls repeat a command already scored for that task, and re-scoring it is
+  where phantom lost/gained pairs come from. A cache makes a comparison
+  self-consistent; it does not make a verdict correct.
+- Score every arm being compared in one session against one image build.
+  `-mtime +31` means something different after a rebuild.
+- Known-flaky tasks: score 3×, take the majority. Cheap — it is ~1% of the
+  set, not all of it. Identifying them by repeated runs is what the
+  execution-benchmark literature does ([arXiv 2505.23419](https://arxiv.org/html/2505.23419v2),
+  [arXiv 2310.15642](https://arxiv.org/pdf/2310.15642)); we cannot drop
+  them, the 300 are fixed, so report them instead.
+- State the embed model digest next to the llama build. `mxbai-embed-large`
+  is half the scorer.
+- Do not reach for `libfaketime` to pin the container clock. It changes the
+  environment and costs roughly 10×; one session per comparison buys the
+  same thing.
+
+### The probe and ALFA do not measure the same thing
+
+`training/probe.py` measures whether a task survives rephrasing; ALFA
+measures whether the tool was right. Only 17% of the ALFA-BM tasks the
+shipped model passes use a beginner tool at all — `find` alone is a third
+of them. Runs 10–13 bought probe points and paid ALFA points, one inside-CI
+step at a time, until the sum cleared the CI (PR #68). Quote both numbers or
+neither, and treat a probe win with an ALFA loss as the trade it is.
 
 ## Dataset work
 
