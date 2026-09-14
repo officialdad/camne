@@ -119,6 +119,8 @@ func installServer(asset provision.Asset, serverPath string) error {
 	if _, err := os.Stat(serverPath); err != nil {
 		return fmt.Errorf("unpacking finished but llama-server is not where it should be — delete the folder %s, then run camne again", filepath.Dir(serverPath))
 	}
+	// Only after the new server is in place, so a failed upgrade keeps the old.
+	provision.RemoveOtherServers(serverPath)
 	return nil
 }
 

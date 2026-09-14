@@ -29,6 +29,12 @@ const (
 	ModelSize int64 = 986048032
 )
 
+// linuxBuild is llamaBuild rebuilt by .github/workflows/llama.yml with
+// GGML_OPENMP=OFF. Upstream's Ubuntu build needs libgomp.so.1, which minimal
+// images (Ubuntu 26.04 cloud) lack, and llama-server then exits at start.
+// macOS and Windows keep upstream's builds.
+const linuxBuild = llamaBuild + "-noomp"
+
 // Asset is one llama.cpp release file for a specific platform.
 type Asset struct {
 	Name   string // release asset file name
@@ -38,15 +44,27 @@ type Asset struct {
 
 // URL is the direct release-asset download URL for the pinned build.
 func (a Asset) URL() string {
+	if strings.HasPrefix(a.Name, "llama-"+linuxBuild+"-") {
+		return "https://github.com/officialdad/camne/releases/download/llama-" + linuxBuild + "/" + a.Name
+	}
 	return "https://github.com/ggml-org/llama.cpp/releases/download/" + llamaBuild + "/" + a.Name
 }
 
+// dir is the versioned directory under bin/ the asset unpacks to: the name up
+// to "-bin-", which is also the tar.gz entry prefix. A new build gets a new
+// directory, so an install of the old one is replaced, never trusted.
+func (a Asset) dir() string {
+	d, _, _ := strings.Cut(a.Name, "-bin-")
+	return d
+}
+
 // llamaAssets maps GOOS/GOARCH to the release asset for the pinned build.
-// Digests and sizes come from the GitHub release API for that tag, hardcoded
+// Digests and sizes come from the GitHub release API for that tag (Linux: the
+// llama-b10333-noomp release on this repo), hardcoded
 // so provisioning never depends on the rate-limited API at runtime.
 var llamaAssets = map[string]Asset{
-	"linux/amd64":   {"llama-" + llamaBuild + "-bin-ubuntu-x64.tar.gz", "936ce04d98abe2a977e9dd2ff92659bb96947e136acee8f2bc3e21d8eaebbf23", 16507165},
-	"linux/arm64":   {"llama-" + llamaBuild + "-bin-ubuntu-arm64.tar.gz", "95da1a0f7538340f625b0301593ee63c046ec0a155c74f21444ea4d43bca79a1", 13377770},
+	"linux/amd64":   {"llama-" + linuxBuild + "-bin-ubuntu-x64.tar.gz", "5041ff232f7e5d19f5748fe93417f69c10ea0adb2e8c34ce10d0be80eaeeae88", 16266714},
+	"linux/arm64":   {"llama-" + linuxBuild + "-bin-ubuntu-arm64.tar.gz", "ecb4e32cb37ea8aac1404c3b7b36ac9cd86aa713bdbc9b8770d91738863f48ef", 13137461},
 	"darwin/amd64":  {"llama-" + llamaBuild + "-bin-macos-x64.tar.gz", "6ffd9e0b9b2e3ab6ccfba332a74b968b0fef891f01bd4747d3d75bc7393877ea", 11290712},
 	"darwin/arm64":  {"llama-" + llamaBuild + "-bin-macos-arm64.tar.gz", "e5d67c5264107e3c14d3bf2aee349365bb2b85ae99bb077a0cb974a1c4c2741a", 11015270},
 	"windows/amd64": {"llama-" + llamaBuild + "-bin-win-cpu-x64.zip", "563ab97cd003cf7cd4843677e6fea2f6162aee0c9580589c8d9e5816923076d5", 18399512},
@@ -88,7 +106,23 @@ func ServerPath() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	return filepath.Join(d, "bin", "llama-"+llamaBuild, serverBinary()), nil
+	a, err := LlamaAsset(runtime.GOOS, runtime.GOARCH)
+	if err != nil {
+		return "", err
+	}
+	return filepath.Join(d, "bin", a.dir(), serverBinary()), nil
+}
+
+// RemoveOtherServers deletes every directory under bin/ except the one holding
+// serverPath. Without it each llama.cpp upgrade strands ~40 MB on disk.
+func RemoveOtherServers(serverPath string) {
+	keep := filepath.Dir(serverPath)
+	names, _ := filepath.Glob(filepath.Join(filepath.Dir(keep), "*"))
+	for _, n := range names {
+		if n != keep {
+			os.RemoveAll(n)
+		}
+	}
 }
 
 // ModelPath is where the GGUF lives once downloaded.
