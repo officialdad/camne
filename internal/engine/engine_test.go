@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
+	"os"
+	"path/filepath"
 	"strings"
 	"testing"
 	"time"
@@ -44,6 +46,42 @@ func TestWaitReadyTimeout(t *testing.T) {
 
 	if err := testClient(srv).WaitReady(0); err == nil {
 		t.Fatal("expected timeout error, got nil")
+	}
+}
+
+func TestThreadsFor(t *testing.T) {
+	for _, tt := range []struct{ cpus, want int }{
+		{0, 1}, {1, 1}, {2, 2}, {3, 2}, {4, 2}, {6, 3}, {8, 4}, {16, 4},
+	} {
+		if got := threadsFor(tt.cpus); got != tt.want {
+			t.Errorf("threadsFor(%d) = %d, want %d", tt.cpus, got, tt.want)
+		}
+	}
+}
+
+func TestWaitReadyServerExited(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusServiceUnavailable)
+	}))
+	defer srv.Close()
+
+	log := filepath.Join(t.TempDir(), "llama.log")
+	os.WriteFile(log, []byte("llama-server: error while loading shared libraries: libgomp.so.1\x1b[0m\n\n"), 0o600)
+	exited := make(chan struct{})
+	close(exited)
+	c := testClient(srv)
+	c.exited, c.logPath = exited, log
+
+	start := time.Now()
+	err := c.WaitReady(time.Minute)
+	if err == nil {
+		t.Fatal("expected error for an exited server, got nil")
+	}
+	if time.Since(start) > 5*time.Second {
+		t.Errorf("WaitReady took %v, want it to stop as soon as the server exits", time.Since(start))
+	}
+	if !strings.Contains(err.Error(), "libgomp.so.1") || strings.Contains(err.Error(), "\x1b") {
+		t.Errorf("error = %q, want the log's last line with control bytes stripped", err)
 	}
 }
 
