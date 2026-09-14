@@ -1,0 +1,115 @@
+name: llama.cpp Linux build
+
+# Upstream's Ubuntu release links OpenMP, so llama-server does not start on a
+# system without libgomp.so.1 (Ubuntu 26.04 cloud images ship without it).
+# A llama-b<build>-noomp tag rebuilds the pinned llama.cpp tag for Linux with
+# GGML_OPENMP=OFF and publishes it as a prerelease that
+# internal/provision/provision.go pins by sha256. Every other flag mirrors
+# upstream's ubuntu-cpu job at that tag.
+#
+# Prerelease + --latest=false: install.sh and `camne update` read
+# /releases/latest, which must keep pointing at a camne release.
+on:
+  push:
+    tags: ["llama-b*-noomp"]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        include:
+          - build: x64
+            os: ubuntu-22.04
+          - build: arm64
+            os: ubuntu-24.04-arm
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 60
+    steps:
+      - name: Pinned llama.cpp tag from the camne tag
+        run: |
+          TAG="${GITHUB_REF_NAME}"
+          UPSTREAM="${TAG#llama-}"
+          echo "TAG=$TAG" >> "$GITHUB_ENV"
+          echo "UPSTREAM=${UPSTREAM%-noomp}" >> "$GITHUB_ENV"
+
+      - uses: actions/checkout@v4
+        with:
+          repository: ggml-org/llama.cpp
+          ref: ${{ env.UPSTREAM }}
+
+      # Upstream's own workaround: the arm64 CPU variants need GCC 14.
+      - name: Toolchain (GCC 14)
+        if: matrix.build == 'arm64'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gcc-14 g++-14
+          echo "CC=gcc-14" >> "$GITHUB_ENV"
+          echo "CXX=g++-14" >> "$GITHUB_ENV"
+
+      # Differences from upstream: GGML_OPENMP=OFF (the fix), LLAMA_OPENSSL=OFF
+      # (camne never has llama-server fetch over HTTPS, and libssl is one more
+      # library a minimal image can lack), LLAMA_BUILD_UI=OFF (camne passes
+      # --no-webui).
+      - name: Build
+        run: |
+          cmake -B build \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_INSTALL_RPATH='$ORIGIN' \
+            -DCMAKE_BUILD_WITH_INSTALL_RPATH=ON \
+            -DGGML_BACKEND_DL=ON \
+            -DGGML_NATIVE=OFF \
+            -DGGML_CPU_ALL_VARIANTS=ON \
+            -DGGML_OPENMP=OFF \
+            -DLLAMA_OPENSSL=OFF \
+            -DLLAMA_BUILD_UI=OFF \
+            -DLLAMA_BUILD_EXAMPLES=OFF \
+            -DLLAMA_BUILD_TESTS=OFF \
+            -DLLAMA_BUILD_TOOLS=ON \
+            -DLLAMA_BUILD_SERVER=ON
+          cmake --build build --config Release -j "$(nproc)"
+
+      # The whole point of this build: fail if anything still needs libgomp
+      # or libssl, or if the server does not start.
+      - name: Check dependencies
+        run: |
+          cd build/bin
+          if readelf -d llama-server *.so* | grep -E 'NEEDED.*(gomp|ssl|crypto)'; then
+            echo "llama-server still needs a library this build removes" >&2
+            exit 1
+          fi
+          ./llama-server --version
+
+      - name: Pack
+        run: |
+          cp LICENSE build/bin/
+          tar -czf "$TAG-bin-ubuntu-${{ matrix.build }}.tar.gz" --transform "s,^\.,$TAG," -C build/bin .
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ubuntu-${{ matrix.build }}
+          path: ${{ env.TAG }}-bin-ubuntu-${{ matrix.build }}.tar.gz
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          merge-multiple: true
+      - name: Publish prerelease
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          sha256sum *.tar.gz | tee checksums.txt
+          stat -c '%s %n' *.tar.gz
+          gh release create "$GITHUB_REF_NAME" \
+            --title "$GITHUB_REF_NAME" \
+            --notes "llama.cpp ${GITHUB_REF_NAME#llama-} rebuilt for Linux with GGML_OPENMP=OFF, so llama-server needs no libgomp. Downloaded by camne, pinned by sha256 in internal/provision/provision.go. Not a camne release." \
+            --prerelease --latest=false \
+            *.tar.gz checksums.txt
