@@ -1528,3 +1528,66 @@ is answered — the data fix is `basics_head.txt` + the `{t}` list, verified
 quoting workaround stays until then. Next lever, if this thread continues:
 find which ALFA-BM tasks the head-row family loses (v7-dpo right, v11-dpo
 wrong, 43 of them) and whether they share a tool the head rows out-vote.
+
+## Where the head-row family lost BM: not the tool it out-voted
+
+Runs 10–13 each cost ALFA a little (BM 0.497 → 0.497 → 0.477 → 0.453 →
+0.423). RESULTS said the next lever was to find the 43 BM tasks v7-dpo
+gets right and v11-dpo wrong and check whether they share a tool the head
+rows out-vote. Done, no GPU: the four DPO arms' scored answer files, all
+three registers, 900 task-instances.
+
+**The hypothesis is inverted.** Net flow by the gold-side tool, v7-dpo →
+v11-dpo, pooled over the three registers:
+
+| | lost | gained | net |
+|---|---|---|---|
+| the 22 head-row tools | 18 | 3 | **−15** |
+| everything else (~40 tools) | 99 | 75 | −24 |
+| all | 117 | 78 | −39 |
+
+The head rows did not out-vote the tail. They doubled their own share of
+the pool (5.1% → 9.8%) and the model got **worse at those same tools**:
+`tail` −3, `free` −2, `head` −2, `chown` −2, `df` −2, `du` −1. Meanwhile
+`find`, diluted 5.03% → 4.86%, is the biggest single gainer at **+10**
+(29 lost, 39 gained). Dilution is not the mechanism.
+
+**What the head-tool losses look like.** 60% keep v7-dpo's tool and 64%
+are longer; mean command length over all 900 went 6.79 → 7.55 tokens.
+They are not wrong-tool errors, they are elaborations:
+
+| prompt | v7-dpo | v11-dpo |
+|---|---|---|
+| change the ownership of /testbed/test.txt to 'nobody' | `chown nobody /testbed/test.txt` | `sudo chown nobody /testbed/test.txt` |
+| Print percentage of the space used on /workspace | `df -h /workspace \| awk '{print $5}'` | `… \| cut -d% -f1` |
+| Display the 5 largest files in /testbed | `du -a /testbed \| sort -n -r \| head -5` | `du -h --max-depth=1 … \| sort -rh \| head -n 5` |
+| print the tenth line of setup_nl2b_fs_1.sh | `head -n 10 f \| tail -n 1` | `tail -n 10 f \| head -n 1` |
+| print the system memory usage | `free -h` | `smem --system` |
+
+11,666 templated rows — 20 slot fills × ~14 phrasings per block, every one
+a short single-tool command — sharpen the exact phrasings the probe asks
+(basics 166 → 169, `#51 exact` 2/8 → 8/8, `delete file` 5/6 → 6/6) and
+leave the model decorating the same tools when the phrasing is ALFA's.
+That is the trade the four runs bought, stated properly: **the probe and
+ALFA are not measuring the same tools.** Only 17% of the BM tasks v7-dpo
+passes are answered with a head-row tool at all; `find` alone is 34%.
+
+**Also: the scorer is not deterministic.** Across the 900 task-arm groups,
+13 tasks scored the byte-identical command both 0 and 1 (`gzip -k
+/testbed/hello.php`, `ps aux`, `dig google.com`, `find /testbed -type f |
+wc -l`, …) — 1.4%, which is issue #57's measured noise floor of 0.013 per
+register almost exactly. #57 attributed it to training; most of it is the
+embed-mode scorer at threshold 0.75. Four coin-flip tasks per register are
+inside every comparison in this file. It does not erase run 13's −0.073
+(22 net tasks) but it does mean a paired CI whose edge sits within ~0.015
+of zero is reporting the scorer.
+
+**What this says about the next change.** More templated head rows will
+keep buying probe points at ALFA's expense; the lever is the *shape* of
+the rows, not the count. Two things worth one run each, not four:
+(a) cap the head at what a tool needs to stop being out-voted (~200 rows
+answered #51; 918 for `nano` did not buy 918 rows' worth) and re-measure;
+(b) give the head rows the register variety the tail has — ALFA's own
+phrasings are long, pathful and pipey, and nothing in `basics_head.txt`
+looks like that. Neither is worth a run on its own; both ride with the
+next change that has an ALFA-sized reason.
