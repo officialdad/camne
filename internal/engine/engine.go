@@ -47,6 +47,10 @@ const idleSleep = "1800"
 type Client struct {
 	base string // URL prefix; a placeholder host when dialing a unix socket
 	hc   *http.Client
+	// exited closes when a server this process started stops. nil for a
+	// server that was already running.
+	exited  <-chan struct{}
+	logPath string
 }
 
 // runDir is the 0700 directory holding the socket, pidfile and server log.
@@ -71,15 +75,19 @@ func pidPath(rd string) string { return filepath.Join(rd, "llama.pid") }
 
 // threads: decoding is memory-bandwidth-bound, not compute-bound, so half the
 // cores capped at 4 is the whatisit-validated default for the target box.
-func threads() string {
-	n := runtime.NumCPU() / 2
+func threads() string { return strconv.Itoa(threadsFor(runtime.NumCPU())) }
+
+// threadsFor floors at 2 when the machine has 2 logical CPUs. Half of 2 is 1,
+// and on a 2-vCPU t3.large -t 2 measured 3.6 s per query against 5.8 s at -t 1.
+func threadsFor(cpus int) int {
+	n := cpus / 2
+	if n < 2 {
+		n = min(cpus, 2)
+	}
 	if n < 1 {
 		n = 1
 	}
-	if n > 4 {
-		n = 4
-	}
-	return strconv.Itoa(n)
+	return min(n, 4)
 }
 
 // Connect returns a client for the resident llama-server, starting one
@@ -110,7 +118,8 @@ func Connect(serverPath, modelPath string) (c *Client, cold bool, err error) {
 	}, hostArgs...)
 	cmd := exec.Command(serverPath, args...)
 	// llama-server chatter goes to a log file, never to the user's terminal.
-	if logf, lerr := os.OpenFile(filepath.Join(rd, "llama.log"),
+	c.logPath = filepath.Join(rd, "llama.log")
+	if logf, lerr := os.OpenFile(c.logPath,
 		os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0o600); lerr == nil {
 		cmd.Stdout, cmd.Stderr = logf, logf
 		defer logf.Close()
@@ -120,7 +129,12 @@ func Connect(serverPath, modelPath string) (c *Client, cold bool, err error) {
 		return nil, false, fmt.Errorf("could not start llama-server — run `camne doctor` to see what is missing: %w", err)
 	}
 	os.WriteFile(pidPath(rd), []byte(strconv.Itoa(cmd.Process.Pid)), 0o600)
-	cmd.Process.Release()
+	// A server that dies at start (a missing shared library, a bad model
+	// file) must fail in seconds, not after the whole WaitReady timeout.
+	// Wait never blocks camne's own exit; the server is in its own session.
+	exited := make(chan struct{})
+	go func() { cmd.Wait(); close(exited) }()
+	c.exited = exited
 	return c, true, nil
 }
 
@@ -148,11 +162,27 @@ func (c *Client) WaitReady(timeout time.Duration) error {
 		if ready, _ := c.health(); ready {
 			return nil
 		}
+		select {
+		case <-c.exited: // a nil channel never fires
+			return fmt.Errorf("llama-server stopped while starting: %s — run `camne doctor`, then ask again. If it keeps happening, open an issue at https://github.com/officialdad/camne/issues with this message", lastLine(c.logPath))
+		default:
+		}
 		if time.Now().After(deadline) {
 			return errors.New("the model is still not ready — run `camne stop`, then ask again. If it keeps happening, `camne doctor` will show what is missing")
 		}
 		time.Sleep(300 * time.Millisecond)
 	}
+}
+
+// lastLine returns the last non-empty line of the server log, stripped to
+// printable ASCII because it reaches the terminal.
+func lastLine(path string) string {
+	b, _ := os.ReadFile(path)
+	lines := strings.Split(strings.TrimSpace(string(b)), "\n")
+	if l := strings.TrimSpace(printable(lines[len(lines)-1])); l != "" {
+		return l
+	}
+	return "no error was recorded"
 }
 
 type completionReq struct {

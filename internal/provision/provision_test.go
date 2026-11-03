@@ -1,14 +1,19 @@
 package provision
 
-import "testing"
+import (
+	"os"
+	"path/filepath"
+	"strings"
+	"testing"
+)
 
 func TestLlamaAsset(t *testing.T) {
 	tests := []struct {
 		goos, goarch string
 		want         string // asset name, "" = expect error
 	}{
-		{"linux", "amd64", "llama-" + llamaBuild + "-bin-ubuntu-x64.tar.gz"},
-		{"linux", "arm64", "llama-" + llamaBuild + "-bin-ubuntu-arm64.tar.gz"},
+		{"linux", "amd64", "llama-" + linuxBuild + "-bin-ubuntu-x64.tar.gz"},
+		{"linux", "arm64", "llama-" + linuxBuild + "-bin-ubuntu-arm64.tar.gz"},
 		{"darwin", "amd64", "llama-" + llamaBuild + "-bin-macos-x64.tar.gz"},
 		{"darwin", "arm64", "llama-" + llamaBuild + "-bin-macos-arm64.tar.gz"},
 		{"windows", "amd64", "llama-" + llamaBuild + "-bin-win-cpu-x64.zip"},
@@ -34,6 +39,35 @@ func TestLlamaAsset(t *testing.T) {
 		if len(a.SHA256) != 64 || a.Size <= 0 {
 			t.Errorf("%s/%s: incomplete pin: sha256 len %d, size %d", tt.goos, tt.goarch, len(a.SHA256), a.Size)
 		}
+		// The tar.gz entry prefix must equal the directory ServerPath uses,
+		// and the Linux rebuild comes from camne's release, not upstream's.
+		wantDir, wantRepo := "llama-"+llamaBuild, "ggml-org/llama.cpp"
+		if tt.goos == "linux" {
+			wantDir, wantRepo = "llama-"+linuxBuild, "officialdad/camne"
+		}
+		if a.dir() != wantDir {
+			t.Errorf("%s/%s: dir %q, want %q", tt.goos, tt.goarch, a.dir(), wantDir)
+		}
+		if !strings.HasPrefix(a.URL(), "https://github.com/"+wantRepo+"/releases/download/") || !strings.HasSuffix(a.URL(), "/"+a.Name) {
+			t.Errorf("%s/%s: URL %q, want a %s release asset", tt.goos, tt.goarch, a.URL(), wantRepo)
+		}
+	}
+}
+
+func TestRemoveOtherServers(t *testing.T) {
+	bin := t.TempDir()
+	current := filepath.Join(bin, "llama-"+linuxBuild, "llama-server")
+	old := filepath.Join(bin, "llama-"+llamaBuild, "llama-server")
+	for _, p := range []string{current, old} {
+		os.MkdirAll(filepath.Dir(p), 0o755)
+		os.WriteFile(p, []byte("x"), 0o755)
+	}
+	RemoveOtherServers(current)
+	if _, err := os.Stat(current); err != nil {
+		t.Errorf("current server removed: %v", err)
+	}
+	if _, err := os.Stat(filepath.Dir(old)); !os.IsNotExist(err) {
+		t.Errorf("old server directory still present: %v", err)
 	}
 }
 
