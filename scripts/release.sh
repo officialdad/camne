@@ -26,16 +26,33 @@ GOT=$("$BIN" --version)
 	exit 1
 }
 
-# --generate-notes builds "What's Changed" from the PRs merged since the
-# previous tag. --notes-file is PREPENDED above it as a fixed header carrying
-# what a changelog cannot know: how to install, how to verify, and what
-# happens on first run.
-#
 # Asset names must stay exactly as build.sh emits them — install.sh downloads
 # camne_${os}_${arch} and greps checksums.txt for " $BIN$".
-gh release create "$TAG" \
-	--title "camne ${TAG#v}" \
-	--verify-tag \
-	--generate-notes \
-	--notes-file .github/release-header.md \
-	dist/camne_* dist/checksums.txt
+#
+# release-please creates the tag and the release when the release PR is merged,
+# and that tag starts release.yml, which runs this script. In that case attach
+# the binaries to the existing release instead of creating a second one for the
+# same tag, and put the install header above release-please's changelog notes.
+#
+# A manually pushed tag has no release yet: --generate-notes builds "What's
+# Changed" from the PRs merged since the previous tag, and --notes-file is
+# PREPENDED above it as a fixed header carrying what a changelog cannot know:
+# how to install, how to verify, and what happens on first run.
+if gh release view "$TAG" >/dev/null 2>&1; then
+	NOTES="$(mktemp)"
+	{
+		cat .github/release-header.md
+		printf '\n'
+		gh release view "$TAG" --json body --jq .body
+	} > "$NOTES"
+	gh release edit "$TAG" --title "camne ${TAG#v}" --notes-file "$NOTES"
+	rm -f "$NOTES"
+	gh release upload "$TAG" dist/camne_* dist/checksums.txt --clobber
+else
+	gh release create "$TAG" \
+		--title "camne ${TAG#v}" \
+		--verify-tag \
+		--generate-notes \
+		--notes-file .github/release-header.md \
+		dist/camne_* dist/checksums.txt
+fi

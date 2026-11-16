@@ -1,0 +1,42 @@
+name: release-please
+
+# Every push to main keeps one open release PR: the next version, CHANGELOG.md
+# and the manifest. Merging it creates the vX.Y.Z tag and the GitHub release.
+#
+# The tag starts release.yml, which builds the six binaries. That needs a token
+# other than GITHUB_TOKEN: resources created with GITHUB_TOKEN start no
+# workflow, so the tag would publish nothing. RELEASE_APP_ID and
+# RELEASE_APP_PRIVATE_KEY belong to a GitHub App installed on this repository.
+on:
+  push:
+    branches: [main]
+
+# No job here needs more than a read of the repository. Every write goes
+# through the app token above, which carries the app's own permissions.
+permissions:
+  contents: read
+
+# Two runs at once would race on the release PR's branch.
+concurrency:
+  group: release-please
+  cancel-in-progress: false
+
+jobs:
+  release-please:
+    runs-on: ${{ fromJSON(vars.CI_RUNNER || '["self-hosted","Linux","X64"]') }}
+    timeout-minutes: 10
+    steps:
+      - name: Mint the release app token
+        id: app-token
+        uses: actions/create-github-app-token@64ab729a6294000f5aa4a4bc0b73d1f32bc45510 # v3.3.0
+        with:
+          app-id: ${{ secrets.RELEASE_APP_ID }}
+          private-key: ${{ secrets.RELEASE_APP_PRIVATE_KEY }}
+          owner: ${{ github.repository_owner }}
+
+      - name: Release PR, tag and release
+        uses: googleapis/release-please-action@45996ed1f6d02564a971a2fa1b5860e934307cf7 # v5.0.0
+        with:
+          token: ${{ steps.app-token.outputs.token }}
+          config-file: release-please-config.json
+          manifest-file: .release-please-manifest.json
