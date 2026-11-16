@@ -35,7 +35,7 @@ jobs:
           echo "TAG=$TAG" >> "$GITHUB_ENV"
           echo "UPSTREAM=${UPSTREAM%-noomp}" >> "$GITHUB_ENV"
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           repository: ggml-org/llama.cpp
           ref: ${{ env.UPSTREAM }}
@@ -87,7 +87,7 @@ jobs:
           cp LICENSE build/bin/
           tar -czf "$TAG-bin-ubuntu-${{ matrix.build }}.tar.gz" --transform "s,^\.,$TAG," -C build/bin .
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: ubuntu-${{ matrix.build }}
           path: ${{ env.TAG }}-bin-ubuntu-${{ matrix.build }}.tar.gz
@@ -98,7 +98,7 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           merge-multiple: true
       - name: Publish prerelease
